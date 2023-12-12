@@ -1,0 +1,9 @@
+{
+    "generator-hyperiot": {
+        "inner-project": true,
+        "project-type": "custom",
+        "projectName": "<%- projectName %>",
+        "projectGroupId": "<%- projectGroupId %>",
+        "projectVersion": "<%- projectVersion %>"
+    }
+}

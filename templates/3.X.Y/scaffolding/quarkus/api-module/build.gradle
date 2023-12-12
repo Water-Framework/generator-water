@@ -1,0 +1,18 @@
+dependencies {
+	//SLF4J
+    implementation group: 'org.slf4j', name: 'slf4j-api', version: project.slf4jVersion
+	//Water basic dependencies
+    implementation group: "it.water.core", name: "Core-api", version: project.waterVersion
+    implementation group: "it.water.core", name: "Core-model", version: project.waterVersion
+	implementation group: 'it.water.implementation', name: 'Implementation-spring', version: project.waterVersion
+}
+
+<% if(publishModule){ -%>
+publishing {
+    	publications {
+        	hyperiot(MavenPublication) {
+            	from components.java
+        	}
+    }
+ }
+ <% } -%>
