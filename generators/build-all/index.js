@@ -18,11 +18,6 @@ module.exports = class extends Generator {
         projectsName = super.getAllProjectsInWorkspace();
     }
 
-    checkDepCycles(){
-        let depCycleChecker = new DepCycleChecker();
-        depCycleChecker.checkDepCycles(true,this);
-    }
-
     install() {
         results = this.launchProjectsBuild(projectsName);
     }

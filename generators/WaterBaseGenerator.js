@@ -1,4 +1,5 @@
 let { AcsBaseGenerator } = require('acs-abstract-generator');
+const DepCycleChecker = require('./WaterDepCycleChecker.js');
 let fs = require('fs');
 let chalk = require('chalk');
 
@@ -213,6 +214,10 @@ module.exports = class extends AcsBaseGenerator {
             restorePreviousFolder = true;
             process.chdir(projectName);
         }
+        
+        let depCycleChecker = new DepCycleChecker();
+        depCycleChecker.checkDepCycles(true,this);
+
         let buildCommand = ["clean","build"] 
         buildResult = this.spawnCommandSync("gradle", [...buildCommand,"-x","test"]);
         

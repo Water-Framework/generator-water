@@ -1,5 +1,4 @@
 let Generator = require('../WaterBaseGenerator.js');
-const DepCycleChecker = require('../WaterDepCycleChecker.js');
 
 let projectsName = [];
 let results = {};
@@ -22,11 +21,6 @@ module.exports = class extends Generator {
             this.orderProjects(projectsName);
             done();
         });
-    }
-
-    checkDepCycles(){
-        let depCycleChecker = new DepCycleChecker();
-        depCycleChecker.checkDepCycles(true,this);
     }
 
     install() {

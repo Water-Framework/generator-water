@@ -1,33 +1,33 @@
 let Generator = require('../WaterBaseGenerator.js');
 const WaterStabilityMetricsCalculator = require('../WaterStabilityMetricsCalculator.js');
 
-let projectsName = [];
 module.exports = class extends Generator {
 
     constructor(args, opts) {
         super(args, opts);
+        this.projectsNames = [];
     }
 
 
     initializing() {
         this.composeWith(require.resolve('../app'), this.options);
-        this.mustBeInWorkspaceFolder();
     }
 
     prompting() {
         let done = this.async();
         this.showSelectProject().then((answers) => {
-            projectsName = answers.projectsToInstall;
-            this.orderProjects(projectsName);
+            this.projectsNames = answers.projectsToInstall;
+            this.orderProjects(this.projectsNames);
             done();
         });
     }
 
     calculateStabilityMetrics(){
+        this.log.info("Starting stability metrics calculation...")
         let waterStabilityMetricsCalculator = new WaterStabilityMetricsCalculator();
-        let stabilityJson = waterStabilityMetricsCalculator.stabilityMetrics(projectsName);
+        let stabilityJson = waterStabilityMetricsCalculator.stabilityMetrics(this.projectsNames,this);
         this.log(stabilityJson);
-        waterStabilityMetricsCalculator.stabilityMetricsInfo();
+        waterStabilityMetricsCalculator.stabilityMetricsInfo(this);
     }
     
 };

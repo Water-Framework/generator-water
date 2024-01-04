@@ -97,7 +97,7 @@ module.exports = class DepCycleChecker {
                         process.exit(-1);
                 }
 
-                generator.log.ok("No cycles found in your workspace depependencies, well done!");
+                generator.log.ok("No cycles found in your project depependencies, well done!");
             } else {
                 generator.log.info(chalk.bold.yellow("WARNING: Gradle \"depList\" task gradle not found. Dependency list metrics not available, please upgrade your workspace settings!"));
             }

@@ -13,7 +13,6 @@ module.exports = class extends Generator {
 
     initializing() {
         this.composeWith(require.resolve('../app'), this.options);
-        this.mustBeInWorkspaceFolder();
     }
 
     prompting() {

@@ -12,15 +12,10 @@ module.exports = class extends Generator {
 
     initializing() {
         this.composeWith(require.resolve('../app'), this.options);
-        this.mustBeInWorkspaceFolder();
     }
 
     prompting() {
         projectsName = super.getAllProjectsInWorkspace();
-    }
-
-    checkDepCycles(){
-        super.checkDepCycles(true);
     }
 
     install() {

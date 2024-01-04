@@ -1,38 +1,33 @@
-let { AcsBaseGenerator } = require('acs-abstract-generator');
 const { JavaClassVisitor } = require('acs-java-visitor');
-let fs = require('fs');
-let Graph = require("graph-data-structure");
+const DepCycleChecker = require('./WaterDepCycleChecker.js');
 const { parse } = require("java-parser");
 let chalk = require('chalk');
 let glob = require("glob")
 
-
 module.exports = class WaterStabilityMetricsCalculator {
 
-    constructor(args, opts) {
-        super(args, opts);
+    constructor() {
+
     }
 
-    stabilityMetrics(projects,generator) {
-        let projectsJson = generator.checkDepCycles(true);
-        let graph = projectsJson.dependenciesGraph;
-        let modulesFilter = (generator.options.filterModules) ? generator.options.filterModules.split(",") : null;
-        if (modulesFilter) {
-            generator.log.info("FILTERING only following modules:", generator.options.filterModules);
-        }
+    stabilityMetrics(projects, generator) {
+        let depCycleChecker = new DepCycleChecker();
         let stabilityJson = {};
         for (let projectIdx in projects) {
+            let currentDir = process.cwd();
+            process.chdir(currentDir+"/"+projects[projectIdx]);
+            let projectsJson = depCycleChecker.checkDepCycles(true, generator);
+            let graph = projectsJson.dependenciesGraph;
             let project = projects[projectIdx];
             for (let nodeIdx in graph.nodes()) {
                 let node = graph.nodes()[nodeIdx];
                 //package:project:version, taking the middle part
                 let projectName = node.substring(node.indexOf(":") + 1, node.lastIndexOf(":"));
                 let skip = projectName.endsWith("-test") || projectName.endsWith("-features") || projectName === project;
-                skip = skip || (modulesFilter && !modulesFilter.includes(projectName));
                 if (node.indexOf(":" + project) > 0 && !skip) {
                     let projectPath = projectsJson[node].path;
-                    this.stabilityMetricsI(node, graph.indegree(node), graph.outdegree(node), stabilityJson);
-                    this.stabilityMetricsA(node, projectPath, stabilityJson);
+                    this.stabilityMetricsI(generator,node, graph.indegree(node), graph.outdegree(node), stabilityJson);
+                    this.stabilityMetricsA(generator,node, projectPath, stabilityJson);
                     let metricI = stabilityJson[node].I;
                     let metricA = stabilityJson[node].A;
                     if (metricI <= 0.5) {
@@ -49,7 +44,9 @@ module.exports = class WaterStabilityMetricsCalculator {
                         }
                     }
                 }
-            }
+            }  
+            generator.log.info("....."+process.cwd())
+            process.chdir("../");
         }
         return stabilityJson;
     }
@@ -63,8 +60,7 @@ module.exports = class WaterStabilityMetricsCalculator {
         generator.log.info("*****************************************************************");
     }
 
-    stabilityMetricsA(project, projectPath, stabilityJson) {
-        let self = this;
+    stabilityMetricsA(generator,project, projectPath, stabilityJson) {
         let abstractCounter = 0;
         let interfaceCounter = 0;
         let childrenClassesCounter = 0;
@@ -73,8 +69,8 @@ module.exports = class WaterStabilityMetricsCalculator {
         }).forEach(file => {
             try {
                 let filePath = projectPath + "/" + file;
-                let javaClassContent = new String(self.readFile(filePath));
-                javaClassContent = self.formatJavaCode(javaClassContent);
+                let javaClassContent = new String(generator.readFile(filePath));
+                javaClassContent = generator.formatJavaCode(javaClassContent);
                 let cstLocalServiceTree = parse(javaClassContent);
                 let visitor = new JavaClassVisitor();
                 let result = {};
@@ -91,6 +87,7 @@ module.exports = class WaterStabilityMetricsCalculator {
                 generator.log.error(err);
             }
         });
+        
         if (!stabilityJson[project])
             stabilityJson[project] = {};
         stabilityJson[project].abstractClasses = (abstractCounter + interfaceCounter);
@@ -102,7 +99,7 @@ module.exports = class WaterStabilityMetricsCalculator {
 
     }
 
-    stabilityMetricsI(project, fanIn, fanOut, stabilityJson) {
+    stabilityMetricsI(generator,project, fanIn, fanOut, stabilityJson) {
         if (!stabilityJson[project])
             stabilityJson[project] = {};
         stabilityJson[project].fanIn = fanIn;
