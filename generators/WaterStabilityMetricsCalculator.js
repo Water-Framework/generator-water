@@ -1,8 +1,10 @@
 const { JavaClassVisitor } = require('acs-java-visitor');
-const DepCycleChecker = require('./WaterDepCycleChecker.js');
+const DepCycleChecker = require('./WaterDepCycleChecker.js')
 const { parse } = require("java-parser");
 let chalk = require('chalk');
 let glob = require("glob")
+
+
 
 module.exports = class WaterStabilityMetricsCalculator {
 
@@ -13,6 +15,7 @@ module.exports = class WaterStabilityMetricsCalculator {
     stabilityMetrics(projects, generator) {
         let depCycleChecker = new DepCycleChecker();
         let stabilityJson = {};
+        const scatterData = []
         for (let projectIdx in projects) {
             let currentDir = process.cwd();
             process.chdir(currentDir+"/"+projects[projectIdx]);
@@ -45,19 +48,19 @@ module.exports = class WaterStabilityMetricsCalculator {
                     }
                 }
             }  
-            generator.log.info("....."+process.cwd())
             process.chdir("../");
         }
+        console.table(stabilityJson);
         return stabilityJson;
     }
 
     stabilityMetricsInfo(generator) {
-        generator.log.info("*************** STABILITY METRICS INFO **************************");
-        generator.log.info(" It gives some insights about how component has been designed: model, util projects should not be considered in this metrics");
-        generator.log.info("- GOOD: The component is well designed and may not have problems");
-        generator.log.info("- Zone of pain: The component is higly stable (I) it means it is imported from many projects but it do not depends on other compoents BUT has few degree of abstraciton (A) it means that has few abstract classes respect of total number of classes");
-        generator.log.info("- Zone of uselessnes: The component is not stable (I) it means it is not used from other modules BUT has an high degree of abstraction, so it is useless. This value menas that the component is useless inside this current workspace, but it may be imported outside. So this value should not be considered always in a negative way.");
-        generator.log.info("*****************************************************************");
+        console.log("***************************** STABILITY METRICS INFO *****************************\n");
+        console.log(chalk.italic(" It gives some insights about how component has been designed: model, util projects should not be considered in this metrics: \n"));
+        console.log("- "+chalk.bold.green("GOOD")+": The component is well designed and may not have problems\n");
+        console.log("- "+chalk.bold.yellow("Zone of pain")+": The component is higly stable (I) it means it is imported from many projects but it do not depends on other compoents BUT has few degree of abstraciton (A) it means that has few abstract classes respect of total number of classes\n");
+        console.log("- "+chalk.bold.red("Zone of uselessnes")+": The component is not stable (I) it means it is not used from other modules BUT has an high degree of abstraction, so it is useless. This value menas that the component is useless inside this current workspace, but it may be imported outside. So this value should not be considered always in a negative way.\n");
+        console.log("***********************************************************************************");
     }
 
     stabilityMetricsA(generator,project, projectPath, stabilityJson) {
@@ -93,7 +96,7 @@ module.exports = class WaterStabilityMetricsCalculator {
         stabilityJson[project].abstractClasses = (abstractCounter + interfaceCounter);
         stabilityJson[project].totalClasses = (abstractCounter + interfaceCounter + childrenClassesCounter);
         if (stabilityJson[project].totalClasses === 0)
-            stabilityJson[project].A = null;
+            stabilityJson[project].A = 0;
         else
             stabilityJson[project].A = parseFloat((stabilityJson[project].abstractClasses / stabilityJson[project].totalClasses).toFixed(2));
 

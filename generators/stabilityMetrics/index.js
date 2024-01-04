@@ -25,8 +25,7 @@ module.exports = class extends Generator {
     calculateStabilityMetrics(){
         this.log.info("Starting stability metrics calculation...")
         let waterStabilityMetricsCalculator = new WaterStabilityMetricsCalculator();
-        let stabilityJson = waterStabilityMetricsCalculator.stabilityMetrics(this.projectsNames,this);
-        this.log(stabilityJson);
+        waterStabilityMetricsCalculator.stabilityMetrics(this.projectsNames,this);
         waterStabilityMetricsCalculator.stabilityMetricsInfo(this);
     }
     
