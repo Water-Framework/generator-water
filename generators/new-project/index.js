@@ -109,7 +109,7 @@ module.exports = class extends Generator {
             message: 'Would you like to use water repository instead of spring classic repositories?',
             default: false,
             when: function (answer) {
-                return answer.projectTechnology === 'spring' &&  answer.applicationType === 'entity';
+                return answer.projectTechnology === 'spring' && answer.applicationType === 'entity';
             }
         },
         {
@@ -129,6 +129,35 @@ module.exports = class extends Generator {
             name: 'publishModule',
             message: 'Project should be deployed to remote maven repository ?',
             default: false
+        },
+        {
+            type: 'input',
+            name: 'publishRepoName',
+            message: 'Please insert publish repo symbolic name ?',
+            default: "My Repository",
+            when: function (answers) {
+                return answers.publishModule == true;
+            }
+        },
+        {
+            type: 'input',
+            name: 'publishRepoUrl',
+            message: 'Please insert publish repo URL ?',
+            default: "https://myrepo/m2",
+            when: function (answers) {
+                return answers.publishModule == true;
+            }
+
+        },
+        {
+            type: 'confirm',
+            name: 'publishRepoHasCredentials',
+            message: 'Repository requires authentication?',
+            default: false,
+            when: function (answers) {
+                return answers.publishModule == true;
+            }
+
         }
         ]).then((answers) => {
             let initialName = answers.projectName;
@@ -139,7 +168,7 @@ module.exports = class extends Generator {
             for (let i = 0; i < projectNameSplits.length; i++) {
                 camelizedName = camelizedName + this.capitalizeFirstLetter(this.camelize(projectNameSplits[i]));
             }
-            this.log.info("Project Name is: "+initialName+" camelized: "+camelizedName);
+            this.log.info("Project Name is: " + initialName + " camelized: " + camelizedName);
             this.projectName = this.capitalizeFirstLetter(this.camelize(this.capitalizeFirstLetter(camelizedName)));
             this.projectSuffix = this.lowerizeFirstLetter(camelizedName);
             this.projectSuffixUpperCase = this.capitalizeFirstLetter(this.camelize(camelizedName));
@@ -161,7 +190,7 @@ module.exports = class extends Generator {
 
             let sourceFolderBasicPath = "/src/main/java/";
             let testFolderBasicPath = "/src/test/java/"
-            let basePackage =  sourceFolderBasicPath + basePackageArr.join("/");
+            let basePackage = sourceFolderBasicPath + basePackageArr.join("/");
             let baseTestPackage = testFolderBasicPath + basePackageArr.join("/");;
 
             this.apiPackagePath = basePackage + "/api";
@@ -171,8 +200,9 @@ module.exports = class extends Generator {
             this.servicePackagePath = basePackage + "/service";
             this.serviceRestPackagePath = basePackage + "/service/rest";
 
-            this.parentProjectPath = "modules/" + this.projectName;
+            this.parentProjectPath = this.projectName;
             this.projectApiPath = this.parentProjectPath + "/" + this.projectName + "-api";
+            this.projectModelPath = this.parentProjectPath + "/" + this.projectName + "-model";
             this.projectConf = {
                 applicationTypeEntity: this.applicationTypeEntity,
                 applicationType: answers.applicationType,
@@ -188,22 +218,25 @@ module.exports = class extends Generator {
                 hasModel: this.hasModel,
                 projectPath: this.projectName,
                 projectApiPath: this.projectApiPath,
+                projectModelPath: this.projectModelPath,
                 projectParentPath: this.parentProjectPath,
                 apiPackagePath: this.apiPackagePath,
-                apiPackage: this.apiPackagePath.replace(sourceFolderBasicPath,"").split("/").join("."),
+                apiPackage: this.apiPackagePath.replace(sourceFolderBasicPath, "").split("/").join("."),
                 actionsPackagePath: this.actionsPackagePath,
-                actionsPackage: this.actionsPackagePath.replace(sourceFolderBasicPath,"").split("/").join("."),
+                actionsPackage: this.actionsPackagePath.replace(sourceFolderBasicPath, "").split("/").join("."),
                 modelPackagePath: this.modelPackagePath,
-                modelPackage: this.modelPackagePath.replace(sourceFolderBasicPath,"").split("/").join("."),
+                modelPackage: this.modelPackagePath.replace(sourceFolderBasicPath, "").split("/").join("."),
                 repositoryPackagePath: this.repositoryPackagePath,
-                repositoryPackage: this.repositoryPackagePath.replace(sourceFolderBasicPath,"").split("/").join("."),
+                repositoryPackage: this.repositoryPackagePath.replace(sourceFolderBasicPath, "").split("/").join("."),
                 servicePackagePath: this.servicePackagePath,
-                servicePackage: this.servicePackagePath.replace(sourceFolderBasicPath,"").split("/").join("."),
+                servicePackage: this.servicePackagePath.replace(sourceFolderBasicPath, "").split("/").join("."),
                 serviceRestPackagePath: this.serviceRestPackagePath,
-                serviceRestPackage: this.serviceRestPackagePath.replace(sourceFolderBasicPath,"").split("/").join("."),
-                testPackage: baseTestPackage.replace(testFolderBasicPath,"").split("/").join("."),
+                serviceRestPackage: this.serviceRestPackagePath.replace(sourceFolderBasicPath, "").split("/").join("."),
+                testPackage: baseTestPackage.replace(testFolderBasicPath, "").split("/").join("."),
                 publishModule: answers.publishModule,
-                publishRepoHasCredentials: super.publicRepoDeifinedAndRequiredCredentials()
+                publishRepoName: answers.publishRepoName,
+                publishRepoUrl: answers.publishRepoUrl,
+                publishRepoHasCredentials: answers.publishRepoHasCredentials
             };
             super.setProjectConfiguration(this.projectName, this.projectConf);
             done();
@@ -219,6 +252,10 @@ module.exports = class extends Generator {
         this.log.info(chalk.bold.yellow("Creating Parent " + this.parentProjectPath + " Project"));
         this.fs.copyTpl(templatePath + "/gitignore", this.destinationPath(this.parentProjectPath + "/.gitignore"), this.projectConf);
         this.fs.copyTpl(templatePath + "/build.gradle", this.destinationPath(this.parentProjectPath + "/build.gradle"), this.projectConf);
+        this.fs.copyTpl(templatePath + "/gradle.properties", this.destinationPath(this.parentProjectPath + "/gradle.properties"), this.projectConf);
+        this.fs.copyTpl(templatePath + "/License.md", this.destinationPath(this.parentProjectPath + "/License.md"), this.projectConf);
+        this.fs.copyTpl(templatePath + "/settings.gradle", this.destinationPath(this.parentProjectPath + "/settings.gradle"), this.projectConf);
+        this.fs.copyTpl(templatePath + "/README.md", this.destinationPath(this.parentProjectPath + "/README.md"), this.projectConf);
         let parentProjectConf = this.projectConf;
         parentProjectConf["parent-project"] = true;
         this.fs.copyTpl(templatePath + "/.yo-rc.json", this.destinationPath(this.parentProjectPath + "/.yo-rc.json"), {
@@ -227,8 +264,12 @@ module.exports = class extends Generator {
         this.log.ok("Parent Project created succesfully!");
     }
 
+    generateModelProject(){
+        super.generateModelProject(this.destinationPath(this.projectModelPath), this.projectConf); 
+    }
+
     generateApiProject() {
-        super.generateApiProject(this.destinationPath(this.projectApiPath),this.projectConf);
+        super.generateApiProject(this.destinationPath(this.projectApiPath), this.projectConf);
     }
 
     generateProject() {

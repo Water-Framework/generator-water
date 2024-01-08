@@ -12,5 +12,5 @@ out/*
 */out/*
 gradlew
 gradlew.bat
-gradle
+/gradle
 .gradle

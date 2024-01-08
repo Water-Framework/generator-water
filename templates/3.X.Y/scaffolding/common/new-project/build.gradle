@@ -1,13 +1,13 @@
 allprojects {
-<% if(publishRepo) { %>
+<% if(publishModule) { -%>
     project.ext.publishRepoName = "<%- publishRepoName %>"
     project.ext.publishRepoUrl =  "<%- publishRepoUrl %>"
-  <% if(publishHasCredentials) { %>
-    project.ext.publishRepoUsername =  System.getProperty("publishRepoUsername","noUser")
+<% if(publishRepoHasCredentials) { -%>
+	project.ext.publishRepoUsername =  System.getProperty("publishRepoUsername","noUser")
     project.ext.publishRepoPassword =  System.getProperty("publishRepoPassword","noPassword")
-  	<%} %>
+<%  } -%>
 <% } -%>
-	project.ext.<%- projectName %>Version = '<%- projectVersion %>' 
+    project.ext.<%- projectName %>Version = '<%- projectVersion %>' 
     group '<%- projectGroupId %>'
 	version project.<%- projectName %>Version
     repositories{
@@ -16,44 +16,42 @@ allprojects {
       maven {
          url "https://plugins.gradle.org/m2/"
       }
- 	<% if(publishModule){ -%>
-	maven {
+<% if(publishModule){ -%>
+	  maven {
         <% if(publishRepoHasCredentials){ %>
-		credentials {
+		 credentials {
 			username project.publishRepoUsername
 			password project.publishRepoPassword
-		}
+		 }
 		<% } -%>
-
-		name = project.publishRepoName
-		url = project.publishRepoUrl
+	  name = project.publishRepoName
+	  url = project.publishRepoUrl
       }
-	<% } -%>
+<% } -%>
 	}
 	
 	apply plugin: 'java'
-	<% if(publishModule){ -%>
+<% if(publishModule){ -%>
 	apply plugin: 'maven-publish'
-	<% } -%>
+<% } -%>
 	apply plugin: 'jacoco'
 	
-	<% if(publishModule){ -%>
+<% if(publishModule){ -%>
 	publishing {
 		repositories {
 			maven {
-				<% if(publishRepoHasCredentials){ %>
+				<% if(publishRepoHasCredentials){ -%>
 				credentials {
 					username project.publishRepoUsername
 					password project.publishRepoPassword
 				}
 				<% } -%>
-
 				name = project.publishRepoName
 				url = project.publishRepoUrl
 			}
 		}
 	}
-	<% } -%>
+<% } -%>
 
 }
 
