@@ -148,14 +148,15 @@ module.exports = class extends AcsBaseGenerator {
     generateModelProject(destFolder,projectConf) {
         this.log.info(chalk.bold.yellow("Creating Model module..."));
         this.createBasicProjectFiles(destFolder,projectConf);
-        let modelTemplatePath = this.getWaterTemplatePath(this.waterVersion)+"/scaffolding/common/model-module/";
+        let modelTemplatePath = this.getWaterTemplatePath(this.waterVersion)+"/scaffolding/common/model-module";
         this.log.info("Model Common Template path is: "+modelTemplatePath)
-        let technologyTemplatePath = this.getWaterTemplatePath(this.waterVersion)+"/scaffolding/"+projectConf.projectTechnology+"/model-module/";
+        let technologyTemplatePath = this.getWaterTemplatePath(this.waterVersion)+"/scaffolding/"+projectConf.projectTechnology+"/model-module";
         this.log.info("Technology Template path is: "+technologyTemplatePath+" \n destination path: "+this.destinationPath(projectConf.projectModelPath))
+        this.fs.copyTpl(modelTemplatePath, this.destinationPath(projectConf.projectModelPath), projectConf);
         this.fs.copyTpl(modelTemplatePath+"/.yo-rc.json", this.destinationPath(projectConf.projectModelPath)+"/.yo-rc.json", projectConf);
         if (projectConf.applicationTypeEntity) {
             this.log.info("Creating Entity ...")
-            this._private_generateClassFile(modelTemplatePath + "src/main/java/.package/Entity.java", this.destinationPath(projectConf.projectModelPath + "/" + projectConf.modelPackagePath + "/" + projectConf.projectSuffixUpperCase + ".java"), projectConf);
+            this.fs.copyTpl(modelTemplatePath + "/src/main/java/.package/Entity.java", this.destinationPath(projectConf.projectModelPath + "/" + projectConf.modelPackagePath + "/" + projectConf.projectSuffixUpperCase + ".java"), projectConf);
         }
         this.log.ok("Model Project created succesfully!");
     }
@@ -163,23 +164,59 @@ module.exports = class extends AcsBaseGenerator {
     generateApiProject(destFolder,projectConf) {
         this.log.info(chalk.bold.yellow("Creating Api module..."));
         this.createBasicProjectFiles(destFolder,projectConf);
-        let apiTemplatePath = this.getWaterTemplatePath(this.waterVersion)+"/scaffolding/common/api-module/";
+        let apiTemplatePath = this.getWaterTemplatePath(this.waterVersion)+"/scaffolding/common/api-module";
         this.log.info("Api Common Template path is: "+apiTemplatePath)
-        let technologyTemplatePath = this.getWaterTemplatePath(this.waterVersion)+"/scaffolding/"+projectConf.projectTechnology+"/api-module/";
+        let technologyTemplatePath = this.getWaterTemplatePath(this.waterVersion)+"/scaffolding/"+projectConf.projectTechnology+"/api-module";
         this.log.info("Technology Template path is: "+technologyTemplatePath+" \n destination path: "+this.destinationPath(projectConf.projectApiPath))
+        this.fs.copyTpl(apiTemplatePath, this.destinationPath(projectConf.projectApiPath), projectConf);
         this.fs.copyTpl(apiTemplatePath+"/.yo-rc.json", this.destinationPath(projectConf.projectApiPath)+"/.yo-rc.json", projectConf);
         if (projectConf.applicationTypeEntity) {
             this.log.info("Creating Entity Api...")
-            this._private_generateClassFile(apiTemplatePath + "src/main/java/.package/EntityApi.java", this.destinationPath(projectConf.projectApiPath + "/" + projectConf.apiPackagePath + "/" + projectConf.projectSuffixUpperCase + "Api.java"), projectConf);
+            this.fs.copyTpl(apiTemplatePath + "/src/main/java/.package/EntityApi.java", this.destinationPath(projectConf.projectApiPath + "/" + projectConf.apiPackagePath + "/" + projectConf.projectSuffixUpperCase + "Api.java"), projectConf);
             this.log.info("Creating Entity System Api...")
-            this._private_generateClassFile(apiTemplatePath + "src/main/java/.package/SystemEntityApi.java", this.destinationPath(projectConf.projectApiPath + "/" + projectConf.apiPackagePath + "/" + projectConf.projectSuffixUpperCase + "SystemApi.java"), projectConf);
+            this.fs.copyTpl(apiTemplatePath + "/src/main/java/.package/SystemEntityApi.java", this.destinationPath(projectConf.projectApiPath + "/" + projectConf.apiPackagePath + "/" + projectConf.projectSuffixUpperCase + "SystemApi.java"), projectConf);
             this.log.info("Creating Repository Interface...")
-            this._private_generateClassFile(apiTemplatePath + "src/main/java/.package/RepoInterface.java", this.destinationPath(projectConf.projectApiPath + "/" + projectConf.apiPackagePath + "/" + projectConf.projectSuffixUpperCase + "Repository.java"), projectConf);    
+            this.fs.copyTpl(apiTemplatePath + "/src/main/java/.package/RepoInterface.java", this.destinationPath(projectConf.projectApiPath + "/" + projectConf.apiPackagePath + "/" + projectConf.projectSuffixUpperCase + "Repository.java"), projectConf);    
         } else {
-            this._private_generateClassFile(apiTemplatePath + "src/main/java/.package/ServiceApi.java", this.destinationPath(projectConf.projectApiPath + "/" + projectConf.apiPackagePath + "/" + projectConf.projectSuffixUpperCase + "Api.java"), projectConf);
-            this._private_generateClassFile(apiTemplatePath + "src/main/java/.package/SystemServiceApi.java", this.destinationPath(projectConf.projectApiPath + "/" + projectConf.apiPackagePath + "/" + projectConf.projectSuffixUpperCase + "SystemApi.java"), projectConf);
+            this.fs.copyTpl(apiTemplatePath + "/src/main/java/.package/ServiceApi.java", this.destinationPath(projectConf.projectApiPath + "/" + projectConf.apiPackagePath + "/" + projectConf.projectSuffixUpperCase + "Api.java"), projectConf);
+            this.fs.copyTpl(apiTemplatePath + "/src/main/java/.package/SystemServiceApi.java", this.destinationPath(projectConf.projectApiPath + "/" + projectConf.apiPackagePath + "/" + projectConf.projectSuffixUpperCase + "SystemApi.java"), projectConf);
         }
         this.log.ok("Api Project created succesfully!");
+    }
+
+    generateServiceProject(destFolder,projectConf) {
+        this.log.info(chalk.bold.yellow("Creating Service module..."));
+        this.createBasicProjectFiles(destFolder,projectConf);
+        let serviceTemplatePath = this.getWaterTemplatePath(this.waterVersion)+"/scaffolding/common/service-module";
+        this.log.info("Service Common Template path is: "+serviceTemplatePath)
+        let technologyTemplatePath = this.getWaterTemplatePath(this.waterVersion)+"/scaffolding/"+projectConf.projectTechnology+"/service-module";
+        this.log.info("Technology Template path is: "+technologyTemplatePath+" \n destination path: "+this.destinationPath(projectConf.projectServicePath))
+        this.fs.copyTpl(serviceTemplatePath, this.destinationPath(projectConf.projectServicePath), projectConf);
+        this.fs.copyTpl(serviceTemplatePath+"/.yo-rc.json", this.destinationPath(projectConf.projectServicePath)+"/.yo-rc.json", projectConf);
+        if (projectConf.applicationTypeEntity) {
+            this.log.info("Creating Persistence Layer...")
+            if(!projectConf.automaticRepositories){
+                this.log.info("Creating repositories implementation...");
+                this.fs.copyTpl(serviceTemplatePath+"/src/main/java/.repository_package/RepositoryImpl.java", this.destinationPath(projectConf.projectServicePath)+projectConf.repositoryPackagePath+"/"+projectConf.projectSuffixUpperCase+"RepositoryImpl.java", projectConf);
+            } else {
+                this.log.info("Skipping creation of repository implementation, using defaults...")
+            }
+        }
+
+        this.log.info("Creating Api Layer...")
+        this.fs.copyTpl(serviceTemplatePath+"/src/main/java/.service_package/ApiImpl.java", this.destinationPath(projectConf.projectServicePath)+projectConf.servicePackagePath+"/"+projectConf.projectSuffixUpperCase+"ServiceImpl.java", projectConf);
+        this.fs.copyTpl(serviceTemplatePath+"/src/main/java/.service_package/SystemApiImpl.java", this.destinationPath(projectConf.projectServicePath)+projectConf.servicePackagePath+"/"+projectConf.projectSuffixUpperCase+"SystemServiceImpl.java", projectConf);
+
+        if (projectConf.hasActions) {
+            this.log.info("Creating Actions Layer...")
+        }
+        
+        if (projectConf.hasRestServices) {
+            this.log.info("Creating Rest Layer...")
+            
+        }
+
+        this.log.ok("Service module created succesfully!");
     }
 
     launchProjectsBuild(projectsName) {
@@ -243,7 +280,9 @@ module.exports = class extends AcsBaseGenerator {
         }
 
         if (buildResult.status === 0) {
-            this.spawnCommandSync("gradle", ["publishToMavenLocal"]);
+            if(this.config.get("projectsConfiguration")[projectName].publishModule == true){
+                this.spawnCommandSync("gradle", ["publishToMavenLocal"]);
+            }
             this.log.ok("Build of " + projectName + " completed succesfully");
         } else {
             this.log.error("Build of " + projectName + " completed with errors");

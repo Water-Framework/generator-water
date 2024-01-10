@@ -104,6 +104,55 @@ module.exports = class extends Generator {
             }
         },
         {
+            type: 'list',
+            name: 'persistenceLib',
+            message: 'Which persistence api does your application support?',
+            default: false,
+            when: function (answer) {
+                return answer.applicationType === 'entity';
+            },
+            default: function(){
+                return "javax";
+            },
+            choices: [
+                {
+                    name: "javax ",
+                    value: "javax"
+                }, {
+                    name: "jakarta",
+                    value: "jakarta"
+                }]
+        },
+        {
+            type: 'list',
+            name: 'validationLib',
+            message: 'Which validation api does your application support?',
+            default: false,
+            default: function(){
+                return "javax";
+            },
+            choices: [
+                {
+                    name: "javax",
+                    value: "javax"
+                }, {
+                    name: "jakarta",
+                    value: "jakarta"
+                }]
+        },
+        {
+            type: 'confirm',
+            name: 'automaticRepositories',
+            message: 'Would you like to use default implementation for CRUD repositories (only interfaces will be generated)?',
+            default: false,
+            when: function (answer) {
+                return answer.applicationType === 'entity';
+            },
+            default: function(){
+                return true;
+            }
+        },
+        {
             type: 'confirm',
             name: 'springRepository',
             message: 'Would you like to use water repository instead of spring classic repositories?',
@@ -203,6 +252,8 @@ module.exports = class extends Generator {
             this.parentProjectPath = this.projectName;
             this.projectApiPath = this.parentProjectPath + "/" + this.projectName + "-api";
             this.projectModelPath = this.parentProjectPath + "/" + this.projectName + "-model";
+            this.projectServicePath = this.parentProjectPath + "/" + this.projectName + "-service";
+            
             this.projectConf = {
                 applicationTypeEntity: this.applicationTypeEntity,
                 applicationType: answers.applicationType,
@@ -216,9 +267,13 @@ module.exports = class extends Generator {
                 hasRestServices: this.hasRestServices,
                 hasActions: this.hasActions,
                 hasModel: this.hasModel,
+                automaticRepositories:answers.automaticRepositories,
+                persistenceLib:answers.persistenceLib,
+                validationLib:answers.validationLib,
                 projectPath: this.projectName,
                 projectApiPath: this.projectApiPath,
                 projectModelPath: this.projectModelPath,
+                projectServicePath: this.projectServicePath,
                 projectParentPath: this.parentProjectPath,
                 apiPackagePath: this.apiPackagePath,
                 apiPackage: this.apiPackagePath.replace(sourceFolderBasicPath, "").split("/").join("."),
@@ -272,8 +327,8 @@ module.exports = class extends Generator {
         super.generateApiProject(this.destinationPath(this.projectApiPath), this.projectConf);
     }
 
-    generateProject() {
-        //TODO generate project
+    generateServiceProject() {
+        super.generateServiceProject(this.destinationPath(this.projectServicePath), this.projectConf);
     }
 
     end() {
