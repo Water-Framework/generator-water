@@ -181,6 +181,12 @@ module.exports = class extends AcsBaseGenerator {
             this.fs.copyTpl(apiTemplatePath + "/src/main/java/.package/ServiceApi.java", this.destinationPath(projectConf.projectApiPath + "/" + projectConf.apiPackagePath + "/" + projectConf.projectSuffixUpperCase + "Api.java"), projectConf);
             this.fs.copyTpl(apiTemplatePath + "/src/main/java/.package/SystemServiceApi.java", this.destinationPath(projectConf.projectApiPath + "/" + projectConf.apiPackagePath + "/" + projectConf.projectSuffixUpperCase + "SystemApi.java"), projectConf);
         }
+
+        if(projectConf.hasRestServices){
+            this.log.info("Creating Rest Api Interface...")
+            this.fs.copyTpl(apiTemplatePath+"/src/main/java/.package/RestApi.java", this.destinationPath(projectConf.projectApiPath)+projectConf.apiPackagePath+"/rest/"+projectConf.projectSuffixUpperCase+"RestApi.java", projectConf);
+        }
+
         this.log.ok("Api Project created succesfully!");
     }
 
@@ -195,12 +201,8 @@ module.exports = class extends AcsBaseGenerator {
         this.fs.copyTpl(serviceTemplatePath+"/.yo-rc.json", this.destinationPath(projectConf.projectServicePath)+"/.yo-rc.json", projectConf);
         if (projectConf.applicationTypeEntity) {
             this.log.info("Creating Persistence Layer...")
-            if(!projectConf.automaticRepositories){
-                this.log.info("Creating repositories implementation...");
-                this.fs.copyTpl(serviceTemplatePath+"/src/main/java/.repository_package/RepositoryImpl.java", this.destinationPath(projectConf.projectServicePath)+projectConf.repositoryPackagePath+"/"+projectConf.projectSuffixUpperCase+"RepositoryImpl.java", projectConf);
-            } else {
-                this.log.info("Skipping creation of repository implementation, using defaults...")
-            }
+            this.log.info("Creating repositories implementation...");
+            this.fs.copyTpl(serviceTemplatePath+"/src/main/java/.repository_package/RepositoryImpl.java", this.destinationPath(projectConf.projectServicePath)+projectConf.repositoryPackagePath+"/"+projectConf.projectSuffixUpperCase+"RepositoryImpl.java", projectConf);
         }
 
         this.log.info("Creating Api Layer...")
@@ -208,14 +210,19 @@ module.exports = class extends AcsBaseGenerator {
         this.fs.copyTpl(serviceTemplatePath+"/src/main/java/.service_package/SystemApiImpl.java", this.destinationPath(projectConf.projectServicePath)+projectConf.servicePackagePath+"/"+projectConf.projectSuffixUpperCase+"SystemServiceImpl.java", projectConf);
 
         if (projectConf.hasActions) {
-            this.log.info("Creating Actions Layer...")
+            this.log.info("Creating Permission Layer...")
         }
         
         if (projectConf.hasRestServices) {
             this.log.info("Creating Rest Layer...")
+            this.fs.copyTpl(serviceTemplatePath+"/src/main/java/.service_rest_package/RestControllerImpl.java", this.destinationPath(projectConf.projectServicePath)+projectConf.serviceRestPackagePath+"/"+projectConf.projectSuffixUpperCase+"RestControllerImpl.java", projectConf);
             
         }
 
+        this.log.info("Creating Tests...")
+        this.fs.copyTpl(serviceTemplatePath+"/src/test/java/.package/TestApi.java", this.destinationPath(projectConf.projectServicePath)+projectConf.projectTestPath+"/"+projectConf.projectSuffixUpperCase+"ApiTest.java", projectConf);
+        this.fs.copyTpl(serviceTemplatePath+"/src/test/java/.package/TestRestApi.java", this.destinationPath(projectConf.projectServicePath)+projectConf.projectTestPath+"/"+projectConf.projectSuffixUpperCase+"RestApiTest.java", projectConf);
+        
         this.log.ok("Service module created succesfully!");
     }
 

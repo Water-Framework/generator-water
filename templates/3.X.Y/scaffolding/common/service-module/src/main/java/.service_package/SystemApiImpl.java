@@ -31,6 +31,8 @@ public class <%- projectSuffixUpperCase %>SystemServiceImpl extends EntitySystem
     }
 
     //todo: add custom logic here...
-    //use getLog to retrieve Logger instance automatically instantiated for this class
+
+    //1. use getLog to retrieve Logger instance automatically instantiated for this class
+    //2. Use componentFilterBuilder, if needed, in order to create filters to retrieve components from the service registry
 
 }

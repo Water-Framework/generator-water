@@ -140,7 +140,7 @@ module.exports = class extends Generator {
                     value: "jakarta"
                 }]
         },
-        {
+        /*{
             type: 'confirm',
             name: 'automaticRepositories',
             message: 'Would you like to use default implementation for CRUD repositories (only interfaces will be generated)?',
@@ -151,7 +151,7 @@ module.exports = class extends Generator {
             default: function(){
                 return true;
             }
-        },
+        },*/
         {
             type: 'confirm',
             name: 'springRepository',
@@ -267,7 +267,6 @@ module.exports = class extends Generator {
                 hasRestServices: this.hasRestServices,
                 hasActions: this.hasActions,
                 hasModel: this.hasModel,
-                automaticRepositories:answers.automaticRepositories,
                 persistenceLib:answers.persistenceLib,
                 validationLib:answers.validationLib,
                 projectPath: this.projectName,
@@ -275,6 +274,7 @@ module.exports = class extends Generator {
                 projectModelPath: this.projectModelPath,
                 projectServicePath: this.projectServicePath,
                 projectParentPath: this.parentProjectPath,
+                projectTestPath: baseTestPackage,
                 apiPackagePath: this.apiPackagePath,
                 apiPackage: this.apiPackagePath.replace(sourceFolderBasicPath, "").split("/").join("."),
                 actionsPackagePath: this.actionsPackagePath,

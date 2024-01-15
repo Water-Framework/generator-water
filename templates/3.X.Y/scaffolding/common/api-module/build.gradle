@@ -23,6 +23,10 @@ dependencies {
 	implementation 'it.water.repository.jpa:JpaRepository-jakarta:'+project.waterVersion
 	<% } -%>
 <% } -%>
+<% if(hasRestServices){ -%>
+	// https://mvnrepository.com/artifact/io.swagger/swagger-jaxrs
+    implementation group: 'io.swagger', name: 'swagger-jaxrs', version: project.swaggerJaxRsVersion
+<% } -%>
 }
 
 <% if(publishModule){ -%>

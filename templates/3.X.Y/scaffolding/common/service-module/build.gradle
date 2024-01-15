@@ -53,10 +53,15 @@ dependencies {
     implementation group: 'it.water.core', name: 'Core-validation', version: project.waterVersion
 <%if(hasRestServices) {-%>
 	//Rest Water Deps
-	//implementation group: 'it.water.core.rest', name: 'Rest-api', version: project.waterVersion
-	//implementation group: 'it.water.core.rest', name: 'Rest-security', version: project.waterVersion
-	//implementation group: 'it.water.core.rest', name: 'Rest-service', version: project.waterVersion
-	//implementation group: 'it.water.core.rest', name: 'Rest-jaxrs-api', version: project.waterVersion
+	implementation group: 'it.water.service.rest', name: 'Rest-api', version: project.waterVersion
+	implementation group: 'it.water.service.rest', name: 'Rest-security', version: project.waterVersion
+	implementation group: 'it.water.service.rest', name: 'Rest-service', version: project.waterVersion
+	implementation group: 'it.water.service.rest', name: 'Rest-jaxrs-api', version: project.waterVersion
+<% 		if(applicationTypeEntity){ -%>
+	implementation group: 'it.water.service.rest', name: 'Rest-persistence', version: project.waterVersion
+<% 		} -%>
+	// https://mvnrepository.com/artifact/io.swagger/swagger-jaxrs
+    implementation group: 'io.swagger', name: 'swagger-jaxrs', version: project.swaggerJaxRsVersion
 <%} -%>
 
 	implementation project (":<%-projectName%>-api")
@@ -71,8 +76,25 @@ dependencies {
 	testImplementation 'org.junit.jupiter:junit-jupiter-engine:' + project.junitJupiterVersion
 	testImplementation 'org.atteo.classindex:classindex:' + project.atteoClassIndexVersion
 <%if(applicationTypeEntity) {-%>	
+	//for testing purpose we use hibernate as persistence provider
+    testImplementation 'org.hibernate:hibernate-core:'+project.hibernateVersion
 	testImplementation 'org.hsqldb:hsqldb:2.4.1'
 <%} -%>
+<%if(hasRestServices) {-%>	
+	testImplementation group: 'it.water.service.rest', name: 'Rest-api-manager-apache-cxf', version: project.waterVersion
+	//Using jetty and apache cxf (jaxrs compliant framework) for testing 
+	testImplementation group: 'org.reflections', name: 'reflections', version: '0.10.2'
+	testImplementation group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.13'
+	testImplementation group: 'org.apache.cxf', name: 'cxf-rt-transports-http-jetty', version: project.cxfVersion
+	testImplementation group: 'org.springframework', name: 'spring-web', version: '5.3.22'
+	testImplementation group: 'org.springframework', name: 'spring-context', version: '5.3.22'
+	//with 9.4.4 tests won't work because of the integration between cxf and jetty outside karaf context
+	testImplementation group: 'org.eclipse.jetty', name: 'jetty-servlet', version: '9.4.49.v20220914'
+<%} -%>
+}
+
+test {
+	useJUnitPlatform()
 }
 
 <% if(publishModule){ -%>

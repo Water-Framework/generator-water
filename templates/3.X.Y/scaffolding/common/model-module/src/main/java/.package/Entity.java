@@ -12,25 +12,34 @@ import <%-persistenceLib%>.persistence.Entity;
  * <%- projectSuffixUpperCase %> Entity Class.
  *
  */
+//JPA
 @Entity
 @Access(AccessType.FIELD)
+//Lombok
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Data
+@RequiredArgsConstructor
 @Getter
-@Setter
 @ToString
+@EqualsAndHashCode(of = {"id","exampleField"/*todo add more fields for equals and hashcode, remember hashcode and equals are key methods for ORMs*/})
 public class <%- projectSuffixUpperCase %> extends AbstractJpaEntity {
+    
+
     //insert fields...
 
-    @Override
-    public boolean equals(Object o) {
-        //insert logic here
-        return false;
-    }
+    //Explanatation: in order to have better code management objects should be encapsulated correctly:
+    //public Constructor should be used with required fields (no no-arg constructor, infact water generates the protected default constructor)
+    //only relevant setter methods should be exposed outside
+    //this approach generates less code and helps in the test coverage phase
 
-    @Override
-    public int hashCode() {
-        //insert logic here
-        return 0;
-    }
+    /*
+    Example:
+    */
+
+    @NoMalitiusCode// --> check to avoid code injections 
+    @NotNull //--> field required for rest api 
+    @NotNullOnPersist //--> field is required on the database
+    @NonNull //--> field is required in the constructor
+    @Setter(AccessLevel.PROTECTED)
+    private String exampleField; 
+
 }
