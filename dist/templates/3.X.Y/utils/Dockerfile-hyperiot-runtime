@@ -1,0 +1,50 @@
+FROM java:8
+
+#####################################
+# Karaf HyperIoT Base Microservices #
+#####################################
+
+ENV KARAF_USER karaf
+ENV KARAF_UID 8181
+ENV JAVA_HOME /usr/lib/jvm/java-8-openjdk-amd64
+ENV KARAF_VERSION 4.2.7
+ENV JAVA_MAX_MEM 2G
+ENV JAVA_MIN_MEM 1G
+ENV JETTY_MAX_THREADS 1000
+ENV JETTY_MIN_THREADS 500
+ENV JETTY_WSCONNECTOR_MIN_THREADS 200
+ENV JETTY_WSCONNECTOR_MAX_THREADS 450
+ENV JETTY_WSCONNECTOR_IDLE_TIMEOUT 60000
+ENV JETTY_WSCONNECTOR_PORT 8182
+ENV JETTY_CONTAINER_JMX_HOST 127.0.0.1
+ENV KARAF_EXEC exec
+ENV KARAF_FOLDER /opt/apache-karaf-microservices
+ENV KARAF_TAR_FILE <%-containerName%>-<%-containerVersion%>.tar.gz
+ENV DB_SERVER_NAME <%-defaultDatabaseUrl%>
+ENV DB_SERVER_PORT <%-defaultDatabasePort%>
+ENV DB_SERVER_USER <%-defaultDatabaseUsername%>
+ENV DB_SERVER_PASSWORD <%-defaultDatabasePassword%>
+ENV DB_SERVER_JDBC_DRIVER org.postgresql.Driver
+
+COPY ./target/$KARAF_TAR_FILE /opt/
+
+RUN mkdir /opt/karaf
+
+RUN groupadd -r $KARAF_USER --gid=$KARAF_UID && useradd -rm -g $KARAF_USER --uid=$KARAF_UID $KARAF_USER
+
+# Fix Debian Jessie source list (Jessie has been archived in 2017)
+COPY fix.sources.list /etc/apt/sources.list
+RUN rm /etc/apt/sources.list.d/jessie-backports.list
+
+RUN apt-get update && apt-get install -y --force-yes --no-install-recommends apt-utils jq curl && rm -rf /var/lib/apt/lists/*
+
+RUN tar --strip-components=1 -C /opt/karaf -xzf /opt/$KARAF_TAR_FILE \
+    && rm /opt/$KARAF_TAR_FILE \
+    && chown -R $KARAF_USER:$KARAF_USER /opt/karaf \
+    && chmod 700 /opt/karaf/data
+
+EXPOSE 8101 8181 8182 1099 44444 5005
+
+USER $KARAF_USER
+
+CMD ["/opt/karaf/bin/karaf", "run","debug","clean"]

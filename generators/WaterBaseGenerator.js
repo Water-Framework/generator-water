@@ -276,18 +276,20 @@ module.exports = class extends AcsBaseGenerator {
         let buildCommand = ["clean","build"] 
         buildResult = this.spawnCommandSync("gradle", [...buildCommand,"-x","test"]);
         
-        let projectKarafFeaturesPath = this.config.get("projectsConfiguration")[projectName]["projectFeaturesPath"];
-        let featureDir = workspaceDir+"/"+projectKarafFeaturesPath;
-        if (fs.existsSync(featureDir)){
-           if(buildResult.status === 0) {
-                this.log.info("---------------> GENERATING FEATURES--------------------")
-                this.log.info("Features path: "+featureDir)
-                buildResult = this.spawnCommandSync("gradle", ["clean","generateFeatures"]);
-            }
+        if(this.config.get("projectsConfiguration")[projectName]["projectFeaturesPath"]){
+            let projectKarafFeaturesPath = this.config.get("projectsConfiguration")[projectName]["projectFeaturesPath"];
+            let featureDir = workspaceDir+"/"+projectKarafFeaturesPath;
+                if (fs.existsSync(featureDir)){
+                if(buildResult.status === 0) {
+                        this.log.info("---------------> GENERATING FEATURES--------------------")
+                        this.log.info("Features path: "+featureDir)
+                        buildResult = this.spawnCommandSync("gradle", ["clean","generateFeatures"]);
+                    }
+                }
         }
 
         if (buildResult.status === 0) {
-            if(this.config.get("projectsConfiguration")[projectName].publishModule == true){
+            if(this.config.get("projectsConfiguration")[projectName].publishModule === true){
                 this.spawnCommandSync("gradle", ["publishToMavenLocal"]);
             }
             this.log.ok("Build of " + projectName + " completed succesfully");

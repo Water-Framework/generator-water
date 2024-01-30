@@ -104,6 +104,24 @@ module.exports = class extends Generator {
             }
         },
         {
+            type: 'confirm',
+            name: 'isProtectedEntity',
+            message: 'Is your aggregate model a "protected entity" so its access should be controlled by the Permission System?',
+            default: false,
+            when: function (answer) {
+                return answer.applicationType === 'service';
+            }
+        },
+        {
+            type: 'confirm',
+            name: 'isOwnedEntity',
+            message: 'Is your aggregate model an "owned entity" ?',
+            default: false,
+            when: function (answer) {
+                return answer.applicationType === 'service';
+            }
+        },
+        {
             type: 'list',
             name: 'persistenceLib',
             message: 'Which persistence api does your application support?',
@@ -129,7 +147,7 @@ module.exports = class extends Generator {
             message: 'Which validation api does your application support?',
             default: false,
             default: function(){
-                return "javax";
+                return "jakarta";
             },
             choices: [
                 {
@@ -174,6 +192,14 @@ module.exports = class extends Generator {
             default: true
         },
         {
+            type: 'input',
+            name: 'restContextRoot',
+            message: 'Please insert your rest context root ex. /myEntity ?',
+            default: function(answers){
+                return "/"+answers.projectName+"s";
+            }
+        },
+        {
             type: 'confirm',
             name: 'publishModule',
             message: 'Project should be deployed to remote maven repository ?',
@@ -185,7 +211,7 @@ module.exports = class extends Generator {
             message: 'Please insert publish repo symbolic name ?',
             default: "My Repository",
             when: function (answers) {
-                return answers.publishModule == true;
+                return answers.publishModule === true;
             }
         },
         {
@@ -194,7 +220,7 @@ module.exports = class extends Generator {
             message: 'Please insert publish repo URL ?',
             default: "https://myrepo/m2",
             when: function (answers) {
-                return answers.publishModule == true;
+                return answers.publishModule === true;
             }
 
         },
@@ -204,7 +230,7 @@ module.exports = class extends Generator {
             message: 'Repository requires authentication?',
             default: false,
             when: function (answers) {
-                return answers.publishModule == true;
+                return answers.publishModule === true;
             }
 
         }
@@ -254,6 +280,11 @@ module.exports = class extends Generator {
             this.projectModelPath = this.parentProjectPath + "/" + this.projectName + "-model";
             this.projectServicePath = this.parentProjectPath + "/" + this.projectName + "-service";
             
+            let restContextRoot = "na"
+            if(answers.hasRestServices){
+                restContextRoot = answers.restContextRoot;
+            }
+
             this.projectConf = {
                 applicationTypeEntity: this.applicationTypeEntity,
                 applicationType: answers.applicationType,
@@ -265,8 +296,11 @@ module.exports = class extends Generator {
                 projectVersion: this.projectVersion,
                 projectTechnology: this.projectTechnology,
                 hasRestServices: this.hasRestServices,
+                restContextRoot: restContextRoot,
                 hasActions: this.hasActions,
                 hasModel: this.hasModel,
+                isProtectedEntity: answers.isProtectedEntity,
+                isOwnedEntity:answers.isOwnedEntity,
                 persistenceLib:answers.persistenceLib,
                 validationLib:answers.validationLib,
                 projectPath: this.projectName,

@@ -44,7 +44,7 @@ class DependencyPathNode {
 
 module.exports = class DepCycleChecker {
 
-    constructor(args, opts) {
+    constructor() {
      
     }
 

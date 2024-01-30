@@ -15,7 +15,6 @@ module.exports = class WaterStabilityMetricsCalculator {
     stabilityMetrics(projects, generator) {
         let depCycleChecker = new DepCycleChecker();
         let stabilityJson = {};
-        const scatterData = []
         for (let projectIdx in projects) {
             let currentDir = process.cwd();
             process.chdir(currentDir+"/"+projects[projectIdx]);
@@ -50,17 +49,17 @@ module.exports = class WaterStabilityMetricsCalculator {
             }  
             process.chdir("../");
         }
-        console.table(stabilityJson);
+        generator.console.table(stabilityJson);
         return stabilityJson;
     }
 
     stabilityMetricsInfo(generator) {
-        console.log("***************************** STABILITY METRICS INFO *****************************\n");
-        console.log(chalk.italic(" It gives some insights about how component has been designed: model, util projects should not be considered in this metrics: \n"));
-        console.log("- "+chalk.bold.green("GOOD")+": The component is well designed and may not have problems\n");
-        console.log("- "+chalk.bold.yellow("Zone of pain")+": The component is higly stable (I) it means it is imported from many projects but it do not depends on other compoents BUT has few degree of abstraciton (A) it means that has few abstract classes respect of total number of classes\n");
-        console.log("- "+chalk.bold.red("Zone of uselessnes")+": The component is not stable (I) it means it is not used from other modules BUT has an high degree of abstraction, so it is useless. This value menas that the component is useless inside this current workspace, but it may be imported outside. So this value should not be considered always in a negative way.\n");
-        console.log("***********************************************************************************");
+        generator.log("***************************** STABILITY METRICS INFO *****************************\n");
+        generator.log(chalk.italic(" It gives some insights about how component has been designed: model, util projects should not be considered in this metrics: \n"));
+        generator.log("- "+chalk.bold.green("GOOD")+": The component is well designed and may not have problems\n");
+        generator.log("- "+chalk.bold.yellow("Zone of pain")+": The component is higly stable (I) it means it is imported from many projects but it do not depends on other compoents BUT has few degree of abstraciton (A) it means that has few abstract classes respect of total number of classes\n");
+        generator.log("- "+chalk.bold.red("Zone of uselessnes")+": The component is not stable (I) it means it is not used from other modules BUT has an high degree of abstraction, so it is useless. This value menas that the component is useless inside this current workspace, but it may be imported outside. So this value should not be considered always in a negative way.\n");
+        generator.log("***********************************************************************************");
     }
 
     stabilityMetricsA(generator,project, projectPath, stabilityJson) {
