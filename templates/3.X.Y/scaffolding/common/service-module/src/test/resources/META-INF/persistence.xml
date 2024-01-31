@@ -21,7 +21,7 @@
              version="2.2">
 
     <persistence-unit name="water-default-persistence-unit" transaction-type="RESOURCE_LOCAL">
-        <class>it.water.user.model.User</class>
+        <class><%- modelPackage %>.<%- projectSuffixUpperCase %></class>
         <properties>
             <!-- Configurazione della connessione al database -->
             <property name="javax.persistence.jdbc.driver" value="org.hsqldb.jdbcDriver"/>

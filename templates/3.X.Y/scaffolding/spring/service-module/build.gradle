@@ -51,12 +51,51 @@ dependencies {
 	//Encryption
 	implementation group: 'org.bouncycastle', name: 'bcmail-jdk15on', version: project.bouncyCastleVersion
 	// Implementation
-	implementation group: 'it.water.distribution', name: 'Distribution-spring', version: project.waterVersion
+	implementation group: 'it.water.distribution', name: 'Water-distribution-spring', version: project.waterVersion
+<%if(applicationTypeEntity) {-%>
+    implementation group: 'org.springframework.data', name: 'spring-data-jpa', version: project.springBootVersion
+<% if(persistenceLib === 'javax') {	-%>
+	//javax persistence
+	implementation 'javax.persistence:javax.persistence-api:'+project.javaxPersistenceVersion
+	//Water javax persistence
+	implementation 'it.water.repository.jpa:JpaRepository-javax:'+project.waterVersion
+	implementation group: 'javax.transaction', name: 'javax.transaction-api', version: project.javaxTransactionApiVersion
+<% } else { -%>
+	//jakarta persistence
+	implementation 'jakarta.persistence:jakarta.persistence-api:'+project.jakartaPersistenceVersion
+	//Water javax persistence
+	implementation 'it.water.repository.jpa:JpaRepository-jakarta:'+project.waterVersion
+	implementation group: 'jakarta.transaction', name: 'jakarta.transaction-api', version: project.jakartaTransactionApiVersion
+<% } -%>	
+	//Water Persistence
+	implementation group:'it.water.repository', name:'Repository-entity', version:project.waterVersion
+	implementation group:'it.water.repository', name:'Repository-persistence', version:project.waterVersion
+	implementation group:'it.water.repository', name:'Repository-service', version:project.waterVersion
+<%} -%>
+	//Validation
+<% if(validationLib === 'javax') {	-%>
+	implementation 'it.water.core:Core-validation-javax:'+project.waterVersion
+    implementation group: 'javax.validation', name: 'validation-api', version: project.javaxValidationVersion
+    implementation group: "org.hibernate", name: "hibernate-validator", version: project.hibernateValidatorJavaxVersion
+<% } else { -%>
+	implementation 'it.water.core:Core-validation:'+project.waterVersion
+    implementation group: 'jakarta.validation', name: 'jakarta.validation-api', version: project.jakartaValidationVersion
+    implementation group: "org.hibernate", name: "hibernate-validator", version: project.hibernateValidatorVersion
+<% } -%>
+<%if(hasRestServices) {-%>
+	//Rest Water Deps
+	implementation group: 'it.water.service.rest', name: 'Rest-api', version: project.waterVersion
+	implementation group: 'it.water.service.rest', name: 'Rest-security', version: project.waterVersion
+	implementation group: 'it.water.service.rest', name: 'Rest-service', version: project.waterVersion
+	implementation group: 'it.water.service.rest', name: 'Rest-spring-api', version: project.waterVersion
+<% 		if(applicationTypeEntity){ -%>
+	implementation group: 'it.water.service.rest', name: 'Rest-persistence', version: project.waterVersion
+<% 		} -%>
+	// https://mvnrepository.com/artifact/io.swagger/swagger-jaxrs
+    implementation group: 'io.swagger', name: 'swagger-jaxrs', version: project.swaggerJaxRsVersion
+<%} -%>
 	//Spring for spring source set
 	implementation 'org.springframework.boot:spring-boot-starter-aop:' + project.springBootVersion
-	// implementation 'org.springframework.boot:spring-boot-starter-validation:' + project.springBootVersion
-	implementation group: 'jakarta.validation', name: 'jakarta.validation-api', version: project.jakartaValidationVersion
-
 	implementation 'org.atteo.classindex:classindex:' + project.atteoClassIndexVersion
 	annotationProcessor('org.atteo.classindex:classindex:' + project.atteoClassIndexVersion)
 

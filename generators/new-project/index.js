@@ -43,7 +43,7 @@ module.exports = class extends Generator {
         this.prompt([{
             type: 'input',
             name: 'projectName',
-            message: 'Project Name',
+            message: 'Project-Name',
             default: "my-awesome-project"
         }, {
             type: 'input',
@@ -237,7 +237,8 @@ module.exports = class extends Generator {
         ]).then((answers) => {
             let initialName = answers.projectName;
             this.projectTechnology = answers.projectTechnology;
-            this.springRepository = answers.springRepository;
+            if(answers.springRepository)
+                this.springRepository = answers.springRepository;
             let projectNameSplits = initialName.split("-");
             let camelizedName = "";
             for (let i = 0; i < projectNameSplits.length; i++) {
@@ -354,15 +355,15 @@ module.exports = class extends Generator {
     }
 
     generateModelProject(){
-        super.generateModelProject(this.destinationPath(this.projectModelPath), this.projectConf); 
+        super.generateModelProject(this.projectConf); 
     }
 
     generateApiProject() {
-        super.generateApiProject(this.destinationPath(this.projectApiPath), this.projectConf);
+        super.generateApiProject(this.projectConf);
     }
 
     generateServiceProject() {
-        super.generateServiceProject(this.destinationPath(this.projectServicePath), this.projectConf);
+        super.generateServiceProject(this.projectConf);
     }
 
     end() {

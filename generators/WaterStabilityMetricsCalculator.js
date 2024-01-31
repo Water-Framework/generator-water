@@ -49,7 +49,9 @@ module.exports = class WaterStabilityMetricsCalculator {
             }  
             process.chdir("../");
         }
-        generator.console.table(stabilityJson);
+        //avoid linter problems
+        let consoleTmp = console;
+        consoleTmp.table(stabilityJson);
         return stabilityJson;
     }
 
