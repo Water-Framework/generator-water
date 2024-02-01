@@ -7,6 +7,8 @@ import it.water.core.interceptors.annotations.*;
 
 import it.water.repository.service.BaseEntitySystemServiceImpl;
 
+import org.springframework.beans.factory.annotation.Autowired;
+
 import lombok.*;
 
 /**
@@ -14,7 +16,7 @@ import lombok.*;
  * System Service Api Class for <%- projectSuffixUpperCase %> entity.
  *
  */
-@FrameworkComponent
+@Service
 public class <%- projectSuffixUpperCase %>SystemServiceImpl extends BaseEntitySystemServiceImpl< <%- projectSuffixUpperCase %>> implements <%- projectSuffixUpperCase %>SystemApi {
 
     @Inject

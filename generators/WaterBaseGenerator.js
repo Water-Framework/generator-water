@@ -253,7 +253,7 @@ module.exports = class extends AcsBaseGenerator {
             this.log.info("Creating Persistence Layer...")
             this.log.info("Creating repositories implementation...");
             this.fs.copyTpl(serviceTemplatePath+"/src/main/java/.repository_package/RepositoryImpl.java", this.destinationPath(projectConf.projectServicePath)+projectConf.repositoryPackagePath+"/"+projectConf.projectSuffixUpperCase+"RepositoryImpl.java", projectConf);
-            if(fs.existsSync(technologyTemplatePath+"/src/main/java/.repository_package/RepositoryImpl.java"))
+            if(fs.existsSync(technologyTemplatePath+"/src/main/java/.repository_package/RepositoryImpl.java") && !projectConf.springRepository)
                 this.fs.copyTpl(technologyTemplatePath+"/src/main/java/.repository_package/RepositoryImpl.java", this.destinationPath(projectConf.projectServicePath)+projectConf.repositoryPackagePath+"/"+projectConf.projectSuffixUpperCase+"RepositoryImpl.java", projectConf);
         }
 

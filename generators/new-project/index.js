@@ -173,7 +173,7 @@ module.exports = class extends Generator {
         {
             type: 'confirm',
             name: 'springRepository',
-            message: 'Would you like to use water repository instead of spring classic repositories?',
+            message: 'Would you like to use Spting repository instead of spring Water default repositories?',
             default: false,
             when: function (answer) {
                 return answer.projectTechnology === 'spring' && answer.applicationType === 'entity';

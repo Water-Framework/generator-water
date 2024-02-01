@@ -7,6 +7,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
 @EnableWaterFramework
+<%-if(applicationTypeEntity) { %>
+@EnableJpaRepositories(basePackages="<%-modelPackage%>.*")
+<% } -%>
 public class <%- projectSuffixUpperCase %>Application {
 
 	public static void main(String[] args) {
