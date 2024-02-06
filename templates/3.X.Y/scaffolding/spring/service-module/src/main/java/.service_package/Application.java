@@ -14,6 +14,7 @@ import org.springframework.boot.autoconfigure.domain.EntityScan;
 @EnableJpaRepositories(basePackages={"it.water.*","<%-projectGroupId%>.*"},repositoryFactoryBeanClass = RepositoryFactory.class)
 @EntityScan({"it.water.*","<%-projectGroupId%>.*"})
 <% } -%>
+@ComponentScan({"it.water.*","<%-projectGroupId%>.*"})
 public class <%- projectSuffixUpperCase %>Application {
 	public static void main(String[] args) {
 		SpringApplication.run(<%- projectSuffixUpperCase %>Application.class, args);

@@ -80,7 +80,7 @@ public class <%- projectSuffixUpperCase %>ApiTest implements Service {
         Assertions.assertNotNull(entity);
         entity.setExampleField("exampleFieldUpdated");
         entity = this.<%- projectSuffixLowerCase %>Api.update(entity);
-        Assertions.assertEquals("exampleFieldUpdated", u.getExampleField());
+        Assertions.assertEquals("exampleFieldUpdated", entity.getExampleField());
         Assertions.assertEquals(2, entity.getEntityVersion());
     }
 
@@ -149,15 +149,15 @@ public class <%- projectSuffixUpperCase %>ApiTest implements Service {
     @Order(8)
     public void saveShouldFailOnDuplicatedEntity() {
         <%- projectSuffixUpperCase %> entity = create<%- projectSuffixUpperCase %>(1);
-        this.<%- projectSuffixLowerCase %>Api.save(u);
-        this.<%- projectSuffixUpperCase %>Api duplicated = this.create<%- projectSuffixLowerCase %>Api(1);
+        this.<%- projectSuffixLowerCase %>Api.save(entity);
+        <%- projectSuffixUpperCase %> duplicated = this.create<%- projectSuffixUpperCase %>(1);
         //cannot insert new entity wich breaks unique constraint
         Assertions.assertThrows(DuplicateEntityException.class,() -> this.<%- projectSuffixLowerCase %>Api.save(duplicated));
         <%- projectSuffixUpperCase %> secondEntity = create<%- projectSuffixUpperCase %>(2);
         this.<%- projectSuffixLowerCase %>Api.save(secondEntity);
         entity.setExampleField("exampleField2");
         //cannot update an entity colliding with other entity on unique constraint
-        Assertions.assertThrows(DuplicateEntityException.class,() -> this.<%- projectSuffixLowerCase %>Api.update(u));
+        Assertions.assertThrows(DuplicateEntityException.class,() -> this.<%- projectSuffixLowerCase %>Api.update(entity));
     }
 
     /**

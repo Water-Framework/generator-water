@@ -13,7 +13,6 @@ module.exports = class extends Generator {
         this.projectGroupId = "";
         this.projectVersion = "";
         this.hasRestServices = true;
-        this.hasActions = true;
         this.hasModel = true;
         this.applicationTypeEntity = true;
         this.projectTechnology = "water";
@@ -109,7 +108,7 @@ module.exports = class extends Generator {
             message: 'Is your aggregate model a "protected entity" so its access should be controlled by the Permission System?',
             default: false,
             when: function (answer) {
-                return answer.applicationType === 'service';
+                return answer.applicationType === 'entity';
             }
         },
         {
@@ -118,7 +117,7 @@ module.exports = class extends Generator {
             message: 'Is your aggregate model an "owned entity" ?',
             default: false,
             when: function (answer) {
-                return answer.applicationType === 'service';
+                return answer.applicationType === 'entity';
             }
         },
         {
@@ -173,17 +172,11 @@ module.exports = class extends Generator {
         {
             type: 'confirm',
             name: 'springRepository',
-            message: 'Would you like to use Spting repository instead of spring Water default repositories?',
+            message: 'Would you like to use Spring repository instead of spring Water default repositories?',
             default: true,
             when: function (answer) {
                 return answer.projectTechnology === 'spring' && answer.applicationType === 'entity';
             }
-        },
-        {
-            type: 'confirm',
-            name: 'hasActions',
-            message: 'Project has actions or permissions which must to be defined?',
-            default: true
         },
         {
             type: 'confirm',
@@ -251,7 +244,6 @@ module.exports = class extends Generator {
             this.projectSuffixLowerCase = this.projectSuffix.toLowerCase();
             this.projectGroupId = answers.projectGroupId;
             this.hasRestServices = answers.hasRestServices;
-            this.hasActions = answers.hasActions;
             if (answers.hasModel) {
                 this.hasModel = answers.hasModel;
             } else if (answers.applicationType === 'entity') {
@@ -298,7 +290,6 @@ module.exports = class extends Generator {
                 projectTechnology: this.projectTechnology,
                 hasRestServices: this.hasRestServices,
                 restContextRoot: restContextRoot,
-                hasActions: this.hasActions,
                 hasModel: this.hasModel,
                 isProtectedEntity: answers.isProtectedEntity,
                 isOwnedEntity:answers.isOwnedEntity,
