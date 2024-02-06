@@ -4,12 +4,15 @@ package <%-serviceRestPackage%>;
 import <%-apiPackage%>.*;
 import <%-apiPackage%>.rest.*;
 import <%-modelPackage%>.*;
+
 import it.water.service.rest.persistence.BaseEntityRestApi;
+import it.water.core.api.model.PaginableResult;
 
 import lombok.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,10 +36,35 @@ public class <%- projectSuffixUpperCase %>RestControllerImpl <%-extendsDeclarati
     @Getter
     private <%- projectSuffixUpperCase %>Api entityService;
 
-    //All CRUD methods are already exposed by BaseEntitytRestApi interface with 
+<%if(applicationTypeEntity){-%>
+    //All CRUD methods are already exposed by BaseEntitytRestApi. Here all methods are wrapped in order to support spring standard
     //if you need to check which methods are exposed please go to <%-apiPackage%>.rest.<%- projectSuffixUpperCase %>
+    @Override
+    public ResponseEntity<<%- projectSuffixUpperCase %>> saveApi(<%- projectSuffixUpperCase %> entity) {
+        return ResponseEntity.ok(super.save(entity));
+    }
 
-    //todo add custom exposed methods or override CRUD operations
-    //ATTENTION: use always <%- projectSuffixLowerCase %>Api in order to ensure the user is requesting operations has the right privileges to do it
+    @Override
+    public ResponseEntity<<%- projectSuffixUpperCase %>> updateApi(<%- projectSuffixUpperCase %> entity) {
+        return ResponseEntity.ok(super.update(entity));
+    }
 
+    @Override
+    public ResponseEntity<<%- projectSuffixUpperCase %>> findApi(long id) {
+        return ResponseEntity.ok(super.find(id));
+    }
+
+    @Override
+    public ResponseEntity<PaginableResult<<%- projectSuffixUpperCase %>>> findAllApi() {
+        return ResponseEntity.ok(super.findAll());
+    }
+
+    @Override
+    public ResponseEntity<<%- projectSuffixUpperCase %>> removeApi(long id) {
+        super.remove(id);
+        return ResponseEntity.ok().build();
+    }
+<% } -%>
+//todo add custom exposed methods or override CRUD operations
+//ATTENTION: use always <%- projectSuffixLowerCase %>Api object in order to ensure the user is requesting operations has the right privileges to do it
 }

@@ -1,0 +1,190 @@
+package <%-projectGroupId%>;
+
+import it.water.core.api.model.PaginableResult;
+import it.water.core.api.registry.ComponentRegistry;
+import it.water.core.api.repository.query.Query;
+import it.water.core.api.service.Service;
+import it.water.core.model.exceptions.ValidationException;
+import it.water.core.model.exceptions.WaterRuntimeException;
+import it.water.repository.entity.model.exceptions.DuplicateEntityException;
+
+import it.water.core.testing.utils.junit.WaterTestExtension;
+
+import <%-apiPackage%>.*;
+import <%-modelPackage%>.*;
+
+import lombok.Setter;
+
+import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.extension.ExtendWith;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.Commit;
+import org.springframework.transaction.annotation.Transactional;
+
+/**
+ * Generated with Water Generator.
+ * Test class for <%- projectSuffixUpperCase %> Services.
+<%if(hasRestServices){-%> * 
+ * Please use <%- projectSuffixUpperCase %>RestTestApi for ensuring format of the json response
+<% } -%> 
+ */
+@SpringBootTest
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+public class <%- projectSuffixUpperCase %>ApiTest  {
+    
+    @Autowired
+    private ComponentRegistry componentRegistry;
+    
+    @Autowired
+    private <%- projectSuffixUpperCase %>Api <%- projectSuffixLowerCase %>Api;
+    
+    @Autowired
+    private <%- projectSuffixUpperCase %>Repository <%- projectSuffixLowerCase %>Repository;
+
+    /**
+     * Testing basic injection of basic component for <%- projectSuffixLowerCase %> entity.
+     */
+    @Test
+    @Order(1)
+    public void componentsInsantiatedCorrectly() {
+        this.<%- projectSuffixLowerCase %>Api = this.componentRegistry.findComponent(<%- projectSuffixUpperCase %>Api.class, null);
+        this.<%- projectSuffixLowerCase %>Repository = this.componentRegistry.findComponent(<%- projectSuffixUpperCase %>Repository.class, null);
+        Assertions.assertNotNull(this.<%- projectSuffixLowerCase %>Api);
+        Assertions.assertNotNull(this.componentRegistry.findComponent(<%- projectSuffixUpperCase %>SystemApi.class, null));
+        Assertions.assertNotNull(this.<%- projectSuffixLowerCase %>Repository);
+    }
+
+    /**
+     * Testing simple save and version increment
+     */
+    @Test
+    @Order(2)
+    @Transactional
+    @Commit
+    public void saveOk() {
+        <%- projectSuffixUpperCase %> entity = create<%- projectSuffixUpperCase %>(0);
+        entity = this.<%- projectSuffixLowerCase %>Api.save(entity);
+        Assertions.assertEquals(1, entity.getEntityVersion());
+        Assertions.assertTrue(entity.getId() > 0);
+        Assertions.assertEquals("exampleField0", entity.getExampleField());
+    }
+
+    /**
+     * Testing update logic, basic test
+     */
+    @Test
+    @Order(3)
+    @Transactional
+    @Commit
+    public void updateShouldWork() {
+        Query q = this.<%- projectSuffixLowerCase %>Repository.getQueryBuilderInstance().createQueryFilter("exampleField=exampleField0");
+        <%- projectSuffixUpperCase %> entity = this.<%- projectSuffixLowerCase %>Api.find(q);
+        Assertions.assertNotNull(entity);
+        entity.setExampleField("exampleFieldUpdated");
+        entity = this.<%- projectSuffixLowerCase %>Api.update(entity);
+        Assertions.assertEquals("exampleFieldUpdated", entity.getExampleField());
+        Assertions.assertEquals(2, entity.getEntityVersion());
+    }
+
+    /**
+     * Testing update logic, basic test
+     */
+    @Test
+    @Order(4)
+    @Transactional
+    public void updateShouldFailWithWrongVersion() {
+        Query q = this.<%- projectSuffixLowerCase %>Repository.getQueryBuilderInstance().createQueryFilter("exampleField=exampleFieldUpdated");
+        <%- projectSuffixUpperCase %> errorEntity = this.<%- projectSuffixLowerCase %>Api.find(q);
+        Assertions.assertEquals("exampleFieldUpdated", errorEntity.getExampleField());
+        Assertions.assertEquals(2, errorEntity.getEntityVersion());
+        errorEntity.setEntityVersion(1);
+        Assertions.assertThrows(WaterRuntimeException.class, () -> this.<%- projectSuffixLowerCase %>Api.update(errorEntity));
+    }
+
+    /**
+     * Testing finding all entries with no pagination
+     */
+    @Test
+    @Order(5)
+    public void findAllShouldWork() {
+        PaginableResult<<%- projectSuffixUpperCase %>> all = this.<%- projectSuffixLowerCase %>Api.findAll(null, -1, -1, null);
+        Assertions.assertTrue(all.getResults().size() == 1);
+    }
+
+    /**
+     * Testing finding all entries with settings related to pagination.
+     * Searching with 5 items per page starting from page 1.
+     */
+    @Test
+    @Order(6)
+    @Transactional
+    @Commit
+    public void findAllPaginatedShouldWork() {
+        for (int i = 2; i < 11; i++) {
+            <%- projectSuffixUpperCase %> u = create<%- projectSuffixUpperCase %>(i);
+            this.<%- projectSuffixLowerCase %>Api.save(u);
+        }
+        PaginableResult<<%- projectSuffixUpperCase %>> paginated = this.<%- projectSuffixLowerCase %>Api.findAll(null, 7, 1, null);
+        Assertions.assertEquals(7, paginated.getResults().size());
+        Assertions.assertEquals(1, paginated.getCurrentPage());
+        Assertions.assertEquals(2, paginated.getNextPage());
+        paginated = this.<%- projectSuffixLowerCase %>Api.findAll(null, 7, 2, null);
+        Assertions.assertEquals(3, paginated.getResults().size());
+        Assertions.assertEquals(2, paginated.getCurrentPage());
+        Assertions.assertEquals(1, paginated.getNextPage());
+    }
+
+    /**
+     * Testing removing all entities using findAll method.
+     */
+    @Test
+    @Order(7)
+    @Transactional
+    @Commit
+    public void removeAllShouldWork() {
+        PaginableResult<<%- projectSuffixUpperCase %>> paginated = this.<%- projectSuffixLowerCase %>Api.findAll(null, -1, -1, null);
+        paginated.getResults().forEach(entity -> {
+            this.<%- projectSuffixLowerCase %>Api.remove(entity.getId());
+        });
+        Assertions.assertTrue(this.<%- projectSuffixLowerCase %>Api.countAll(null) == 0);
+    }
+
+    /**
+     * Testing failure on duplicated entity
+     */
+    @Test
+    @Order(8)
+    @Transactional
+    public void saveShouldFailOnDuplicatedEntity() {
+        <%- projectSuffixUpperCase %> entity = create<%- projectSuffixUpperCase %>(1);
+        this.<%- projectSuffixLowerCase %>Api.save(entity);
+        <%- projectSuffixUpperCase %> duplicated = this.create<%- projectSuffixUpperCase %>(1);
+        //cannot insert new entity wich breaks unique constraint
+        Assertions.assertThrows(DuplicateEntityException.class,() -> this.<%- projectSuffixLowerCase %>Api.save(duplicated));
+        <%- projectSuffixUpperCase %> secondEntity = create<%- projectSuffixUpperCase %>(2);
+        this.<%- projectSuffixLowerCase %>Api.save(secondEntity);
+        entity.setExampleField("exampleField2");
+        //cannot update an entity colliding with other entity on unique constraint
+        Assertions.assertThrows(DuplicateEntityException.class,() -> this.<%- projectSuffixLowerCase %>Api.update(entity));
+    }
+
+    /**
+     * Testing failure on validation failure for example code injection
+     */
+    @Test
+    @Order(9)
+    @Transactional
+    @Commit
+    public void updateShouldFailOnValidationFailure() {
+        <%- projectSuffixUpperCase %> newEntity = new <%- projectSuffixUpperCase %>("<script>function(){alert('ciao')!}</script>");
+        Assertions.assertThrows(ValidationException.class,() -> this.<%- projectSuffixLowerCase %>Api.save(newEntity));
+    }
+
+    private <%- projectSuffixUpperCase %> create<%- projectSuffixUpperCase %>(int seed){
+        <%- projectSuffixUpperCase %> entity = new <%- projectSuffixUpperCase %>("exampleField"+seed);
+        //todo add more fields here...
+        return entity;
+    }
+}

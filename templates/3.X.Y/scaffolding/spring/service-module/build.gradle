@@ -70,7 +70,6 @@ dependencies {
 	//jakarta persistence
 	implementation 'jakarta.persistence:jakarta.persistence-api:'+project.jakartaPersistenceVersion
 <% } -%>	
-
 <%} -%>
 	//Validation
 	//implementation 'org.springframework.boot:spring-boot-starter-validation:' + project.springBootVersion
@@ -95,7 +94,8 @@ dependencies {
 	implementation group: 'it.water.service.rest', name: 'Rest-persistence', version: project.waterVersion
 <% 		} -%>
 	// Swagger
-    implementation group: 'io.swagger', name: 'swagger-jaxrs', version: project.swaggerJaxRsVersion
+    implementation 'io.springfox:springfox-swagger2:3.0.0'
+    implementation 'io.springfox:springfox-swagger-ui:3.0.0'
 <%} -%>
 	//Spring for spring source set
 	implementation 'org.springframework.boot:spring-boot-starter-aop:' + project.springBootVersion
@@ -110,7 +110,9 @@ dependencies {
 	testAnnotationProcessor('org.atteo.classindex:classindex:' + project.atteoClassIndexVersion)
 	testAnnotationProcessor 'org.projectlombok:lombok:' + project.lombokVersion
 	// https://mvnrepository.com/artifact/com.intuit.karate/karate-junit5
-	testImplementation group: 'com.intuit.karate', name: 'karate-junit5', version: '1.4.1'
+	testImplementation ('com.intuit.karate:karate-junit5:1.4.1') {
+		exclude group : "ch.qos.logback"
+	}
 }
 
 test {

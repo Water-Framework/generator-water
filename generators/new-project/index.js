@@ -300,6 +300,7 @@ module.exports = class extends Generator {
                 projectModelPath: this.projectModelPath,
                 projectServicePath: this.projectServicePath,
                 projectParentPath: this.parentProjectPath,
+                projectBasePath: basePackage,
                 projectTestPath: baseTestPackage,
                 apiPackagePath: this.apiPackagePath,
                 apiPackage: this.apiPackagePath.replace(sourceFolderBasicPath, "").split("/").join("."),
