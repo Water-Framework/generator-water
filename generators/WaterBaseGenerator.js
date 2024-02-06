@@ -182,7 +182,6 @@ module.exports = class extends AcsBaseGenerator {
         if(projectConf.projectTechnology !== "water"){
             finalPath = projectConf.projectServicePath;
         }
-
         this.createBasicProjectFiles(this.destinationPath(finalPath),projectConf);
         let apiTemplatePath = this.getWaterTemplatePath(this.waterVersion)+"/scaffolding/common/api-module";
         this.log.info("Api Common Template path is: "+apiTemplatePath)
@@ -192,10 +191,12 @@ module.exports = class extends AcsBaseGenerator {
         this.fs.copyTpl(apiTemplatePath, this.destinationPath(finalPath), projectConf);
         this.fs.copyTpl(apiTemplatePath+"/.yo-rc.json", this.destinationPath(finalPath)+"/.yo-rc.json", projectConf);
         
-        if(technologyTemplatePathExists){
+        //adds file only if there's content inside
+        if(technologyTemplatePathExists && fs.readdirSync(technologyTemplatePath).lenght > 0){
             //Overriding eventually with specific technologies files
             this.fs.copyTpl(technologyTemplatePath, this.destinationPath(finalPath), projectConf);
         }
+
         if(fs.existsSync(technologyTemplatePath+"/.yo-rc.json"))
             this.fs.copyTpl(technologyTemplatePath+"/.yo-rc.json", this.destinationPath(finalPath)+"/.yo-rc.json", projectConf);
         if (projectConf.applicationTypeEntity) {
@@ -203,14 +204,13 @@ module.exports = class extends AcsBaseGenerator {
             this.fs.copyTpl(apiTemplatePath + "/src/main/java/.package/EntityApi.java", this.destinationPath(finalPath + "/" + projectConf.apiPackagePath + "/" + projectConf.projectSuffixUpperCase + "Api.java"), projectConf);
             this.log.info("Creating Entity System Api...")
             this.fs.copyTpl(apiTemplatePath + "/src/main/java/.package/SystemEntityApi.java", this.destinationPath(finalPath + "/" + projectConf.apiPackagePath + "/" + projectConf.projectSuffixUpperCase + "SystemApi.java"), projectConf);
-            if(projectConf.projectTechnology !== "spring" || (projectConf.projectTechnology === "spring" && !projectConf.springRepository)){
-                this.log.info("Creating Repository Interface...")
-                this.fs.copyTpl(apiTemplatePath + "/src/main/java/.package/RepoInterface.java", this.destinationPath(finalPath + "/" + projectConf.apiPackagePath + "/" + projectConf.projectSuffixUpperCase + "Repository.java"), projectConf);
-                if(technologyTemplatePathExists){
-                    //overriding with specific technology
-                    this.fs.copyTpl(technologyTemplatePath + "/src/main/java/.package/RepoInterface.java", this.destinationPath(finalPath + "/" + projectConf.apiPackagePath + "/" + projectConf.projectSuffixUpperCase + "Repository.java"), projectConf);    
-                }
+            this.log.info("Creating Repository Interface...")
+            this.fs.copyTpl(apiTemplatePath + "/src/main/java/.package/RepoInterface.java", this.destinationPath(finalPath + "/" + projectConf.apiPackagePath + "/" + projectConf.projectSuffixUpperCase + "Repository.java"), projectConf);
+            if(technologyTemplatePathExists){
+                //overriding with specific technology
+                this.fs.copyTpl(technologyTemplatePath + "/src/main/java/.package/RepoInterface.java", this.destinationPath(finalPath + "/" + projectConf.apiPackagePath + "/" + projectConf.projectSuffixUpperCase + "Repository.java"), projectConf);    
             }
+            
         } else {
             this.fs.copyTpl(apiTemplatePath + "/src/main/java/.package/ServiceApi.java", this.destinationPath(finalPath + "/" + projectConf.apiPackagePath + "/" + projectConf.projectSuffixUpperCase + "Api.java"), projectConf);
             this.fs.copyTpl(apiTemplatePath + "/src/main/java/.package/SystemServiceApi.java", this.destinationPath(finalPath + "/" + projectConf.apiPackagePath + "/" + projectConf.projectSuffixUpperCase + "SystemApi.java"), projectConf);
@@ -252,9 +252,11 @@ module.exports = class extends AcsBaseGenerator {
         if (projectConf.applicationTypeEntity) {
             this.log.info("Creating Persistence Layer...")
             this.log.info("Creating repositories implementation...");
-            this.fs.copyTpl(serviceTemplatePath+"/src/main/java/.repository_package/RepositoryImpl.java", this.destinationPath(projectConf.projectServicePath)+projectConf.repositoryPackagePath+"/"+projectConf.projectSuffixUpperCase+"RepositoryImpl.java", projectConf);
-            if(fs.existsSync(technologyTemplatePath+"/src/main/java/.repository_package/RepositoryImpl.java") && !projectConf.springRepository)
-                this.fs.copyTpl(technologyTemplatePath+"/src/main/java/.repository_package/RepositoryImpl.java", this.destinationPath(projectConf.projectServicePath)+projectConf.repositoryPackagePath+"/"+projectConf.projectSuffixUpperCase+"RepositoryImpl.java", projectConf);
+            if(!projectConf.springRepository){
+                this.fs.copyTpl(serviceTemplatePath+"/src/main/java/.repository_package/RepositoryImpl.java", this.destinationPath(projectConf.projectServicePath)+projectConf.repositoryPackagePath+"/"+projectConf.projectSuffixUpperCase+"RepositoryImpl.java", projectConf);
+                if(fs.existsSync(technologyTemplatePath+"/src/main/java/.repository_package/RepositoryImpl.java"))
+                    this.fs.copyTpl(technologyTemplatePath+"/src/main/java/.repository_package/RepositoryImpl.java", this.destinationPath(projectConf.projectServicePath)+projectConf.repositoryPackagePath+"/"+projectConf.projectSuffixUpperCase+"RepositoryImpl.java", projectConf);
+            }
         }
 
         this.log.info("Creating Api Layer...")

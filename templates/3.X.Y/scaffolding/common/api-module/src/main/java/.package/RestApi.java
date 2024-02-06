@@ -6,6 +6,7 @@ import <%-modelPackage%>.*;
 import it.water.core.api.model.PaginableResult;
 import it.water.core.api.service.rest.FrameworkRestApi;
 import it.water.core.api.service.rest.RestApi;
+import it.water.service.rest.api.security.LoggedIn;
 
 import com.fasterxml.jackson.annotation.JsonView;
 import it.water.service.rest.api.WaterJsonView;

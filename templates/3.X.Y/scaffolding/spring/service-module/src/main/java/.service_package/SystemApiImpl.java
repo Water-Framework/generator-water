@@ -8,6 +8,7 @@ import it.water.core.interceptors.annotations.*;
 import it.water.repository.service.BaseEntitySystemServiceImpl;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import lombok.*;
 
@@ -19,12 +20,13 @@ import lombok.*;
 @Service
 public class <%- projectSuffixUpperCase %>SystemServiceImpl extends BaseEntitySystemServiceImpl< <%- projectSuffixUpperCase %>> implements <%- projectSuffixUpperCase %>SystemApi {
 
-    @Inject
+    @Autowired
     @Getter
     @Setter
     private <%- projectSuffixUpperCase %>Repository repository;
 
-    @Inject
+    @Autowired
+    @Getter
     @Setter
     private ComponentFilterBuilder componentFilterBuilder;
 

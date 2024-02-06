@@ -45,34 +45,35 @@ dependencies {
 	annotationProcessor 'org.projectlombok:lombok:' + project.lombokVersion
 	//Jackson
 	implementation group: 'com.fasterxml.jackson.jaxrs', name: 'jackson-jaxrs-json-provider', version: project.jacksonVersion
-	//Persistence
-	implementation group: 'javax.persistence', name: 'javax.persistence-api', version: project.javaxPersistenceVersion
-	implementation group: 'javax.transaction', name: 'javax.transaction-api', version: project.javaxTransactionApiVersion
 	//Encryption
 	implementation group: 'org.bouncycastle', name: 'bcmail-jdk15on', version: project.bouncyCastleVersion
 	// Implementation
 	implementation group: 'it.water.distribution', name: 'Water-distribution-spring', version: project.waterVersion
 <%if(applicationTypeEntity) {-%>
-    implementation group: 'org.springframework.data', name: 'spring-data-jpa', version: project.springBootVersion
-<% if(persistenceLib === 'javax') {	-%>
-	//javax persistence
-	implementation 'javax.persistence:javax.persistence-api:'+project.javaxPersistenceVersion
-	//Water javax persistence
-	implementation 'it.water.repository.jpa:JpaRepository-javax:'+project.waterVersion
-	implementation group: 'javax.transaction', name: 'javax.transaction-api', version: project.javaxTransactionApiVersion
-<% } else { -%>
-	//jakarta persistence
-	implementation 'jakarta.persistence:jakarta.persistence-api:'+project.jakartaPersistenceVersion
-	//Water javax persistence
-	implementation 'it.water.repository.jpa:JpaRepository-jakarta:'+project.waterVersion
-	implementation group: 'jakarta.transaction', name: 'jakarta.transaction-api', version: project.jakartaTransactionApiVersion
-<% } -%>	
+	//todo remove it 
+	implementation 'org.hsqldb:hsqldb:2.4.1'
+	// Persistence 
+	implementation group: 'org.springframework.data', name: 'spring-data-jpa', version: project.springBootVersion
 	//Water Persistence
 	implementation group:'it.water.repository', name:'Repository-entity', version:project.waterVersion
 	implementation group:'it.water.repository', name:'Repository-persistence', version:project.waterVersion
 	implementation group:'it.water.repository', name:'Repository-service', version:project.waterVersion
+	implementation group:'it.water.repository.jpa', name:'JpaRepository-spring', version:project.waterVersion
+<% if(persistenceLib === 'javax') {	-%>
+	//Water jakarta persistence
+	implementation 'it.water.repository.jpa:JpaRepository-javax:'+project.waterVersion
+	//javax persistence
+	implementation 'javax.persistence:javax.persistence-api:'+project.javaxPersistenceVersion
+<% } else { -%>
+	//Water jakarta persistence
+	implementation 'it.water.repository.jpa:JpaRepository-jakarta:'+project.waterVersion
+	//jakarta persistence
+	implementation 'jakarta.persistence:jakarta.persistence-api:'+project.jakartaPersistenceVersion
+<% } -%>	
+
 <%} -%>
 	//Validation
+	//implementation 'org.springframework.boot:spring-boot-starter-validation:' + project.springBootVersion
 <% if(validationLib === 'javax') {	-%>
 	implementation 'it.water.core:Core-validation-javax:'+project.waterVersion
     implementation group: 'javax.validation', name: 'validation-api', version: project.javaxValidationVersion
@@ -83,7 +84,9 @@ dependencies {
     implementation group: "org.hibernate", name: "hibernate-validator", version: project.hibernateValidatorVersion
 <% } -%>
 <%if(hasRestServices) {-%>
-	//Rest Water Deps
+	// Rest Services
+	implementation 'org.springframework.boot:spring-boot-starter-web:' + project.springBootVersion
+	// Rest Water Deps
 	implementation group: 'it.water.service.rest', name: 'Rest-api', version: project.waterVersion
 	implementation group: 'it.water.service.rest', name: 'Rest-security', version: project.waterVersion
 	implementation group: 'it.water.service.rest', name: 'Rest-service', version: project.waterVersion
@@ -91,7 +94,7 @@ dependencies {
 <% 		if(applicationTypeEntity){ -%>
 	implementation group: 'it.water.service.rest', name: 'Rest-persistence', version: project.waterVersion
 <% 		} -%>
-	// https://mvnrepository.com/artifact/io.swagger/swagger-jaxrs
+	// Swagger
     implementation group: 'io.swagger', name: 'swagger-jaxrs', version: project.swaggerJaxRsVersion
 <%} -%>
 	//Spring for spring source set
@@ -99,12 +102,15 @@ dependencies {
 	implementation 'org.atteo.classindex:classindex:' + project.atteoClassIndexVersion
 	annotationProcessor('org.atteo.classindex:classindex:' + project.atteoClassIndexVersion)
 
+	testImplementation group:'it.water.core',name:'Core-testing-utils',version:project.waterVersion
 	testImplementation 'org.springframework.boot:spring-boot-starter-test:' + project.springBootVersion
 	testImplementation 'org.junit.jupiter:junit-jupiter-api:' + project.junitJupiterVersion
 	testImplementation 'org.junit.jupiter:junit-jupiter-engine:' + project.junitJupiterVersion
 	testImplementation 'org.atteo.classindex:classindex:' + project.atteoClassIndexVersion
 	testAnnotationProcessor('org.atteo.classindex:classindex:' + project.atteoClassIndexVersion)
 	testAnnotationProcessor 'org.projectlombok:lombok:' + project.lombokVersion
+	// https://mvnrepository.com/artifact/com.intuit.karate/karate-junit5
+	testImplementation group: 'com.intuit.karate', name: 'karate-junit5', version: '1.4.1'
 }
 
 test {

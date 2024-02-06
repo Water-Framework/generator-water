@@ -4,19 +4,19 @@ package <%-serviceRestPackage%>;
 import <%-apiPackage%>.*;
 import <%-apiPackage%>.rest.*;
 import <%-modelPackage%>.*;
-
-import it.water.core.api.service.BaseEntityApi;
-import it.water.core.api.service.rest.FrameworkRestController;
-import it.water.core.interceptors.annotations.*;
 import it.water.service.rest.persistence.BaseEntityRestApi;
 
 import lombok.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RestController;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 <%
-    let extends = "";
+    let extendsDeclaration = "";
     if(applicationTypeEntity){
-        extends = "extends BaseEntityRestApi<"+projectSuffixUpperCase+">";
+        extendsDeclaration = "extends BaseEntityRestApi<"+projectSuffixUpperCase+">";
     }
 
 -%>
@@ -26,60 +26,14 @@ import org.springframework.beans.factory.annotation.Autowired;
  *
  */
 @RestController
-public class <%- projectSuffixUpperCase %>RestControllerImpl <%-extends%> implements <%- projectSuffixUpperCase %>RestApi {
+public class <%- projectSuffixUpperCase %>RestControllerImpl <%-extendsDeclaration%> implements <%- projectSuffixUpperCase %>RestApi {
+    private static Logger log = LoggerFactory.getLogger(<%- projectSuffixUpperCase %>RestControllerImpl.class.getName());
 
     @Autowired
-    private <%- projectSuffixUpperCase %>Api <%- projectSuffixLowerCase %>Api;
+    @Getter
+    private <%- projectSuffixUpperCase %>Api entityService;
 
-    @Override
-    protected BaseEntityApi<<%- projectSuffixUpperCase %>> getEntityService() {
-        return <%- projectSuffixLowerCase %>Api;
-    }
-<%if(applicationTypeEntity) { -%>
-    @Override
-    public <%- projectSuffixUpperCase %> save(<%- projectSuffixUpperCase %> entity) {
-        return super.save(entity);
-    }
-
-    @Override
-    public <%- projectSuffixUpperCase %> update(<%- projectSuffixUpperCase %> entity) {
-        return super.update(entity);
-    }
-
-    @Override
-    public void remove(long id) {
-        this.log.debug("Invoking Remove entity from rest service for {} with id: {}", this.getEntityService().getEntityType().getSimpleName(), id);
-        this.getEntityService().remove(id);
-    }
-
-    @Override
-    public <%- projectSuffixUpperCase %> find(long id) {
-        this.log.debug("Invoking Find entity from rest service for {} with id: {}", this.getEntityService().getEntityType().getSimpleName(), id);
-        return this.getEntityService().find(id);
-    }
-
-    @Override
-    public PaginableResult<<%- projectSuffixUpperCase %>> findAll(Integer delta, Integer page, Query filter, QueryOrder order) {
-        this.log.debug("Invoking Find All entity from rest service for {}", this.getEntityService().getEntityType().getSimpleName());
-        if (delta == null || delta <= 0) {
-            delta = 20;
-        }
-
-        if (page == null || page <= 0) {
-            page = 1;
-        }
-
-        return this.getEntityService().findAll(filter, delta, page, order);
-    }
-
-    @Override
-    public PaginableResult<<%- projectSuffixUpperCase %>> findAll() {
-        this.log.debug("Invoking Find All with no params rest service for {}", this.getEntityService().getEntityType().getSimpleName());
-        return this.findAll((Integer)null, (Integer)null, (Query)null, (QueryOrder)null);
-    }
-<% } -%>
-
-    //All CRUD methods are already exposed by <%- projectSuffixUpperCase %>RestApi interface with JAXRS Annotatiosn
+    //All CRUD methods are already exposed by BaseEntitytRestApi interface with 
     //if you need to check which methods are exposed please go to <%-apiPackage%>.rest.<%- projectSuffixUpperCase %>
 
     //todo add custom exposed methods or override CRUD operations

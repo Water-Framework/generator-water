@@ -174,7 +174,7 @@ module.exports = class extends Generator {
             type: 'confirm',
             name: 'springRepository',
             message: 'Would you like to use Spting repository instead of spring Water default repositories?',
-            default: false,
+            default: true,
             when: function (answer) {
                 return answer.projectTechnology === 'spring' && answer.applicationType === 'entity';
             }
@@ -196,7 +196,7 @@ module.exports = class extends Generator {
             name: 'restContextRoot',
             message: 'Please insert your rest context root ex. /myEntity ?',
             default: function(answers){
-                return "/"+answers.projectName+"s";
+                return "/"+self.camelize(answers.projectName)+"s";
             }
         },
         {
@@ -318,6 +318,7 @@ module.exports = class extends Generator {
                 modelPackage: this.modelPackagePath.replace(sourceFolderBasicPath, "").split("/").join("."),
                 repositoryPackagePath: this.repositoryPackagePath,
                 repositoryPackage: this.repositoryPackagePath.replace(sourceFolderBasicPath, "").split("/").join("."),
+                springRepository: this.springRepository,
                 servicePackagePath: this.servicePackagePath,
                 servicePackage: this.servicePackagePath.replace(sourceFolderBasicPath, "").split("/").join("."),
                 serviceRestPackagePath: this.serviceRestPackagePath,

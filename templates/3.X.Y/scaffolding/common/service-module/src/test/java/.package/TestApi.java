@@ -7,6 +7,8 @@ import it.water.core.api.service.Service;
 import it.water.core.interceptors.annotations.Inject;
 import it.water.core.model.exceptions.ValidationException;
 import it.water.core.model.exceptions.WaterRuntimeException;
+import it.water.repository.entity.model.exceptions.DuplicateEntityException;
+
 import it.water.core.testing.utils.junit.WaterTestExtension;
 
 import <%-apiPackage%>.*;
@@ -61,10 +63,10 @@ public class <%- projectSuffixUpperCase %>ApiTest implements Service {
     @Order(2)
     public void saveOk() {
         <%- projectSuffixUpperCase %> entity = create<%- projectSuffixUpperCase %>(0);
-        u = this.<%- projectSuffixLowerCase %>Api.save(entity);
+        entity = this.<%- projectSuffixLowerCase %>Api.save(entity);
         Assertions.assertEquals(1, entity.getEntityVersion());
-        Assertions.assertTrue(u.getId() > 0);
-        Assertions.assertEquals("exampleField0", u.getExampleField());
+        Assertions.assertTrue(entity.getId() > 0);
+        Assertions.assertEquals("exampleField0", entity.getExampleField());
     }
 
     /**
@@ -77,7 +79,7 @@ public class <%- projectSuffixUpperCase %>ApiTest implements Service {
         <%- projectSuffixUpperCase %> entity = this.<%- projectSuffixLowerCase %>Api.find(q);
         Assertions.assertNotNull(entity);
         entity.setExampleField("exampleFieldUpdated");
-        entity = this.this.<%- projectSuffixLowerCase %>Api.update(entity);
+        entity = this.<%- projectSuffixLowerCase %>Api.update(entity);
         Assertions.assertEquals("exampleFieldUpdated", u.getExampleField());
         Assertions.assertEquals(2, entity.getEntityVersion());
     }
@@ -90,7 +92,7 @@ public class <%- projectSuffixUpperCase %>ApiTest implements Service {
     public void updateShouldFailWithWrongVersion() {
         Query q = this.<%- projectSuffixLowerCase %>Repository.getQueryBuilderInstance().createQueryFilter("exampleField=exampleFieldUpdated");
         <%- projectSuffixUpperCase %> errorEntity = this.<%- projectSuffixLowerCase %>Api.find(q);
-        Assertions.assertEquals("exampleFieldUpdated", errorEntity.getUsername());
+        Assertions.assertEquals("exampleFieldUpdated", errorEntity.getExampleField());
         Assertions.assertEquals(2, errorEntity.getEntityVersion());
         errorEntity.setEntityVersion(1);
         Assertions.assertThrows(WaterRuntimeException.class, () -> this.<%- projectSuffixLowerCase %>Api.update(errorEntity));
@@ -102,7 +104,7 @@ public class <%- projectSuffixUpperCase %>ApiTest implements Service {
     @Test
     @Order(5)
     public void findAllShouldWork() {
-        PaginableResult<<%- projectSuffixUpperCase %>> all = this.this.<%- projectSuffixLowerCase %>Api.findAll(null, -1, -1, null);
+        PaginableResult<<%- projectSuffixUpperCase %>> all = this.<%- projectSuffixLowerCase %>Api.findAll(null, -1, -1, null);
         Assertions.assertTrue(all.getResults().size() == 1);
     }
 
@@ -114,14 +116,14 @@ public class <%- projectSuffixUpperCase %>ApiTest implements Service {
     @Order(6)
     public void findAllPaginatedShouldWork() {
         for (int i = 2; i < 11; i++) {
-            User u = create<%- projectSuffixUpperCase %>(i);
-            this.userApi.save(u);
+            <%- projectSuffixUpperCase %> u = create<%- projectSuffixUpperCase %>(i);
+            this.<%- projectSuffixLowerCase %>Api.save(u);
         }
-        PaginableResult<<%- projectSuffixUpperCase %>> paginated = this.this.<%- projectSuffixLowerCase %>Api.findAll(null, 7, 1, null);
+        PaginableResult<<%- projectSuffixUpperCase %>> paginated = this.<%- projectSuffixLowerCase %>Api.findAll(null, 7, 1, null);
         Assertions.assertEquals(7, paginated.getResults().size());
         Assertions.assertEquals(1, paginated.getCurrentPage());
         Assertions.assertEquals(2, paginated.getNextPage());
-        paginated = this.userApi.findAll(null, 7, 2, null);
+        paginated = this.<%- projectSuffixLowerCase %>Api.findAll(null, 7, 2, null);
         Assertions.assertEquals(3, paginated.getResults().size());
         Assertions.assertEquals(2, paginated.getCurrentPage());
         Assertions.assertEquals(1, paginated.getNextPage());
@@ -137,7 +139,7 @@ public class <%- projectSuffixUpperCase %>ApiTest implements Service {
         paginated.getResults().forEach(entity -> {
             this.<%- projectSuffixLowerCase %>Api.remove(entity.getId());
         });
-        Assertions.assertTrue(this.this.<%- projectSuffixLowerCase %>Api.countAll(null) == 0);
+        Assertions.assertTrue(this.<%- projectSuffixLowerCase %>Api.countAll(null) == 0);
     }
 
     /**
@@ -148,7 +150,7 @@ public class <%- projectSuffixUpperCase %>ApiTest implements Service {
     public void saveShouldFailOnDuplicatedEntity() {
         <%- projectSuffixUpperCase %> entity = create<%- projectSuffixUpperCase %>(1);
         this.<%- projectSuffixLowerCase %>Api.save(u);
-        User duplicated = this.create<%- projectSuffixLowerCase %>Api(1);
+        this.<%- projectSuffixUpperCase %>Api duplicated = this.create<%- projectSuffixLowerCase %>Api(1);
         //cannot insert new entity wich breaks unique constraint
         Assertions.assertThrows(DuplicateEntityException.class,() -> this.<%- projectSuffixLowerCase %>Api.save(duplicated));
         <%- projectSuffixUpperCase %> secondEntity = create<%- projectSuffixUpperCase %>(2);
@@ -164,7 +166,7 @@ public class <%- projectSuffixUpperCase %>ApiTest implements Service {
     @Test
     @Order(9)
     public void updateShouldFailOnValidationFailure() {
-        <%- projectSuffixUpperCase %> newEntity = new User("<script>function(){alert('ciao')!}</script>");
+        <%- projectSuffixUpperCase %> newEntity = new <%- projectSuffixUpperCase %>("<script>function(){alert('ciao')!}</script>");
         Assertions.assertThrows(ValidationException.class,() -> this.<%- projectSuffixLowerCase %>Api.save(newEntity));
     }
 
