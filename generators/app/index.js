@@ -9,7 +9,8 @@ module.exports = class extends Generator {
 
     initializing() {
         super.printSplash();
-        this.checkUpdates();
+        if(!this.options.skipUpdate)
+            this.checkUpdates();
         this._private_getWorkspaceVersion();
         this._private_checkRequirements();
         this.automaticallyLinkProjects();
