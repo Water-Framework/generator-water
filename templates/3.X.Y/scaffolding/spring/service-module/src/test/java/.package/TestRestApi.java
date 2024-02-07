@@ -7,7 +7,6 @@ import it.water.core.testing.utils.junit.WaterTestExtension;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.context.SpringBootTest;
 
-@SpringBootTest
 public class <%- projectSuffixUpperCase %>RestApiTest {
     
     @Karate.Test
