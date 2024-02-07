@@ -242,6 +242,7 @@ module.exports = class extends AcsBaseGenerator {
         this.log.info("Technology Template path is: "+technologyTemplatePath+" \n destination path: "+this.destinationPath(projectConf.projectServicePath))
         this.fs.copyTpl(serviceTemplatePath, this.destinationPath(projectConf.projectServicePath), projectConf);
         this.fs.copyTpl(serviceTemplatePath+"/.yo-rc.json", this.destinationPath(projectConf.projectServicePath)+"/.yo-rc.json", projectConf);
+        
         if(technologyTemplatePathExists){
             //Overriding eventually with specific technologies files
             this.fs.copyTpl(technologyTemplatePath, this.destinationPath(projectConf.projectServicePath), projectConf);
@@ -288,6 +289,12 @@ module.exports = class extends AcsBaseGenerator {
         if(projectConf.projectTechnology === "spring"){
             //using the same destination path for tests, in order to cover also spring requirements
             this.fs.copyTpl(technologyTemplatePath+"/src/main/java/.service_package/Application.java", this.destinationPath(projectConf.projectServicePath)+projectConf.projectBasePath+"/"+projectConf.projectSuffixUpperCase+"Application.java", projectConf);
+            let testMetaInfFolder = this.destinationPath(projectConf.projectServicePath)+"/src/test/resources/META-INF";
+            let testAppPropFile = this.destinationPath(projectConf.projectServicePath)+"/src/test/resources/it.water.application.properties";
+            this.log.info("Removing "+testMetaInfFolder);
+            this.fs.delete(testMetaInfFolder,{ recursive: true, force: true });
+            this.log.info("Removing "+testAppPropFile);
+            this.fs.delete(testAppPropFile,{ force: true });
         }
         this.log.ok("Service module created succesfully!");
     }

@@ -4,14 +4,12 @@ package <%- apiPackage %>.rest;
 import <%-modelPackage%>.*;
 
 import it.water.core.api.model.PaginableResult;
-import it.water.core.api.service.rest.FrameworkRestApi;
 import it.water.core.api.service.rest.RestApi;
 import it.water.service.rest.api.security.LoggedIn;
 
 import com.fasterxml.jackson.annotation.JsonView;
 import it.water.service.rest.api.WaterJsonView;
 import io.swagger.annotations.*;
-import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 
 import org.springframework.web.bind.annotation.*;
@@ -37,7 +35,7 @@ public interface <%- projectSuffixUpperCase %>RestApi extends RestApi {
             @ApiResponse(code = 422, message = "Duplicated Entity"),
             @ApiResponse(code = 500, message = "Internal server error")
     })
-    ResponseEntity<<%- projectSuffixUpperCase %>> saveApi(<%- projectSuffixUpperCase %> <%- projectSuffixLowerCase %>);
+    ResponseEntity<<%- projectSuffixUpperCase %>> saveApi(@RequestBody <%- projectSuffixUpperCase %> <%- projectSuffixLowerCase %>);
 
     @LoggedIn
     @JsonView(WaterJsonView.Public.class)
@@ -50,7 +48,7 @@ public interface <%- projectSuffixUpperCase %>RestApi extends RestApi {
             @ApiResponse(code = 422, message = "Duplicated Entity"),
             @ApiResponse(code = 500, message = "Internal server error")
     })
-    ResponseEntity<<%- projectSuffixUpperCase %>> updateApi(<%- projectSuffixUpperCase %> <%- projectSuffixLowerCase %>);
+    ResponseEntity<<%- projectSuffixUpperCase %>> updateApi(@RequestBody <%- projectSuffixUpperCase %> <%- projectSuffixLowerCase %>);
 
     @LoggedIn
     @JsonView(WaterJsonView.Public.class)

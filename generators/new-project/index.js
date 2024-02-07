@@ -257,7 +257,8 @@ module.exports = class extends Generator {
             let basePackageArr = this.projectGroupId.split(".");
 
             let sourceFolderBasicPath = "/src/main/java/";
-            let testFolderBasicPath = "/src/test/java/"
+            let testFolderBasicPath = "/src/test/java/";
+
             let basePackage = sourceFolderBasicPath + basePackageArr.join("/");
             let baseTestPackage = testFolderBasicPath + basePackageArr.join("/");;
 
