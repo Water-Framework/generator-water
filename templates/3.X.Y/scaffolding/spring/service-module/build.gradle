@@ -48,6 +48,7 @@ dependencies {
 	//Encryption
 	implementation group: 'org.bouncycastle', name: 'bcmail-jdk15on', version: project.bouncyCastleVersion
 	// Implementation
+	implementation 'it.water.core:Core-api:'+project.waterVersion
 	implementation group: 'it.water.distribution', name: 'Water-distribution-spring', version: project.waterVersion
 <%if(applicationTypeEntity) {-%>
 	//todo remove it 

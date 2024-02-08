@@ -12,6 +12,7 @@ import lombok.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.http.ResponseEntity;
 
 import org.slf4j.Logger;
@@ -29,6 +30,7 @@ import org.slf4j.LoggerFactory;
  *
  */
 @RestController
+@Transactional
 public class <%- projectSuffixUpperCase %>RestControllerImpl <%-extendsDeclaration%> implements <%- projectSuffixUpperCase %>RestApi {
     private static Logger log = LoggerFactory.getLogger(<%- projectSuffixUpperCase %>RestControllerImpl.class.getName());
 
@@ -62,7 +64,7 @@ public class <%- projectSuffixUpperCase %>RestControllerImpl <%-extendsDeclarati
     @Override
     public ResponseEntity<<%- projectSuffixUpperCase %>> removeApi(long id) {
         super.remove(id);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.status(204).build();
     }
 <% } -%>
 //todo add custom exposed methods or override CRUD operations

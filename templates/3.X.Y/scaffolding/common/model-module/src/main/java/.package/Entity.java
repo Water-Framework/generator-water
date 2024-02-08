@@ -2,7 +2,7 @@ package <%- modelPackage %>;
 
 import it.water.repository.jpa.model.AbstractJpaEntity;
 import it.water.core.validation.annotations.*;
-import it.water.service.rest.api.WaterJsonView;
+import it.water.core.api.service.rest.WaterJsonView;
 <%if(isProtectedEntity || isOwnedEntity){-%>
 import it.water.core.api.permission.*;
 import it.water.core.permission.action.CrudActions;
@@ -58,17 +58,13 @@ import javax.persistence.*;
 @Entity
 @Table(uniqueConstraints = @UniqueConstraint(columnNames = {"exampleField"})) //example of unique constraint
 @Access(AccessType.FIELD)
-<% if(hasRestServices){ -%>
-// Jackson :ignoring technical fields from abstract entity in json serialization
-@JsonIgnoreProperties(value = {"systemApiClassName","resourceName"})    
-<% } -%>
 //Lombok
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @RequiredArgsConstructor
 @Getter
 @ToString
 @EqualsAndHashCode(of = {"id","exampleField"/*todo add more fields for equals and hashcode, remember hashcode and equals are key methods for ORMs*/})
-<%- defineActionsAndRolesAnnotation %>
+<%- defineActionsAndRolesAnnotation -%>
 public class <%- projectSuffixUpperCase %> extends AbstractJpaEntity<%-implementedInterfaces%> {
     
 
