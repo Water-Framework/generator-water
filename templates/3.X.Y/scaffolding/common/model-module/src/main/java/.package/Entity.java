@@ -32,11 +32,11 @@ import javax.persistence.*;
             '@AccessControl(availableActions = {CrudActions.SAVE, CrudActions.UPDATE, CrudActions.FIND, CrudActions.REMOVE},\n'+
             'rolesPermissions = {\n'+
             '       //Admin role can do everything\n'+
-            '        @DefaultRoleAccess(roleName = "'+projectSuffixUpperCase+'Manager", actions = {CrudActions.SAVE, CrudActions.UPDATE, CrudActions.FIND, CrudActions.REMOVE}),\n'+
+            '        @DefaultRoleAccess(roleName = '+projectSuffixUpperCase+'.DEFAULT_MANAGER_ROLE, actions = {CrudActions.SAVE, CrudActions.UPDATE, CrudActions.FIND, CrudActions.REMOVE}),\n'+
             '        //Viwer has read only access\n'+
-            '        @DefaultRoleAccess(roleName = "'+projectSuffixUpperCase+'Viewer", actions = {CrudActions.FIND}),\n'+
+            '        @DefaultRoleAccess(roleName = '+projectSuffixUpperCase+'.DEFAULT_VIEWER_ROLE, actions = {CrudActions.FIND}),\n'+
             '        //Editor can do anything but remove\n'+
-            '        @DefaultRoleAccess(roleName = "'+projectSuffixUpperCase+'Editor", actions = {CrudActions.SAVE, CrudActions.UPDATE, CrudActions.FIND})\n'+
+            '        @DefaultRoleAccess(roleName = '+projectSuffixUpperCase+'.DEFAULT_EDITOR_ROLE, actions = {CrudActions.SAVE, CrudActions.UPDATE, CrudActions.FIND})\n'+
             '})';
      implementedInterfaces += "ProtectedEntity"
    }
@@ -67,7 +67,11 @@ import javax.persistence.*;
 <%- defineActionsAndRolesAnnotation -%>
 public class <%- projectSuffixUpperCase %> extends AbstractJpaEntity<%-implementedInterfaces%> {
     
-
+<%if (isProtectedEntity){ -%>
+    public static final String DEFAULT_MANAGER_ROLE = "<%- projectSuffixLowerCase %>Manager";
+    public static final String DEFAULT_VIEWER_ROLE = "<%- projectSuffixLowerCase %>Viewer";
+    public static final String DEFAULT_EDITOR_ROLE = "<%- projectSuffixLowerCase %>Editor";
+<% } -%>
     //insert fields...
 
     //Explanatation: in order to have better code management objects should be encapsulated correctly:

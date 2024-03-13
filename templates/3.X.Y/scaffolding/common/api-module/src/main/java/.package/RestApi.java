@@ -9,7 +9,7 @@ import it.water.core.api.service.rest.RestApi;
 import it.water.service.rest.api.security.LoggedIn;
 
 import com.fasterxml.jackson.annotation.JsonView;
-import it.water.service.rest.api.WaterJsonView;
+import it.water.core.api.service.rest.WaterJsonView;
 import io.swagger.annotations.*;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;

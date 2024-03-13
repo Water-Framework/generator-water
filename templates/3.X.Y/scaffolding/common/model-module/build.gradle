@@ -27,6 +27,7 @@ dependencies {
 	//Core Water dependencies
     implementation "it.water.core:Core-api:"+project.waterVersion
     implementation "it.water.core:Core-model:"+project.waterVersion
+	implementation "it.water.core:Core-permission:"+project.waterVersion
 	//Validation Water dependencies
 <% if(validationLib === 'javax') {	-%>
     implementation group: 'javax.validation', name: 'validation-api', version: project.javaxValidationVersion

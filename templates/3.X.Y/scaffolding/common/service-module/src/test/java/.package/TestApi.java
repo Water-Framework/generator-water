@@ -1,12 +1,17 @@
 package <%-projectGroupId%>;
 
 import it.water.core.api.model.PaginableResult;
+import it.water.core.api.permission.Role;
+import it.water.core.api.permission.RoleManager;
 import it.water.core.api.registry.ComponentRegistry;
 import it.water.core.api.repository.query.Query;
 import it.water.core.api.service.Service;
+import it.water.core.testing.utils.api.TestPermissionManager;
+import it.water.core.testing.utils.bundle.TestRuntimeInitializer;
 import it.water.core.interceptors.annotations.Inject;
 import it.water.core.model.exceptions.ValidationException;
 import it.water.core.model.exceptions.WaterRuntimeException;
+import it.water.core.permission.exceptions.UnauthorizedException;
 import it.water.repository.entity.model.exceptions.DuplicateEntityException;
 
 import it.water.core.testing.utils.junit.WaterTestExtension;
@@ -43,6 +48,49 @@ public class <%- projectSuffixUpperCase %>ApiTest implements Service {
     @Setter
     private <%- projectSuffixUpperCase %>Repository <%- projectSuffixLowerCase %>Repository;
 
+<%if(isProtectedEntity){ -%>
+    @Inject
+    @Setter
+    //default permission manager in test environment;
+    private TestPermissionManager permissionManager;
+
+    @Inject
+    @Setter
+    //test role manager
+    private RoleManager roleManager;
+
+    //admin user
+    private it.water.core.api.model.User adminUser;
+    private it.water.core.api.model.User <%- projectSuffixLowerCase %>ManagerUser;
+    private it.water.core.api.model.User <%- projectSuffixLowerCase %>ViewerUser;
+    private it.water.core.api.model.User <%- projectSuffixLowerCase %>EditorUser;
+
+    private Role <%- projectSuffixLowerCase %>ManagerRole;
+    private Role <%- projectSuffixLowerCase %>ViewerRole;
+    private Role <%- projectSuffixLowerCase %>EditorRole;
+    
+    @BeforeAll
+    public void beforeAll() {
+        //getting user
+        <%- projectSuffixLowerCase %>ManagerRole = roleManager.getRole(<%- projectSuffixUpperCase %>.DEFAULT_MANAGER_ROLE);
+        <%- projectSuffixLowerCase %>ViewerRole = roleManager.getRole(<%- projectSuffixUpperCase %>.DEFAULT_VIEWER_ROLE);
+        <%- projectSuffixLowerCase %>EditorRole = roleManager.getRole(<%- projectSuffixUpperCase %>.DEFAULT_EDITOR_ROLE);
+        Assertions.assertNotNull(<%- projectSuffixLowerCase %>ManagerRole);
+        Assertions.assertNotNull(<%- projectSuffixLowerCase %>ViewerRole);
+        Assertions.assertNotNull(<%- projectSuffixLowerCase %>EditorRole);
+        //impersonate admin so we can test the happy path
+        adminUser = permissionManager.addUser("admin", "name", "lastname", "admin@a.com", true);
+        <%- projectSuffixLowerCase %>ManagerUser = permissionManager.addUser("manager", "name", "lastname", "manager@a.com", false);
+        <%- projectSuffixLowerCase %>ViewerUser = permissionManager.addUser("viewer", "name", "lastname", "viewer@a.com", false);
+        <%- projectSuffixLowerCase %>EditorUser = permissionManager.addUser("editor", "name", "lastname", "editor@a.com", false);
+        //starting with admin permissions
+        roleManager.addRole(<%- projectSuffixLowerCase %>ManagerUser.getId(), <%- projectSuffixLowerCase %>ManagerRole);
+        roleManager.addRole(<%- projectSuffixLowerCase %>ViewerUser.getId(), <%- projectSuffixLowerCase %>ViewerRole);
+        roleManager.addRole(<%- projectSuffixLowerCase %>EditorUser.getId(), <%- projectSuffixLowerCase %>EditorRole);
+        //starting with admin
+        TestRuntimeInitializer.getInstance().impersonate(adminUser);
+    }
+<% } -%>
     /**
      * Testing basic injection of basic component for <%- projectSuffixLowerCase %> entity.
      */
@@ -170,9 +218,55 @@ public class <%- projectSuffixUpperCase %>ApiTest implements Service {
         Assertions.assertThrows(ValidationException.class,() -> this.<%- projectSuffixLowerCase %>Api.save(newEntity));
     }
 
+<%if(isProtectedEntity) { -%>
+    /**
+     * Testing Crud operations on manager role
+     */
+    @Order(10)
+    @Test
+    public void managerCanDoEverything() {
+        TestRuntimeInitializer.getInstance().impersonate(managerUser);
+        final <%- projectSuffixUpperCase %> entity = createUser(101);
+        <%- projectSuffixUpperCase %> savedEntity = Assertions.assertDoesNotThrow(() -> this.<%- projectSuffixLowerCase %>Api.save(entity));
+        savedEntity.setExampleField("newSavedEntity");
+        Assertions.assertDoesNotThrow(() -> this.<%- projectSuffixLowerCase %>Api.update(entity));
+        Assertions.assertDoesNotThrow(() -> this.<%- projectSuffixLowerCase %>Api.find(savedEntity.getId()));
+        Assertions.assertDoesNotThrow(() -> this.<%- projectSuffixLowerCase %>Api.remove(savedEntity.getId()));
+
+    }
+
+    @Order(11)
+    @Test
+    public void viewerCannotSaveOrUpdateOrRemove() {
+        TestRuntimeInitializer.getInstance().impersonate(viewerUser);
+        final <%- projectSuffixUpperCase %> entity = createUser(201);
+        Assertions.assertThrows(UnauthorizedException.class, () -> this.<%- projectSuffixLowerCase %>Api.save(entity));
+        //viewer can search
+        <%- projectSuffixUpperCase %> found = Assertions.assertDoesNotThrow(() -> this.<%- projectSuffixLowerCase %>Api.findAll(null, -1, -1, null).getResults().stream().findFirst()).get();
+        Assertions.assertDoesNotThrow(() -> this.<%- projectSuffixLowerCase %>Api.find(found.getId()));
+        //viewer cannot update or remove
+        found.setExampleField("changeIt!");
+        Assertions.assertThrows(UnauthorizedException.class, () -> this.<%- projectSuffixLowerCase %>Api.update(entity));
+        Assertions.assertThrows(UnauthorizedException.class, () -> this.<%- projectSuffixLowerCase %>Api.remove(found.getId()));
+    }
+
+    @Order(12)
+    @Test
+    public void editorCannotRemove() {
+        TestRuntimeInitializer.getInstance().impersonate(editorUser);
+        final <%- projectSuffixUpperCase %> entity = createUser(301);
+        <%- projectSuffixUpperCase %> savedEntity = Assertions.assertDoesNotThrow(() -> this.<%- projectSuffixLowerCase %>Api.save(entity));
+        savedEntity.setExampleField("editorNewSavedEntity");
+        Assertions.assertDoesNotThrow(() -> this.<%- projectSuffixLowerCase %>Api.update(entity));
+        Assertions.assertDoesNotThrow(() -> this.<%- projectSuffixLowerCase %>Api.find(savedEntity.getId()));
+        Assertions.assertThrows(UnauthorizedException.class, () -> this.<%- projectSuffixLowerCase %>Api.remove(savedEntity.getId()));
+    }
+    
+<% } -%>
     private <%- projectSuffixUpperCase %> create<%- projectSuffixUpperCase %>(int seed){
         <%- projectSuffixUpperCase %> entity = new <%- projectSuffixUpperCase %>("exampleField"+seed);
         //todo add more fields here...
         return entity;
     }
+
 }
