@@ -245,8 +245,10 @@ module.exports = class extends AcsBaseGenerator {
         
         if(technologyTemplatePathExists){
             //Overriding eventually with specific technologies files
+            this.log.info("Overriding basic files with "+projectConf.projectTechnology+" specific files...")
             this.fs.copyTpl(technologyTemplatePath, this.destinationPath(projectConf.projectServicePath), projectConf);
         }
+
         if(fs.existsSync(technologyTemplatePath+"/.yo-rc.json"))
             this.fs.copyTpl(technologyTemplatePath+"/.yo-rc.json", this.destinationPath(projectConf.projectServicePath)+"/.yo-rc.json", projectConf);
 
@@ -295,7 +297,10 @@ module.exports = class extends AcsBaseGenerator {
             this.fs.delete(testMetaInfFolder,{ recursive: true, force: true });
             this.log.info("Removing "+testAppPropFile);
             this.fs.delete(testAppPropFile,{ force: true });
+        } else if (projectConf.projectTechnology === "osgi"){
+            this.fs.copyTpl(technologyTemplatePath+"/src/test/java/.package/TestConfiguration.java", this.destinationPath(projectConf.projectServicePath)+projectConf.projectTestPath+"/"+projectConf.projectSuffixUpperCase+"TestConfiguration.java", projectConf);
         }
+
         this.log.ok("Service module created succesfully!");
     }
 
@@ -349,10 +354,10 @@ module.exports = class extends AcsBaseGenerator {
         let buildCommand = ["clean","build"] 
         buildResult = this.spawnCommandSync("gradle", [...buildCommand,"-x","test"]);
         
-        if(this.config.get("projectsConfiguration")[projectName]["projectFeaturesPath"]){
+        if(this.config.get("projectsConfiguration")[projectName]["projectTechnology"] === "osgi"){
             let projectKarafFeaturesPath = this.config.get("projectsConfiguration")[projectName]["projectFeaturesPath"];
-            let featureDir = workspaceDir+"/"+projectKarafFeaturesPath;
-                if (fs.existsSync(featureDir)){
+            let featureDir = workspaceDir+"/"+projectKarafFeaturesPath+"/src/main/resources/features-src.xml";
+            if (fs.existsSync(featureDir)){
                 if(buildResult.status === 0) {
                         this.log.info("---------------> GENERATING FEATURES--------------------")
                         this.log.info("Features path: "+featureDir)
@@ -362,9 +367,7 @@ module.exports = class extends AcsBaseGenerator {
         }
 
         if (buildResult.status === 0) {
-            if(this.config.get("projectsConfiguration")[projectName].publishModule === true){
-                this.spawnCommandSync("gradle", ["publishToMavenLocal"]);
-            }
+            this.spawnCommandSync("gradle", ["publishToMavenLocal"]);
             this.log.ok("Build of " + projectName + " completed succesfully");
         } else {
             this.log.error("Build of " + projectName + " completed with errors");

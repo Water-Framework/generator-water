@@ -31,9 +31,7 @@ allprojects {
 	}
 	
 	apply plugin: 'java'
-<% if(publishModule){ -%>
 	apply plugin: 'maven-publish'
-<% } -%>
 	apply plugin: 'jacoco'
 	
 <% if(publishModule){ -%>

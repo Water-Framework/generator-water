@@ -51,19 +51,19 @@ dependencies {
 	implementation group: 'it.water.distribution', name: 'Water-distribution-spring', version: project.waterVersion
 <%if(applicationTypeEntity) {-%>
 	//todo remove it 
-	implementation 'org.hsqldb:hsqldb:2.4.1'
+	implementation group:'org.hsqldb', name:'hsqldb', version:'2.4.1'
 	// Persistence 
 	implementation group: 'org.springframework.data', name: 'spring-data-jpa', version: project.springBootVersion
 	//Water Persistence
 	implementation group:'it.water.repository.jpa', name:'JpaRepository-spring', version:project.waterVersion
 <% if(persistenceLib === 'javax') {	-%>
 	//javax persistence
-	implementation 'javax.persistence:javax.persistence-api:'+project.javaxPersistenceVersion
+	implementation group:'javax.persistence', name:'javax.persistence-api', version:project.javaxPersistenceVersion
 <% } else { -%>
 	//Water jakarta persistence
-	implementation 'it.water.repository.jpa:JpaRepository-jakarta:'+project.waterVersion
+	implementation group:'it.water.repository.jpa', name:'JpaRepository-jakarta', version:project.waterVersion
 	//jakarta persistence
-	implementation 'jakarta.persistence:jakarta.persistence-api:'+project.jakartaPersistenceVersion
+	implementation group:'jakarta.persistence', name:'jakarta.persistence-api', version:project.jakartaPersistenceVersion
 <% } -%>	
 <%} -%>
 	//Validation
@@ -78,26 +78,26 @@ dependencies {
 implementation group: 'org.springframework', name: 'spring-boot-starter', version: project.springBootVersion
 <%if(hasRestServices) {-%>
 	// Rest Services
-	implementation 'org.springframework.boot:spring-boot-starter-web:' + project.springBootVersion
+	implementation group:'org.springframework.boot', name:'spring-boot-starter-web', version:project.springBootVersion
 	// Rest Water Deps
 	implementation group: 'it.water.service.rest', name: 'Rest-spring-api', version: project.waterVersion
 <% 		if(applicationTypeEntity){ -%>
 	implementation group: 'it.water.service.rest', name: 'Rest-persistence', version: project.waterVersion
 <% 		} -%>
 	// Swagger
-    implementation 'io.springfox:springfox-swagger2:3.0.0'
-    implementation 'io.springfox:springfox-swagger-ui:3.0.0'
+    implementation group:'io.springfox', name:'springfox-swagger2', version:'3.0.0'
+    implementation group:'io.springfox', name:'springfox-swagger-ui', version:'3.0.0'
 <%} -%>
 	//Spring for spring source set
-	implementation 'org.springframework.boot:spring-boot-starter-aop:' + project.springBootVersion
-	implementation 'org.atteo.classindex:classindex:' + project.atteoClassIndexVersion
+	implementation group:'org.springframework.boot', name:'spring-boot-starter-aop', version:project.springBootVersion
+	implementation group:'org.atteo.classindex', name:'classindex', version:project.atteoClassIndexVersion
 	annotationProcessor('org.atteo.classindex:classindex:' + project.atteoClassIndexVersion)
 
-	testImplementation 'org.springframework.boot:spring-boot-starter-test:' + project.springBootVersion
-	testImplementation 'org.junit.jupiter:junit-jupiter-api:' + project.junitJupiterVersion
-	testImplementation 'org.junit.jupiter:junit-jupiter-engine:' + project.junitJupiterVersion
-	testImplementation  'javax.validation:validation-api:2.0.1.Final'
-	testImplementation 'org.atteo.classindex:classindex:' + project.atteoClassIndexVersion
+	testImplementation group 'org.springframework.boot', name:'spring-boot-starter-test', version:project.springBootVersion
+	testImplementation group 'org.junit.jupiter', name:'junit-jupiter-api:',version: project.junitJupiterVersion
+	testImplementation group 'org.junit.jupiter', name:'junit-jupiter-engine:', version: project.junitJupiterVersion
+	testImplementation group 'javax.validation', name:'validation-api', version: '2.0.1.Final'
+	testImplementation group 'org.atteo.classindex', name:'classindex', version: project.atteoClassIndexVersion
 	testAnnotationProcessor('org.atteo.classindex:classindex:' + project.atteoClassIndexVersion)
 	testAnnotationProcessor 'org.projectlombok:lombok:' + project.lombokVersion
 	// https://mvnrepository.com/artifact/com.intuit.karate/karate-junit5

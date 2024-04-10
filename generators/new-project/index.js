@@ -322,6 +322,12 @@ module.exports = class extends Generator {
                 publishRepoUrl: answers.publishRepoUrl,
                 publishRepoHasCredentials: answers.publishRepoHasCredentials
             };
+            
+            if(this.projectTechnology === "osgi"){
+                //adding features path in order to create features xml for karaf distribution
+                this.projectConf.projectFeaturesPath = this.projectConf.projectServicePath;
+            }
+
             super.setProjectConfiguration(this.projectName, this.projectConf);
             done();
         });
