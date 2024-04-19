@@ -22,11 +22,6 @@ import <%-modelPackage%>.*;
 
 import lombok.Setter;
 
-import org.junit.jupiter.api.*;
-import org.junit.FixMethodOrder;
-import org.junit.BeforeClass;
-import org.junit.runner.RunWith;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.runners.MethodSorters;
 
 import org.apache.karaf.features.FeaturesService;
@@ -51,28 +46,25 @@ import org.ops4j.pax.exam.spi.reactors.PerSuite;
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class <%- projectSuffixUpperCase %>ApiTest extends KarafTestSupport {
     
-    private ComponentRegistry componentRegistry;
-    
-    private <%- projectSuffixUpperCase %>Api <%- projectSuffixLowerCase %>Api;
-    
-    private <%- projectSuffixUpperCase %>Repository <%- projectSuffixLowerCase %>Repository;
-    
-    private TestPermissionManager permissionManager;
-    
-    private Runtime runtime;
-    
-    private it.water.core.api.model.User adminUser;
+    private static ComponentRegistry componentRegistry;
+    private static <%- projectSuffixUpperCase %>Api <%- projectSuffixLowerCase %>Api;
+    private static <%- projectSuffixUpperCase %>Repository <%- projectSuffixLowerCase %>Repository;
+    private static TestPermissionManager permissionManager;
+    private static Runtime runtime;
+    private static it.water.core.api.model.User adminUser;
+    private static EntityManagerFactory entityManagerFactory;
+    private static EntityManager em;
     <%if(isProtectedEntity){ -%>
     //declaring user for permissions tests
-    private it.water.core.api.model.User managerUser;
-    private it.water.core.api.model.User viewerUser;
-    private it.water.core.api.model.User editorUser;
+    private static it.water.core.api.model.User managerUser;
+    private static it.water.core.api.model.User viewerUser;
+    private static it.water.core.api.model.User editorUser;
     
     //default is test role manager
-    private RoleManager roleManager;
-    private Role manager;
-    private Role viewer;
-    private Role editor;
+    private static RoleManager roleManager;
+    private static Role manager;
+    private static Role viewer;
+    private static Role editor;
     <% } -%>
 
     @Override
@@ -114,6 +106,8 @@ public class <%- projectSuffixUpperCase %>ApiTest extends KarafTestSupport {
         //impersonate admin so we can test the happy path
         adminUser = permissionManager.addUser("admin", "name", "lastname", "admin@a.com", true);
         TestRuntimeInitializer.getInstance().impersonate(adminUser, runtime);
+        entityManagerFactory = getOsgiService(EntityManagerFactory.class, "(osgi.unit.name=" + BookOsgiRepositoryImpl.PERSISTENCE_UNIT_NAME + ")", 0);
+        em = entityManagerFactory.createEntityManager();
     }
 
     /**
@@ -133,11 +127,13 @@ public class <%- projectSuffixUpperCase %>ApiTest extends KarafTestSupport {
      */
     @Test
     public void test002_saveOk() {
+        em.getTransaction().begin();
         <%- projectSuffixUpperCase %> entity = create<%- projectSuffixUpperCase %>(0);
         entity = this.<%- projectSuffixLowerCase %>Api.save(entity);
-        Assert.assertEquals(new Long(1), entity.getEntityVersion());
+        Assert.assertEquals(new Integer(1), entity.getEntityVersion());
         Assert.assertTrue(entity.getId() > 0);
         Assert.assertEquals("exampleField0", entity.getExampleField());
+        em.getTransaction().commit();
     }
 
     /**
@@ -145,26 +141,30 @@ public class <%- projectSuffixUpperCase %>ApiTest extends KarafTestSupport {
      */
     @Test
     public void test003_updateShouldWork() {
+        em.getTransaction().begin();
         Query q = this.<%- projectSuffixLowerCase %>Repository.getQueryBuilderInstance().createQueryFilter("exampleField=exampleField0");
         <%- projectSuffixUpperCase %> entity = this.<%- projectSuffixLowerCase %>Api.find(q);
         Assert.assertNotNull(entity);
         entity.setExampleField("exampleFieldUpdated");
         entity = this.<%- projectSuffixLowerCase %>Api.update(entity);
         Assert.assertEquals("exampleFieldUpdated", entity.getExampleField());
-        Assert.assertEquals(new Long(2), entity.getEntityVersion());
+        Assert.assertEquals(new Integer(2), entity.getEntityVersion());
+        em.getTransaction().commit();
     }
 
     /**
      * Testing update logic, basic test
      */
-    @Test
+    @Test(expected = WaterRuntimeException.class)
     public void test004_updateShouldFailWithWrongVersion() {
+        em.getTransaction().begin();
         Query q = this.<%- projectSuffixLowerCase %>Repository.getQueryBuilderInstance().createQueryFilter("exampleField=exampleFieldUpdated");
         <%- projectSuffixUpperCase %> errorEntity = this.<%- projectSuffixLowerCase %>Api.find(q);
         Assert.assertEquals("exampleFieldUpdated", errorEntity.getExampleField());
-        Assert.assertEquals(new Long(2), errorEntity.getEntityVersion());
+        Assert.assertEquals(new Integer(2), errorEntity.getEntityVersion());
         errorEntity.setEntityVersion(1);
-        Assert.assertThrows(WaterRuntimeException.class, () -> this.<%- projectSuffixLowerCase %>Api.update(errorEntity));
+        this.<%- projectSuffixLowerCase %>Api.update(errorEntity);
+        em.getTransaction().commit();
     }
 
     /**
@@ -182,10 +182,12 @@ public class <%- projectSuffixUpperCase %>ApiTest extends KarafTestSupport {
      */
     @Test
     public void test006_findAllPaginatedShouldWork() {
+        em.getTransaction().begin();
         for (int i = 2; i < 11; i++) {
             <%- projectSuffixUpperCase %> u = create<%- projectSuffixUpperCase %>(i);
             this.<%- projectSuffixLowerCase %>Api.save(u);
         }
+        em.getTransaction().commit();
         PaginableResult<<%- projectSuffixUpperCase %>> paginated = this.<%- projectSuffixLowerCase %>Api.findAll(null, 7, 1, null);
         Assert.assertEquals(7, paginated.getResults().size());
         Assert.assertEquals(1, paginated.getCurrentPage());
@@ -201,37 +203,47 @@ public class <%- projectSuffixUpperCase %>ApiTest extends KarafTestSupport {
      */
     @Test
     public void test007_removeAllShouldWork() {
+        em.getTransaction().begin();
         PaginableResult<<%- projectSuffixUpperCase %>> paginated = this.<%- projectSuffixLowerCase %>Api.findAll(null, -1, -1, null);
         paginated.getResults().forEach(entity -> {
             this.<%- projectSuffixLowerCase %>Api.remove(entity.getId());
         });
+        em.getTransaction().commit();
         Assert.assertTrue(this.<%- projectSuffixLowerCase %>Api.countAll(null) == 0);
     }
 
     /**
      * Testing failure on duplicated entity
      */
-    @Test
+    @Test(expected = WaterRuntimeException.class)
     public void test008_saveShouldFailOnDuplicatedEntity() {
+        em.getTransaction().begin();
         <%- projectSuffixUpperCase %> entity = create<%- projectSuffixUpperCase %>(1);
         this.<%- projectSuffixLowerCase %>Api.save(entity);
+        em.getTransaction().commit();
         <%- projectSuffixUpperCase %> duplicated = this.create<%- projectSuffixUpperCase %>(1);
         //cannot insert new entity wich breaks unique constraint
-        Assert.assertThrows(DuplicateEntityException.class,() -> this.<%- projectSuffixLowerCase %>Api.save(duplicated));
+        try {
+            this.<%- projectSuffixLowerCase %>Api.save(duplicated);
+        } catch(Expcetion e){
+            Assert.assertTrue(e instanceof DuplicateEntityException);
+        }
+
         <%- projectSuffixUpperCase %> secondEntity = create<%- projectSuffixUpperCase %>(2);
         this.<%- projectSuffixLowerCase %>Api.save(secondEntity);
+        em.getTransaction().commit();
         entity.setExampleField("exampleField2");
         //cannot update an entity colliding with other entity on unique constraint
-        Assert.assertThrows(DuplicateEntityException.class,() -> this.<%- projectSuffixLowerCase %>Api.update(entity));
+        this.<%- projectSuffixLowerCase %>Api.update(entity);
     }
 
     /**
      * Testing failure on validation failure for example code injection
      */
-    @Test
+    @Test(expected = ValidationException.class)
     public void test009_updateShouldFailOnValidationFailure() {
         <%- projectSuffixUpperCase %> newEntity = new <%- projectSuffixUpperCase %>("<script>function(){alert('ciao')!}</script>");
-        Assert.assertThrows(ValidationException.class,() -> this.<%- projectSuffixLowerCase %>Api.save(newEntity));
+        this.<%- projectSuffixLowerCase %>Api.save(newEntity);
     }
     <%if(isProtectedEntity){ -%>
     /**
@@ -239,6 +251,7 @@ public class <%- projectSuffixUpperCase %>ApiTest extends KarafTestSupport {
      */
     @Test
     public void test010_managerCanDoEverything() {
+        em.getTransaction().begin();
         TestRuntimeInitializer.getInstance().impersonate(managerUser, runtime);
         <%- projectSuffixUpperCase %> newEntity = create<%- projectSuffixUpperCase %>(1);
         <%- projectSuffixUpperCase %> entity = this.<%- projectSuffixLowerCase %>Api.save(newEntity);
@@ -248,29 +261,38 @@ public class <%- projectSuffixUpperCase %>ApiTest extends KarafTestSupport {
         this.<%- projectSuffixLowerCase %>Api.remove(entity.getId());
         newEntity = create<%- projectSuffixUpperCase %>(15);
         this.<%- projectSuffixLowerCase %>Api.save(newEntity);
+        em.getTransaction().commit();
     }
 
     /**
      * Viewers are authorized just to read content, not to alter it
      */
-    @Test
+    @Test( expected = UnauthorizedException.class)
     public void test011_viewerCannotSaveOrUpdateOrRemove() {
         TestRuntimeInitializer.getInstance().impersonate(viewerUser, runtime);
         final <%- projectSuffixUpperCase %> entity = create<%- projectSuffixUpperCase %>(201);
-        Assert.assertThrows(UnauthorizedException.class, () -> this.<%- projectSuffixLowerCase %>Api.save(entity));
+        try {
+            this.<%- projectSuffixLowerCase %>Api.save(entity);
+        } catch(Exception e){
+            Assert.assertTrue(e instanceof UnauthorizedException);
+        }
         //viewer can search
         <%- projectSuffixUpperCase %> found = this.<%- projectSuffixLowerCase %>Api.findAll(null, -1, -1, null).getResults().stream().findFirst().get();
         this.<%- projectSuffixLowerCase %>Api.find(found.getId());
         //viewer cannot update or remove
         found.setExampleField("changeIt!");
-        Assert.assertThrows(UnauthorizedException.class, () -> this.<%- projectSuffixLowerCase %>Api.update(entity));
-        Assert.assertThrows(UnauthorizedException.class, () -> this.<%- projectSuffixLowerCase %>Api.remove(found.getId()));
+        try {
+            this.<%- projectSuffixLowerCase %>Api.update(entity)
+        } catch(Exception e){
+            Assert.assertTrue(e instanceof UnauthorizedException);
+        }
+        this.<%- projectSuffixLowerCase %>Api.update(entity)
     }
 
     /**
      * Editors can save or update but cannot remove
      */
-    @Test
+    @Test(expected = UnauthorizedException.class)
     public void test012_editorCannotRemove() {
         TestRuntimeInitializer.getInstance().impersonate(editorUser, runtime);
         final <%- projectSuffixUpperCase %> entity = create<%- projectSuffixUpperCase %>(101);
@@ -278,13 +300,13 @@ public class <%- projectSuffixUpperCase %>ApiTest extends KarafTestSupport {
         savedEntity.setExampleField("newSavedEntity");
         this.<%- projectSuffixLowerCase %>Api.update(entity);
         this.<%- projectSuffixLowerCase %>Api.find(savedEntity.getId());
-        Assert.assertThrows(UnauthorizedException.class, () -> this.<%- projectSuffixLowerCase %>Api.remove(savedEntity.getId()));
+        this.<%- projectSuffixLowerCase %>Api.remove(savedEntity.getId());
     }
     
     /**
      * Testing user with multiple roles on the same entity. Checking the at least minimum priviledge principle
      */
-    @Test
+    @Test(expected = UnauthorizedException.class)
     public void test013_usersWithViewerAndEditorRoleCannotRemove(){
         User crossRoleUser = permissionManager.addUser("crossRoleUser", "crossRoleUser", "crossRoleUser", "crossRoleUser@a.com", false);
         //assigning roles to the cross user
@@ -295,7 +317,7 @@ public class <%- projectSuffixUpperCase %>ApiTest extends KarafTestSupport {
         savedEntity.setExampleField("crossRoleUserUpdatedField");
         this.<%- projectSuffixLowerCase %>Api.update(entity);
         this.<%- projectSuffixLowerCase %>Api.find(savedEntity.getId());
-        Assert.assertThrows(UnauthorizedException.class, () -> this.<%- projectSuffixLowerCase %>Api.remove(savedEntity.getId()));
+        this.<%- projectSuffixLowerCase %>Api.remove(savedEntity.getId());
     }
     <% } -%>
     private <%- projectSuffixUpperCase %> create<%- projectSuffixUpperCase %>(int seed){

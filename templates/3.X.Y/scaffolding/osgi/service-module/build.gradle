@@ -24,7 +24,7 @@ dependencies {
 	//javax persistence
 	implementation 'javax.persistence:javax.persistence-api:'+project.javaxPersistenceVersion
 	//Water javax persistence
-	implementation 'it.water.repository.jpa:JpaRepository-javax:'+project.waterVersion
+	implementation 'it.water.repository.jpa:JpaRepository-osgi:'+project.waterVersion
 	implementation group: 'javax.transaction', name: 'javax.transaction-api', version: project.javaxTransactionApiVersion
 <% } else { -%>
 	//jakarta persistence
@@ -33,10 +33,6 @@ dependencies {
 	implementation 'it.water.repository.jpa:JpaRepository-jakarta:'+project.waterVersion
 	implementation group: 'jakarta.transaction', name: 'jakarta.transaction-api', version: project.jakartaTransactionApiVersion
 <% } -%>	
-	//Water Persistence
-	implementation group:'it.water.repository', name:'Repository-entity', version:project.waterVersion
-	implementation group:'it.water.repository', name:'Repository-persistence', version:project.waterVersion
-	implementation group:'it.water.repository', name:'Repository-service', version:project.waterVersion
 <%} -%>
 	//Validation
 <% if(validationLib === 'javax') {	-%>
@@ -52,7 +48,7 @@ dependencies {
     implementation group: 'com.fasterxml.jackson.jaxrs', name: 'jackson-jaxrs-json-provider', version: project.jacksonVersion
     //Encryption
     implementation group: 'org.bouncycastle', name: 'bcmail-jdk15on', version: project.bouncyCastleVersion
-    implementation group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: project.nimbusJoseJwtVersionN
+    implementation group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: project.nimbusJoseJwtVersion
     //Water Osgi Distribution
 	implementation group: 'it.water.distribution', name: 'Water-distribution-osgi', version: project.waterVersion
     

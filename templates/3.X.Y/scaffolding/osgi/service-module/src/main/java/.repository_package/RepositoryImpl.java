@@ -30,14 +30,15 @@ import javax.transaction.Transactional;
 @Service(value = <%- projectSuffixUpperCase %>Repository.class)
 @Transactional
 public class <%- projectSuffixUpperCase %>RepositoryImpl extends BaseJpaRepositoryImpl<<%- projectSuffixUpperCase %>> implements <%- projectSuffixUpperCase %>Repository {
-    
+    private static final String PERSISTENCE_UNIT_NAME = "<%- projectSuffixLowerCase %>-default-persistence-unit";
+
     public <%- projectSuffixUpperCase %>RepositoryImpl() {
-        super(<%- projectSuffixUpperCase %>.class);
+        super(<%- projectSuffixUpperCase %>.class,PERSISTENCE_UNIT_NAME);
     }
 
     @Inject
-    @Reference
-    @PersistenceUnit(unitName = "water-persistence-unit")
+    @Reference(target = "(osgi.unit.name=" + PERSISTENCE_UNIT_NAME + ")")
+    @PersistenceUnit
     EntityManagerFactory entityManagerFactory;
 
     @Override

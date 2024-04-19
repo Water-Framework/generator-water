@@ -353,9 +353,8 @@ module.exports = class extends AcsBaseGenerator {
 
         let buildCommand = ["clean","build"] 
         buildResult = this.spawnCommandSync("gradle", [...buildCommand,"-x","test"]);
-        
-        if(this.config.get("projectsConfiguration")[projectName]["projectTechnology"] === "osgi"){
-            let projectKarafFeaturesPath = this.config.get("projectsConfiguration")[projectName]["projectFeaturesPath"];
+        let projectKarafFeaturesPath = this.config.get("projectsConfiguration")[projectName]["projectFeaturesPath"];
+        if(projectKarafFeaturesPath != null && projectKarafFeaturesPath != undefined && projectKarafFeaturesPath.length > 0){
             let featureDir = workspaceDir+"/"+projectKarafFeaturesPath+"/src/main/resources/features-src.xml";
             if (fs.existsSync(featureDir)){
                 if(buildResult.status === 0) {

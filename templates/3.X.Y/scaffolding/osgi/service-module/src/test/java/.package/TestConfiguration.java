@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package <%-projectGroupId%>;
+package <%-testPackage%>;
 
 import it.water.implementation.osgi.util.test.karaf.WaterTestConfigurationBuilder;
 import org.ops4j.pax.exam.ConfigurationFactory;
@@ -31,7 +31,7 @@ public class <%- projectSuffixUpperCase %>TestConfiguration implements Configura
         return new Option[]{
                 new KarafDistributionConfigurationFileExtendOption(
                         new ConfigurationPointer("etc/org.apache.karaf.features.cfg", "featuresRepositories"),
-                        ",mvn:<%-projectGroupId%>/<%- projectSuffixUpperCase %>-features/<%-projectVersion %>"
+                        ",mvn:<%-projectGroupId%>/<%- projectSuffixUpperCase %>-karaf-features/<%-projectVersion %>"
                                 + "/xml/features"),
                 new KarafDistributionConfigurationFileExtendOption(
                         new ConfigurationPointer("etc/org.apache.karaf.features.cfg", "featuresBoot"),
@@ -47,6 +47,8 @@ public class <%- projectSuffixUpperCase %>TestConfiguration implements Configura
                 .withCodeCoverage("<%-projectGroupId%>.*")
                 //remote debug on 5005 , but without waiting for connection, please set to true if you want to wait for debug connections
                 .withDebug("5005", false)
+                //adding custom configuration in order to install the local bundle
+                .append(getConfiguration())
                 .build();
     }
 }

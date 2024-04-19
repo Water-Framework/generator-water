@@ -19,12 +19,11 @@
   <feature name="<%-projectSuffixLowerCase%>-feature" version="${project.version}" description="All <%-projectSuffixUpperCase%> Modules">
     <feature>water-core-features</feature>
 <% if(applicationTypeEntity){ -%>
-    <bundle start-level="80">mvn:it.water.repository.jpa/JpaRepository-osgi/${project.waterVersion}</bundle>
+    <feature>water-jpa-repository</feature>
 <% } -%>
 <% if(hasRestServices){ -%>
-    <bundle start-level="80">mvn:it.water.service.rest/Rest-service/${project.waterVersion}</bundle>
-    <bundle start-level="80">mvn:it.water.service.rest/Rest-api-manager-apache-cxf/${project.waterVersion}</bundle>
+    <feature>water-rest</feature>
 <% } -%>    
-    <bundle start-level="80">mvn:<%-projectGroupId%>/<%- projectSuffixUpperCase %>/${project.version}</bundle>
+    <bundle start-level="80">mvn:<%-projectGroupId%>/<%- projectSuffixUpperCase %>-service/${project.version}</bundle>
   </feature>
 </features>
