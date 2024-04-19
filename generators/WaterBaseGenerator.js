@@ -299,6 +299,12 @@ module.exports = class extends AcsBaseGenerator {
             this.fs.delete(testAppPropFile,{ force: true });
         } else if (projectConf.projectTechnology === "osgi"){
             this.fs.copyTpl(technologyTemplatePath+"/src/test/java/.package/TestConfiguration.java", this.destinationPath(projectConf.projectServicePath)+projectConf.projectTestPath+"/"+projectConf.projectSuffixUpperCase+"TestConfiguration.java", projectConf);
+            //removing persistence.xml from the common template
+            let persistenceXml = this.destinationPath(projectConf.projectServicePath)+"/src/test/resources/META-INF/persistence.xml";
+            //removing app properties which is not used
+            let appProperties = this.destinationPath(projectConf.projectServicePath)+"/src/test/resources/it.water.application.properties";
+            this.fs.delete(persistenceXml,{ recursive: true, force: true });
+            this.fs.delete(appProperties,{ recursive: true, force: true })
         }
 
         this.log.ok("Service module created succesfully!");

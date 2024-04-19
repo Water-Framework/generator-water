@@ -30,7 +30,7 @@ import javax.transaction.Transactional;
 @Service(value = <%- projectSuffixUpperCase %>Repository.class)
 @Transactional
 public class <%- projectSuffixUpperCase %>RepositoryImpl extends BaseJpaRepositoryImpl<<%- projectSuffixUpperCase %>> implements <%- projectSuffixUpperCase %>Repository {
-    private static final String PERSISTENCE_UNIT_NAME = "<%- projectSuffixLowerCase %>-default-persistence-unit";
+    public static final String PERSISTENCE_UNIT_NAME = "<%- projectSuffixLowerCase %>-default-persistence-unit";
 
     public <%- projectSuffixUpperCase %>RepositoryImpl() {
         super(<%- projectSuffixUpperCase %>.class,PERSISTENCE_UNIT_NAME);

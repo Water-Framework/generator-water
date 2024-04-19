@@ -2,26 +2,29 @@ package <%-projectGroupId%>;
 
 import it.water.core.api.bundle.Runtime;
 import it.water.core.api.model.PaginableResult;
-import it.water.core.api.model.User;
-import it.water.core.api.permission.PermissionManager;
 import it.water.core.api.registry.ComponentRegistry;
 import it.water.core.api.repository.query.Query;
+<%if(isProtectedEntity) {-%>
 import it.water.core.api.service.Service;
 import it.water.core.api.permission.Role;
 import it.water.core.api.permission.RoleManager;
+import it.water.core.api.model.User;
+import it.water.core.api.permission.PermissionManager;
+import it.water.core.permission.exceptions.UnauthorizedException;
+<% } -%>
 import it.water.core.model.exceptions.ValidationException;
 import it.water.core.model.exceptions.WaterRuntimeException;
-import it.water.core.permission.exceptions.UnauthorizedException;
 import it.water.repository.entity.model.exceptions.DuplicateEntityException;
-
 import it.water.core.testing.utils.api.TestPermissionManager;
 import it.water.core.testing.utils.bundle.TestRuntimeInitializer;
 
 import <%-apiPackage%>.*;
 import <%-modelPackage%>.*;
+import <%-repositoryPackage%>.*;
 
 import lombok.Setter;
 
+import org.junit.FixMethodOrder;
 import org.junit.runners.MethodSorters;
 
 import org.apache.karaf.features.FeaturesService;
@@ -33,6 +36,9 @@ import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.exam.junit.PaxExam;
 import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
 import org.ops4j.pax.exam.spi.reactors.PerSuite;
+
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
 
 /**
  * Generated with Water Generator.
@@ -225,7 +231,7 @@ public class <%- projectSuffixUpperCase %>ApiTest extends KarafTestSupport {
         //cannot insert new entity wich breaks unique constraint
         try {
             this.<%- projectSuffixLowerCase %>Api.save(duplicated);
-        } catch(Expcetion e){
+        } catch(Exception e){
             Assert.assertTrue(e instanceof DuplicateEntityException);
         }
 

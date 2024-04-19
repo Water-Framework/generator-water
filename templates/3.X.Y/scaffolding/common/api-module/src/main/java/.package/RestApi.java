@@ -20,7 +20,8 @@ import javax.ws.rs.core.MediaType;
  * This interfaces exposes all CRUD methods with default JAXRS annotations.
  *
  */
-@Path("/<%- restContextRoot %>")
+<%let webPath =  restContextRoot.startsWith("/")?restContextRoot:"/"+restContextRoot; -%>
+@Path("<%- webPath %>")
 @Api(produces = MediaType.APPLICATION_JSON, tags = "<%- projectSuffixUpperCase %> API")
 @FrameworkRestApi
 public interface <%- projectSuffixUpperCase %>RestApi extends RestApi {

@@ -15,7 +15,7 @@ Import-Package: \
     javassist.util.proxy,\
     jakarta.validation,\
     jakarta.validation.*,\
-<% if(validationLib === 'javax') {	-%>
+<% if(persistenceLib === 'javax') {	-%>
     javax.persistence,\
     javax.transaction,\
     javax.enterprise.*,\
