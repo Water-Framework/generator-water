@@ -20,12 +20,15 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok:' + project.lombokVersion
 <%if(applicationTypeEntity) {-%>
 <% if(persistenceLib === 'javax') {	-%>
+	//hibernate
+	implementation 'org.hibernate:hibernate-core:'+project.hibernateVersion
 	//javax persistence
 	implementation 'javax.persistence:javax.persistence-api:'+project.javaxPersistenceVersion
 	//Water javax persistence
 	implementation 'it.water.repository.jpa:JpaRepository-osgi:'+project.waterVersion
 	implementation group: 'javax.transaction', name: 'javax.transaction-api', version: project.javaxTransactionApiVersion
 <% } else { -%>
+	implementation 'org.hibernate:hibernate-core:'+project.hibernateJakartaVersion
 	//jakarta persistence
 	implementation 'jakarta.persistence:jakarta.persistence-api:'+project.jakartaPersistenceVersion
 	//Water javax persistence
@@ -77,8 +80,7 @@ dependencies {
 	testImplementation 'org.hsqldb:hsqldb:2.4.1'
 <%} -%>
 <%if(hasRestServices) {-%>	
-	// https://mvnrepository.com/artifact/com.intuit.karate/karate-junit5
-	testImplementation group: 'com.intuit.karate', name: 'karate-junit5', version: '1.4.1'
+	testImplementation group: 'com.intuit.karate', name: 'karate-junit4', version: '1.4.0.RC3'
 <%} -%>
 }
 

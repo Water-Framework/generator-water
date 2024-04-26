@@ -24,6 +24,7 @@
 <% if(hasRestServices){ -%>
     <feature>water-rest</feature>
 <% } -%>    
-    <bundle start-level="80">mvn:<%-projectGroupId%>/<%- projectSuffixUpperCase %>-service/${project.version}</bundle>
+    <!--All water bundles should start with 82 start-level at least -->
+    <bundle start-level="82">mvn:<%-projectGroupId%>/<%- projectSuffixUpperCase %>-service/${project.version}</bundle>
   </feature>
 </features>

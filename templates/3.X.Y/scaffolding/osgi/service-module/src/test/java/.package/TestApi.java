@@ -37,9 +37,6 @@ import org.ops4j.pax.exam.junit.PaxExam;
 import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
 import org.ops4j.pax.exam.spi.reactors.PerSuite;
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-
 /**
  * Generated with Water Generator.
  * Test class for <%- projectSuffixUpperCase %> Services.
@@ -58,8 +55,7 @@ public class <%- projectSuffixUpperCase %>ApiTest extends KarafTestSupport {
     private static TestPermissionManager permissionManager;
     private static Runtime runtime;
     private static it.water.core.api.model.User adminUser;
-    private static EntityManagerFactory entityManagerFactory;
-    private static EntityManager em;
+
     <%if(isProtectedEntity){ -%>
     //declaring user for permissions tests
     private static it.water.core.api.model.User managerUser;
@@ -110,10 +106,8 @@ public class <%- projectSuffixUpperCase %>ApiTest extends KarafTestSupport {
         //starting with admin
         <% } -%>
         //impersonate admin so we can test the happy path
+        //default security context in test environment is admin
         adminUser = permissionManager.addUser("admin", "name", "lastname", "admin@a.com", true);
-        TestRuntimeInitializer.getInstance().impersonate(adminUser, runtime);
-        entityManagerFactory = getOsgiService(EntityManagerFactory.class, "(osgi.unit.name=" + BookOsgiRepositoryImpl.PERSISTENCE_UNIT_NAME + ")", 0);
-        em = entityManagerFactory.createEntityManager();
     }
 
     /**
@@ -133,13 +127,11 @@ public class <%- projectSuffixUpperCase %>ApiTest extends KarafTestSupport {
      */
     @Test
     public void test002_saveOk() {
-        em.getTransaction().begin();
         <%- projectSuffixUpperCase %> entity = create<%- projectSuffixUpperCase %>(0);
         entity = this.<%- projectSuffixLowerCase %>Api.save(entity);
         Assert.assertEquals(new Integer(1), entity.getEntityVersion());
         Assert.assertTrue(entity.getId() > 0);
         Assert.assertEquals("exampleField0", entity.getExampleField());
-        em.getTransaction().commit();
     }
 
     /**
@@ -147,7 +139,6 @@ public class <%- projectSuffixUpperCase %>ApiTest extends KarafTestSupport {
      */
     @Test
     public void test003_updateShouldWork() {
-        em.getTransaction().begin();
         Query q = this.<%- projectSuffixLowerCase %>Repository.getQueryBuilderInstance().createQueryFilter("exampleField=exampleField0");
         <%- projectSuffixUpperCase %> entity = this.<%- projectSuffixLowerCase %>Api.find(q);
         Assert.assertNotNull(entity);
@@ -155,7 +146,6 @@ public class <%- projectSuffixUpperCase %>ApiTest extends KarafTestSupport {
         entity = this.<%- projectSuffixLowerCase %>Api.update(entity);
         Assert.assertEquals("exampleFieldUpdated", entity.getExampleField());
         Assert.assertEquals(new Integer(2), entity.getEntityVersion());
-        em.getTransaction().commit();
     }
 
     /**
@@ -163,14 +153,12 @@ public class <%- projectSuffixUpperCase %>ApiTest extends KarafTestSupport {
      */
     @Test(expected = WaterRuntimeException.class)
     public void test004_updateShouldFailWithWrongVersion() {
-        em.getTransaction().begin();
         Query q = this.<%- projectSuffixLowerCase %>Repository.getQueryBuilderInstance().createQueryFilter("exampleField=exampleFieldUpdated");
         <%- projectSuffixUpperCase %> errorEntity = this.<%- projectSuffixLowerCase %>Api.find(q);
         Assert.assertEquals("exampleFieldUpdated", errorEntity.getExampleField());
         Assert.assertEquals(new Integer(2), errorEntity.getEntityVersion());
         errorEntity.setEntityVersion(1);
         this.<%- projectSuffixLowerCase %>Api.update(errorEntity);
-        em.getTransaction().commit();
     }
 
     /**
@@ -188,12 +176,10 @@ public class <%- projectSuffixUpperCase %>ApiTest extends KarafTestSupport {
      */
     @Test
     public void test006_findAllPaginatedShouldWork() {
-        em.getTransaction().begin();
         for (int i = 2; i < 11; i++) {
             <%- projectSuffixUpperCase %> u = create<%- projectSuffixUpperCase %>(i);
             this.<%- projectSuffixLowerCase %>Api.save(u);
         }
-        em.getTransaction().commit();
         PaginableResult<<%- projectSuffixUpperCase %>> paginated = this.<%- projectSuffixLowerCase %>Api.findAll(null, 7, 1, null);
         Assert.assertEquals(7, paginated.getResults().size());
         Assert.assertEquals(1, paginated.getCurrentPage());
@@ -209,12 +195,10 @@ public class <%- projectSuffixUpperCase %>ApiTest extends KarafTestSupport {
      */
     @Test
     public void test007_removeAllShouldWork() {
-        em.getTransaction().begin();
         PaginableResult<<%- projectSuffixUpperCase %>> paginated = this.<%- projectSuffixLowerCase %>Api.findAll(null, -1, -1, null);
         paginated.getResults().forEach(entity -> {
             this.<%- projectSuffixLowerCase %>Api.remove(entity.getId());
         });
-        em.getTransaction().commit();
         Assert.assertTrue(this.<%- projectSuffixLowerCase %>Api.countAll(null) == 0);
     }
 
@@ -223,10 +207,8 @@ public class <%- projectSuffixUpperCase %>ApiTest extends KarafTestSupport {
      */
     @Test(expected = WaterRuntimeException.class)
     public void test008_saveShouldFailOnDuplicatedEntity() {
-        em.getTransaction().begin();
         <%- projectSuffixUpperCase %> entity = create<%- projectSuffixUpperCase %>(1);
         this.<%- projectSuffixLowerCase %>Api.save(entity);
-        em.getTransaction().commit();
         <%- projectSuffixUpperCase %> duplicated = this.create<%- projectSuffixUpperCase %>(1);
         //cannot insert new entity wich breaks unique constraint
         try {
@@ -237,7 +219,6 @@ public class <%- projectSuffixUpperCase %>ApiTest extends KarafTestSupport {
 
         <%- projectSuffixUpperCase %> secondEntity = create<%- projectSuffixUpperCase %>(2);
         this.<%- projectSuffixLowerCase %>Api.save(secondEntity);
-        em.getTransaction().commit();
         entity.setExampleField("exampleField2");
         //cannot update an entity colliding with other entity on unique constraint
         this.<%- projectSuffixLowerCase %>Api.update(entity);
@@ -257,7 +238,6 @@ public class <%- projectSuffixUpperCase %>ApiTest extends KarafTestSupport {
      */
     @Test
     public void test010_managerCanDoEverything() {
-        em.getTransaction().begin();
         TestRuntimeInitializer.getInstance().impersonate(managerUser, runtime);
         <%- projectSuffixUpperCase %> newEntity = create<%- projectSuffixUpperCase %>(1);
         <%- projectSuffixUpperCase %> entity = this.<%- projectSuffixLowerCase %>Api.save(newEntity);
@@ -267,7 +247,6 @@ public class <%- projectSuffixUpperCase %>ApiTest extends KarafTestSupport {
         this.<%- projectSuffixLowerCase %>Api.remove(entity.getId());
         newEntity = create<%- projectSuffixUpperCase %>(15);
         this.<%- projectSuffixLowerCase %>Api.save(newEntity);
-        em.getTransaction().commit();
     }
 
     /**

@@ -303,8 +303,12 @@ module.exports = class extends AcsBaseGenerator {
             let persistenceXml = this.destinationPath(projectConf.projectServicePath)+"/src/test/resources/META-INF/persistence.xml";
             //removing app properties which is not used
             let appProperties = this.destinationPath(projectConf.projectServicePath)+"/src/test/resources/it.water.application.properties";
+            //removing certificates path
+            let certsPath = this.destinationPath(projectConf.projectServicePath)+"/src/test/resources/certs";
+
             this.fs.delete(persistenceXml,{ recursive: true, force: true });
             this.fs.delete(appProperties,{ recursive: true, force: true })
+            this.fs.delete(certsPath,{ recursive: true, force: true })
         }
 
         this.log.ok("Service module created succesfully!");

@@ -19,6 +19,7 @@ package <%-testPackage%>;
 
 import it.water.implementation.osgi.util.test.karaf.WaterTestConfigurationBuilder;
 import org.ops4j.pax.exam.ConfigurationFactory;
+import org.ops4j.pax.exam.Configuration;
 import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.exam.karaf.options.ConfigurationPointer;
 import org.ops4j.pax.exam.karaf.options.KarafDistributionConfigurationFileExtendOption;
@@ -41,12 +42,14 @@ public class <%- projectSuffixUpperCase %>TestConfiguration implements Configura
     }
 
     @Override
+    @Configuration
     public Option[] createConfiguration() {
         return WaterTestConfigurationBuilder.createStandardConfiguration()
                 //supporting code coverage
                 .withCodeCoverage("<%-projectGroupId%>.*")
                 //remote debug on 5005 , but without waiting for connection, please set to true if you want to wait for debug connections
                 .withDebug("5005", false)
+                .withHttpPort("8080")
                 //adding custom configuration in order to install the local bundle
                 .append(getConfiguration())
                 .build();

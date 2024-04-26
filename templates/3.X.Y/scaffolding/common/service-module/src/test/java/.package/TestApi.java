@@ -87,8 +87,7 @@ public class <%- projectSuffixUpperCase %>ApiTest implements Service {
         roleManager.addRole(<%- projectSuffixLowerCase %>ManagerUser.getId(), <%- projectSuffixLowerCase %>ManagerRole);
         roleManager.addRole(<%- projectSuffixLowerCase %>ViewerUser.getId(), <%- projectSuffixLowerCase %>ViewerRole);
         roleManager.addRole(<%- projectSuffixLowerCase %>EditorUser.getId(), <%- projectSuffixLowerCase %>EditorRole);
-        //starting with admin
-        TestRuntimeInitializer.getInstance().impersonate(adminUser);
+        //default security context in test environment is admin
     }
 <% } -%>
     /**
