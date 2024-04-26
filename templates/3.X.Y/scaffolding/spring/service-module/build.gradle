@@ -1,41 +1,3 @@
-
-<% if(publishModule) { -%>
-    project.ext.publishRepoName = "<%- publishRepoName %>"
-    project.ext.publishRepoUrl =  "<%- publishRepoUrl %>"
-<% if(publishRepoHasCredentials) { -%>
-	project.ext.publishRepoUsername =  System.getProperty("publishRepoUsername","noUser")
-    project.ext.publishRepoPassword =  System.getProperty("publishRepoPassword","noPassword")
-<%  } -%>
-<% } -%>
-    project.ext.<%- projectName %>Version = '<%- projectVersion %>' 
-    group '<%- projectGroupId %>'
-	version project.<%- projectName %>Version
-    repositories{
-      mavenLocal()
-	  mavenCentral()
-      maven {
-         url "https://plugins.gradle.org/m2/"
-      }
-<% if(publishModule){ -%>
-	  maven {
-        <% if(publishRepoHasCredentials){ %>
-		 credentials {
-			username project.publishRepoUsername
-			password project.publishRepoPassword
-		 }
-		<% } -%>
-	  name = project.publishRepoName
-	  url = project.publishRepoUrl
-      }
-<% } -%>
-	}
-	
-	apply plugin: 'java'
-<% if(publishModule){ -%>
-	apply plugin: 'maven-publish'
-<% } -%>
-	apply plugin: 'jacoco'
-
 dependencies {
     //SLF4J
 	implementation group: 'org.slf4j', name: 'slf4j-api', version: project.slf4jVersion
@@ -75,7 +37,6 @@ dependencies {
     implementation group: 'jakarta.validation', name: 'jakarta.validation-api', version: project.jakartaValidationVersion
     implementation group: "org.hibernate", name: "hibernate-validator", version: project.hibernateValidatorVersion
 <% } -%>
-implementation group: 'org.springframework', name: 'spring-boot-starter', version: project.springBootVersion
 <%if(hasRestServices) {-%>
 	// Rest Services
 	implementation group:'org.springframework.boot', name:'spring-boot-starter-web', version:project.springBootVersion
@@ -93,11 +54,9 @@ implementation group: 'org.springframework', name: 'spring-boot-starter', versio
 	implementation group:'org.atteo.classindex', name:'classindex', version:project.atteoClassIndexVersion
 	annotationProcessor('org.atteo.classindex:classindex:' + project.atteoClassIndexVersion)
 
-	testImplementation group 'org.springframework.boot', name:'spring-boot-starter-test', version:project.springBootVersion
-	testImplementation group 'org.junit.jupiter', name:'junit-jupiter-api:',version: project.junitJupiterVersion
-	testImplementation group 'org.junit.jupiter', name:'junit-jupiter-engine:', version: project.junitJupiterVersion
-	testImplementation group 'javax.validation', name:'validation-api', version: '2.0.1.Final'
-	testImplementation group 'org.atteo.classindex', name:'classindex', version: project.atteoClassIndexVersion
+	testImplementation group:'org.springframework.boot', name:'spring-boot-starter-test', version:project.springBootVersion
+	testImplementation group:'javax.validation', name:'validation-api', version: '2.0.1.Final'
+	testImplementation group:'org.atteo.classindex', name:'classindex', version: project.atteoClassIndexVersion
 	testAnnotationProcessor('org.atteo.classindex:classindex:' + project.atteoClassIndexVersion)
 	testAnnotationProcessor 'org.projectlombok:lombok:' + project.lombokVersion
 	// https://mvnrepository.com/artifact/com.intuit.karate/karate-junit5
@@ -110,21 +69,5 @@ test {
 	useJUnitPlatform()
 }
 	
-<% if(publishModule){ -%>
-	publishing {
-		repositories {
-			maven {
-				<% if(publishRepoHasCredentials){ -%>
-				credentials {
-					username project.publishRepoUsername
-					password project.publishRepoPassword
-				}
-				<% } -%>
-				name = project.publishRepoName
-				url = project.publishRepoUrl
-			}
-		}
-	}
-<% } -%>
 
 

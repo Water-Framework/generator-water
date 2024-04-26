@@ -106,8 +106,8 @@ public class <%- projectSuffixUpperCase %>ApiTest extends KarafTestSupport {
         //starting with admin
         <% } -%>
         //impersonate admin so we can test the happy path
-        //default security context in test environment is admin
         adminUser = permissionManager.addUser("admin", "name", "lastname", "admin@a.com", true);
+        //deafult user in test mode is admin please use TestRuntimeInitializer.getInstance().impersonate(...); to impersonate other users
     }
 
     /**

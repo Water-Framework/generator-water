@@ -6,7 +6,9 @@ import it.water.core.api.repository.query.Query;
 import it.water.core.api.service.Service;
 import it.water.core.model.exceptions.ValidationException;
 import it.water.core.model.exceptions.WaterRuntimeException;
+import it.water.core.bundle.WaterRuntime;
 import it.water.repository.entity.model.exceptions.DuplicateEntityException;
+import it.water.core.testing.utils.api.TestPermissionManager;
 
 import it.water.core.testing.utils.junit.WaterTestExtension;
 
@@ -48,7 +50,7 @@ public class <%- projectSuffixUpperCase %>ApiTest  {
     private TestPermissionManager permissionManager;
 
     @Autowired
-    private Runtime runtime;
+    private WaterRuntime runtime;
 
     private it.water.core.api.model.User adminUser;
     <%if(isProtectedEntity){ -%>
@@ -85,7 +87,8 @@ public class <%- projectSuffixUpperCase %>ApiTest  {
         <% } -%>
         //impersonate admin so we can test the happy path
         adminUser = permissionManager.addUser("admin", "name", "lastname", "admin@a.com", true);
-        TestRuntimeInitializer.getInstance().impersonate(adminUser, runtime);
+        //deafult user in test mode is admin please use TestRuntimeInitializer.getInstance().impersonate(...); to impersonate other users
+
     }
 
     /**
@@ -295,11 +298,11 @@ public class <%- projectSuffixUpperCase %>ApiTest  {
         roleManager.addRole(crossRoleUser.getId(), viewer);
         roleManager.addRole(crossRoleUser.getId(), editor);
         final <%- projectSuffixUpperCase %> entity = create<%- projectSuffixUpperCase %>(104);
-        Book savedEntity = Assertions.assertDoesNotThrow(() -> this.<%- projectSuffixLowerCase %Api.save(entity));
+        Book savedEntity = Assertions.assertDoesNotThrow(() -> this.<%- projectSuffixLowerCase %>Api.save(entity));
         savedEntity.setExampleField("crossRoleUserUpdatedField");
-        Assertions.assertDoesNotThrow(() -> this.<%- projectSuffixLowerCase %Api.update(entity));
-        Assertions.assertDoesNotThrow(() -> this.<%- projectSuffixLowerCase %Api.find(savedEntity.getId()));
-        Assertions.assertThrows(UnauthorizedException.class, () -> this.<%- projectSuffixLowerCase %Api.remove(savedEntity.getId()));
+        Assertions.assertDoesNotThrow(() -> this.<%- projectSuffixLowerCase %>Api.update(entity));
+        Assertions.assertDoesNotThrow(() -> this.<%- projectSuffixLowerCase %>Api.find(savedEntity.getId()));
+        Assertions.assertThrows(UnauthorizedException.class, () -> this.<%- projectSuffixLowerCase %>Api.remove(savedEntity.getId()));
     }
     <% } -%>
     private <%- projectSuffixUpperCase %> create<%- projectSuffixUpperCase %>(int seed){
