@@ -35,6 +35,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 <%if(hasRestServices){-%> * 
  * Please use <%- projectSuffixUpperCase %>RestTestApi for ensuring format of the json response
 <% } -%> 
+
  */
 @ExtendWith(WaterTestExtension.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -51,7 +52,7 @@ public class <%- projectSuffixUpperCase %>ApiTest implements Service {
 
     @Inject
     @Setter
-    private WaterRuntime runtime;
+    private Runtime runtime;
 
 <%if(applicationTypeEntity) { -%>
     @Inject
