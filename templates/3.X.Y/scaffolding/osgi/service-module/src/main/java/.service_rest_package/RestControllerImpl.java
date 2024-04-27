@@ -3,7 +3,9 @@ package <%-serviceRestPackage%>;
 
 import <%-apiPackage%>.*;
 import <%-apiPackage%>.rest.*;
+<%if(hasModel){-%>
 import <%-modelPackage%>.*;
+<% } -%>
 import it.water.service.rest.persistence.BaseEntityRestApi;
 import it.water.core.interceptors.annotations.Inject;
 import it.water.core.api.model.PaginableResult;

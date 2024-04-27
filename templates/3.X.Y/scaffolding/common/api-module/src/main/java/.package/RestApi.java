@@ -1,8 +1,8 @@
 package <%- apiPackage %>.rest;
 
-
+<%if(hasModel){-%>
 import <%-modelPackage%>.*;
-
+<% } -%>
 import it.water.core.api.model.PaginableResult;
 import it.water.core.api.service.rest.FrameworkRestApi;
 import it.water.core.api.service.rest.RestApi;
@@ -25,7 +25,8 @@ import javax.ws.rs.core.MediaType;
 @Api(produces = MediaType.APPLICATION_JSON, tags = "<%- projectSuffixUpperCase %> API")
 @FrameworkRestApi
 public interface <%- projectSuffixUpperCase %>RestApi extends RestApi {
-    
+
+<% if(applicationTypeEntity) { -%>   
     @LoggedIn
     @POST
     @Produces(MediaType.APPLICATION_JSON)
@@ -102,4 +103,5 @@ public interface <%- projectSuffixUpperCase %>RestApi extends RestApi {
             @ApiResponse(code = 500, message = "Internal server error")
     })
     void remove(@PathParam("id") long id);
+<% } -%>
 }

@@ -166,7 +166,7 @@ module.exports = class extends AcsBaseGenerator {
         if(fs.existsSync(technologyTemplatePath+"/.yo-rc.json"))
             this.fs.copyTpl(technologyTemplatePath+"/.yo-rc.json", this.destinationPath(finalPath)+"/.yo-rc.json", projectConf);
 
-        if (projectConf.applicationTypeEntity) {
+        if (projectConf.hasModel || projectConf.applicationTypeEntity) {
             this.log.info("Creating Entity ...")
             this.fs.copyTpl(modelTemplatePath + "/src/main/java/.package/Entity.java", this.destinationPath(finalPath + "/" + projectConf.modelPackagePath + "/" + projectConf.projectSuffixUpperCase + ".java"), projectConf);
             //overriding with specific technology if exists
@@ -210,14 +210,15 @@ module.exports = class extends AcsBaseGenerator {
                 //overriding with specific technology
                 this.fs.copyTpl(technologyTemplatePath + "/src/main/java/.package/RepoInterface.java", this.destinationPath(finalPath + "/" + projectConf.apiPackagePath + "/" + projectConf.projectSuffixUpperCase + "Repository.java"), projectConf);    
             }
-            
         } else {
             this.fs.copyTpl(apiTemplatePath + "/src/main/java/.package/ServiceApi.java", this.destinationPath(finalPath + "/" + projectConf.apiPackagePath + "/" + projectConf.projectSuffixUpperCase + "Api.java"), projectConf);
             this.fs.copyTpl(apiTemplatePath + "/src/main/java/.package/SystemServiceApi.java", this.destinationPath(finalPath + "/" + projectConf.apiPackagePath + "/" + projectConf.projectSuffixUpperCase + "SystemApi.java"), projectConf);
             if(technologyTemplatePathExists){
                 //overriding with specific technology
-                this.fs.copyTpl(technologyTemplatePath + "/src/main/java/.package/ServiceApi.java", this.destinationPath(finalPath + "/" + projectConf.apiPackagePath + "/" + projectConf.projectSuffixUpperCase + "Api.java"), projectConf);
-                this.fs.copyTpl(technologyTemplatePath + "/src/main/java/.package/SystemServiceApi.java", this.destinationPath(finalPath + "/" + projectConf.apiPackagePath + "/" + projectConf.projectSuffixUpperCase + "SystemApi.java"), projectConf);
+                if(fs.existsSync(technologyTemplatePath+"/src/main/java/.package/ServiceApi.java"))
+                    this.fs.copyTpl(technologyTemplatePath + "/src/main/java/.package/ServiceApi.java", this.destinationPath(finalPath + "/" + projectConf.apiPackagePath + "/" + projectConf.projectSuffixUpperCase + "Api.java"), projectConf);
+                if(fs.existsSync(technologyTemplatePath+"/src/main/java/.package/SystemServiceApi.java"))
+                    this.fs.copyTpl(technologyTemplatePath + "/src/main/java/.package/SystemServiceApi.java", this.destinationPath(finalPath + "/" + projectConf.apiPackagePath + "/" + projectConf.projectSuffixUpperCase + "SystemApi.java"), projectConf);
             }
         }
 
@@ -281,23 +282,28 @@ module.exports = class extends AcsBaseGenerator {
 
         this.log.info("Creating Tests...")
         this.fs.copyTpl(serviceTemplatePath+"/src/test/java/.package/TestApi.java", this.destinationPath(projectConf.projectServicePath)+projectConf.projectTestPath+"/"+projectConf.projectSuffixUpperCase+"ApiTest.java", projectConf);
-        this.fs.copyTpl(serviceTemplatePath+"/src/test/java/.package/TestRestApi.java", this.destinationPath(projectConf.projectServicePath)+projectConf.projectTestPath+"/"+projectConf.projectSuffixUpperCase+"RestApiTest.java", projectConf);
+        if(projectConf.hasRestServices){
+            this.fs.copyTpl(serviceTemplatePath+"/src/test/java/.package/TestRestApi.java", this.destinationPath(projectConf.projectServicePath)+projectConf.projectTestPath+"/"+projectConf.projectSuffixUpperCase+"RestApiTest.java", projectConf);
+        }
         //Overriding tests with specific technology
         if(fs.existsSync(technologyTemplatePath+"/src/test/java/.package/TestApi.java"))
             this.fs.copyTpl(technologyTemplatePath+"/src/test/java/.package/TestApi.java", this.destinationPath(projectConf.projectServicePath)+projectConf.projectTestPath+"/"+projectConf.projectSuffixUpperCase+"ApiTest.java", projectConf);
-        if(fs.existsSync(technologyTemplatePath+"/src/test/java/.package/TestRestApi.java"))
+        if(fs.existsSync(technologyTemplatePath+"/src/test/java/.package/TestRestApi.java") && projectConf.hasRestServicesy)
             this.fs.copyTpl(technologyTemplatePath+"/src/test/java/.package/TestRestApi.java", this.destinationPath(projectConf.projectServicePath)+projectConf.projectTestPath+"/"+projectConf.projectSuffixUpperCase+"RestApiTest.java", projectConf);
         
-        if(projectConf.projectTechnology === "spring"){
+        if(projectConf.projectTechnology === "spring2" || projectConf.projectTechnology === "spring3"){
             //using the same destination path for tests, in order to cover also spring requirements
             this.log.info("Generating Spring application...")
             this.fs.copyTpl(technologyTemplatePath+"/src/main/java/.service_package/Application.java", this.destinationPath(projectConf.projectServicePath)+projectConf.projectBasePath+"/"+projectConf.projectSuffixUpperCase+"Application.java", projectConf);
             let testMetaInfFolder = this.destinationPath(projectConf.projectServicePath)+"/src/test/resources/META-INF";
             let testAppPropFile = this.destinationPath(projectConf.projectServicePath)+"/src/test/resources/it.water.application.properties";
+            let certsPath = this.destinationPath(projectConf.projectServicePath)+"/src/test/resources/certs";
             this.log.info("Removing "+testMetaInfFolder);
             this.fs.delete(testMetaInfFolder,{ recursive: true, force: true });
             this.log.info("Removing "+testAppPropFile);
             this.fs.delete(testAppPropFile,{ force: true });
+            this.log.info("Removing "+certsPath);
+            this.fs.delete(certsPath,{ recursive: true, force: true })
         } else if (projectConf.projectTechnology === "osgi"){
             this.fs.copyTpl(technologyTemplatePath+"/src/test/java/.package/TestConfiguration.java", this.destinationPath(projectConf.projectServicePath)+projectConf.projectTestPath+"/"+projectConf.projectSuffixUpperCase+"TestConfiguration.java", projectConf);
             //removing persistence.xml from the common template
@@ -306,10 +312,21 @@ module.exports = class extends AcsBaseGenerator {
             let appProperties = this.destinationPath(projectConf.projectServicePath)+"/src/test/resources/it.water.application.properties";
             //removing certificates path
             let certsPath = this.destinationPath(projectConf.projectServicePath)+"/src/test/resources/certs";
-
+            this.log.info("Removing "+persistenceXml);
             this.fs.delete(persistenceXml,{ recursive: true, force: true });
+            this.log.info("Removing "+appProperties);
             this.fs.delete(appProperties,{ recursive: true, force: true })
+            this.log.info("Removing "+certsPath);
             this.fs.delete(certsPath,{ recursive: true, force: true })
+        }
+
+        if(!projectConf.hasRestServices){
+            let karatePath = this.destinationPath(projectConf.projectServicePath)+"/src/test/resources/karate/";
+            let karateConfigPath = this.destinationPath(projectConf.projectServicePath)+"/src/test/resources/karate-config.js";
+            this.log.info("Removing "+karatePath);
+            this.fs.delete(karatePath,{ recursive: true, force: true })
+            this.log.info("Removing "+karateConfigPath);
+            this.fs.delete(karateConfigPath,{ recursive: true, force: true })
         }
 
         this.log.ok("Service module created succesfully!");

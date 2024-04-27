@@ -43,12 +43,12 @@ public class <%- projectSuffixUpperCase %>ApiTest implements Service {
     @Inject
     @Setter
     private <%- projectSuffixUpperCase %>Api <%- projectSuffixLowerCase %>Api;
-    
+
+<%if(isProtectedEntity){ -%>
     @Inject
     @Setter
     private <%- projectSuffixUpperCase %>Repository <%- projectSuffixLowerCase %>Repository;
-
-<%if(isProtectedEntity){ -%>
+    
     @Inject
     @Setter
     //default permission manager in test environment;
@@ -97,12 +97,15 @@ public class <%- projectSuffixUpperCase %>ApiTest implements Service {
     @Order(1)
     public void componentsInsantiatedCorrectly() {
         this.<%- projectSuffixLowerCase %>Api = this.componentRegistry.findComponent(<%- projectSuffixUpperCase %>Api.class, null);
-        this.<%- projectSuffixLowerCase %>Repository = this.componentRegistry.findComponent(<%- projectSuffixUpperCase %>Repository.class, null);
         Assertions.assertNotNull(this.<%- projectSuffixLowerCase %>Api);
         Assertions.assertNotNull(this.componentRegistry.findComponent(<%- projectSuffixUpperCase %>SystemApi.class, null));
+<%if(applicationTypeEntity){ -%>        
+        this.<%- projectSuffixLowerCase %>Repository = this.componentRegistry.findComponent(<%- projectSuffixUpperCase %>Repository.class, null);
         Assertions.assertNotNull(this.<%- projectSuffixLowerCase %>Repository);
+<% } -%>
     }
 
+<%if(applicationTypeEntity){ -%>
     /**
      * Testing simple save and version increment
      */
@@ -267,5 +270,5 @@ public class <%- projectSuffixUpperCase %>ApiTest implements Service {
         //todo add more fields here...
         return entity;
     }
-
+<% } -%>
 }

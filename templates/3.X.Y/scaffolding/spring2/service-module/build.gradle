@@ -12,7 +12,7 @@ dependencies {
 	// Implementation
 	implementation group: 'it.water.distribution', name: 'Water-distribution-spring', version: project.waterVersion
 <%if(applicationTypeEntity) {-%>
-	//todo remove it 
+	//todo remove and substitute with specific technology, used just as example
 	implementation group:'org.hsqldb', name:'hsqldb', version:'2.4.1'
 	// Persistence 
 	implementation group: 'org.springframework.data', name: 'spring-data-jpa', version: project.springBootVersion
@@ -28,23 +28,14 @@ dependencies {
 	implementation group:'jakarta.persistence', name:'jakarta.persistence-api', version:project.jakartaPersistenceVersion
 <% } -%>	
 <%} -%>
-	//Validation
-	//implementation 'org.springframework.boot:spring-boot-starter-validation:' + project.springBootVersion
-<% if(validationLib === 'javax') {	-%>
-    implementation group: 'javax.validation', name: 'validation-api', version: project.javaxValidationVersion
-    implementation group: "org.hibernate", name: "hibernate-validator", version: project.hibernateValidatorJavaxVersion
-<% } else { -%>
+	//Validation - Spring uses jakarta validation
+	implementation group: 'org.springframework.boot', name:'spring-boot-starter-validation', version: project.springBootVersion
     implementation group: 'jakarta.validation', name: 'jakarta.validation-api', version: project.jakartaValidationVersion
-    implementation group: "org.hibernate", name: "hibernate-validator", version: project.hibernateValidatorVersion
-<% } -%>
 <%if(hasRestServices) {-%>
 	// Rest Services
 	implementation group:'org.springframework.boot', name:'spring-boot-starter-web', version:project.springBootVersion
 	// Rest Water Deps
 	implementation group: 'it.water.service.rest', name: 'Rest-spring-api', version: project.waterVersion
-<% 		if(applicationTypeEntity){ -%>
-	implementation group: 'it.water.service.rest', name: 'Rest-persistence', version: project.waterVersion
-<% 		} -%>
 	// Swagger
     implementation group:'io.springfox', name:'springfox-swagger2', version:'3.0.0'
     implementation group:'io.springfox', name:'springfox-swagger-ui', version:'3.0.0'

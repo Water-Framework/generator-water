@@ -4,6 +4,7 @@ import it.water.repository.jpa.model.AbstractJpaEntity;
 import it.water.core.validation.annotations.*;
 import it.water.core.api.service.rest.WaterJsonView;
 <%if(isProtectedEntity || isOwnedEntity){-%>
+import it.water.core.api.entity.owned.OwnedResource;
 import it.water.core.api.permission.*;
 import it.water.core.permission.action.CrudActions;
 import it.water.core.permission.annotations.AccessControl;
@@ -16,7 +17,6 @@ import <%-persistenceLib%>.persistence.*;
 
 import <%-validationLib%>.validation.constraints.*;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonView;
 
 import javax.persistence.*;
@@ -44,7 +44,7 @@ import javax.persistence.*;
    if(isOwnedEntity){
         if(isProtectedEntity)
             implementedInterfaces += ", ";
-        implementedInterfaces += "OwnedEntity "
+        implementedInterfaces += "OwnedResource "
    }
  }
 -%>

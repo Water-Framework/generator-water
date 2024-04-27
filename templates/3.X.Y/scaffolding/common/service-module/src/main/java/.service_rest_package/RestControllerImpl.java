@@ -3,7 +3,9 @@ package <%-serviceRestPackage%>;
 
 import <%-apiPackage%>.*;
 import <%-apiPackage%>.rest.*;
+<%if(hasModel){-%>
 import <%-modelPackage%>.*;
+<% } -%>
 
 import it.water.core.api.service.BaseEntityApi;
 import it.water.core.api.service.rest.FrameworkRestController;

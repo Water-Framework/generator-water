@@ -3,7 +3,9 @@ package <%-serviceRestPackage%>;
 
 import <%-apiPackage%>.*;
 import <%-apiPackage%>.rest.*;
+<%if(hasModel){-%>
 import <%-modelPackage%>.*;
+<% } -%>
 
 import it.water.service.rest.persistence.BaseEntityRestApi;
 import it.water.core.api.model.PaginableResult;
@@ -12,8 +14,10 @@ import lombok.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.http.ResponseEntity;
+<% if(applicationTypeEntity) {-%>
+import org.springframework.transaction.annotation.Transactional;
+<% } -%>
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,7 +34,9 @@ import org.slf4j.LoggerFactory;
  *
  */
 @RestController
+<%if(applicationTypeEntity){-%>
 @Transactional
+<% } -%>
 public class <%- projectSuffixUpperCase %>RestControllerImpl <%-extendsDeclaration%> implements <%- projectSuffixUpperCase %>RestApi {
     private static Logger log = LoggerFactory.getLogger(<%- projectSuffixUpperCase %>RestControllerImpl.class.getName());
 
@@ -67,6 +73,6 @@ public class <%- projectSuffixUpperCase %>RestControllerImpl <%-extendsDeclarati
         return ResponseEntity.status(204).build();
     }
 <% } -%>
-//todo add custom exposed methods or override CRUD operations
-//ATTENTION: use always <%- projectSuffixLowerCase %>Api object in order to ensure the user is requesting operations has the right privileges to do it
+    //todo add custom exposed methods or override CRUD operations
+    //ATTENTION: use always <%- projectSuffixLowerCase %>Api object in order to ensure the user is requesting operations has the right privileges to do it
 }

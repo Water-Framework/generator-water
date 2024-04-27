@@ -51,12 +51,12 @@ public class <%- projectSuffixUpperCase %>ApiTest extends KarafTestSupport {
     
     private static ComponentRegistry componentRegistry;
     private static <%- projectSuffixUpperCase %>Api <%- projectSuffixLowerCase %>Api;
-    private static <%- projectSuffixUpperCase %>Repository <%- projectSuffixLowerCase %>Repository;
     private static TestPermissionManager permissionManager;
     private static Runtime runtime;
     private static it.water.core.api.model.User adminUser;
 
     <%if(isProtectedEntity){ -%>
+    private static <%- projectSuffixUpperCase %>Repository <%- projectSuffixLowerCase %>Repository;
     //declaring user for permissions tests
     private static it.water.core.api.model.User managerUser;
     private static it.water.core.api.model.User viewerUser;
@@ -116,12 +116,15 @@ public class <%- projectSuffixUpperCase %>ApiTest extends KarafTestSupport {
     @Test
     public void test001_componentsInsantiatedCorrectly() {
         this.<%- projectSuffixLowerCase %>Api = this.componentRegistry.findComponent(<%- projectSuffixUpperCase %>Api.class, null);
-        this.<%- projectSuffixLowerCase %>Repository = this.componentRegistry.findComponent(<%- projectSuffixUpperCase %>Repository.class, null);
         Assert.assertNotNull(this.<%- projectSuffixLowerCase %>Api);
         Assert.assertNotNull(this.componentRegistry.findComponent(<%- projectSuffixUpperCase %>SystemApi.class, null));
+<%if(applicationTypeEntity){ -%>
+        this.<%- projectSuffixLowerCase %>Repository = this.componentRegistry.findComponent(<%- projectSuffixUpperCase %>Repository.class, null);
         Assert.assertNotNull(this.<%- projectSuffixLowerCase %>Repository);
+<% } -%>        
     }
-
+    
+<%if(applicationTypeEntity){ -%>
     /**
      * Testing simple save and version increment
      */
@@ -310,4 +313,5 @@ public class <%- projectSuffixUpperCase %>ApiTest extends KarafTestSupport {
         //todo add more fields here...
         return entity;
     }
+<% } -%>    
 }

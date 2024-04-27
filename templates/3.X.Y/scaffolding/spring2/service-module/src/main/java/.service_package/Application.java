@@ -1,12 +1,14 @@
 package <%-projectGroupId%>;
 
-import it.water.repository.jpa.spring.RepositoryFactory;
 import it.water.implementation.spring.annotations.EnableWaterFramework;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+<% if(applicationTypeEntity) {-%>
+import it.water.repository.jpa.spring.RepositoryFactory;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
+<% } -%>
 import org.springframework.context.annotation.ComponentScan;
 <%if(hasRestServices){ -%>
 import springfox.documentation.swagger2.annotations.EnableSwagger2;

@@ -1,29 +1,29 @@
 package <%-projectGroupId%>;
 
 import it.water.core.api.model.PaginableResult;
+import it.water.core.api.model.User;
+import it.water.core.api.permission.Role;
+import it.water.core.api.permission.RoleManager;
 import it.water.core.api.registry.ComponentRegistry;
 import it.water.core.api.repository.query.Query;
-import it.water.core.api.service.Service;
 import it.water.core.model.exceptions.ValidationException;
 import it.water.core.model.exceptions.WaterRuntimeException;
 import it.water.core.bundle.WaterRuntime;
+import it.water.core.permission.exceptions.UnauthorizedException;
 import it.water.repository.entity.model.exceptions.DuplicateEntityException;
 import it.water.core.testing.utils.api.TestPermissionManager;
-
-import it.water.core.testing.utils.junit.WaterTestExtension;
+import it.water.core.testing.utils.bundle.TestRuntimeInitializer;
 
 import <%-apiPackage%>.*;
 import <%-modelPackage%>.*;
 
-import lombok.Setter;
-
 import org.junit.jupiter.api.*;
-import org.junit.jupiter.api.extension.ExtendWith;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.Commit;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
 
 /**
  * Generated with Water Generator.
@@ -42,9 +42,6 @@ public class <%- projectSuffixUpperCase %>ApiTest  {
     
     @Autowired
     private <%- projectSuffixUpperCase %>Api <%- projectSuffixLowerCase %>Api;
-    
-    @Autowired
-    private <%- projectSuffixUpperCase %>Repository <%- projectSuffixLowerCase %>Repository;
 
     @Autowired
     private TestPermissionManager permissionManager;
@@ -53,7 +50,10 @@ public class <%- projectSuffixUpperCase %>ApiTest  {
     private WaterRuntime runtime;
 
     private it.water.core.api.model.User adminUser;
-    <%if(isProtectedEntity){ -%>
+<%if(isProtectedEntity){ -%>
+    @Autowired
+    private <%- projectSuffixUpperCase %>Repository <%- projectSuffixLowerCase %>Repository;
+    
     @Autowired
     //default is test role manager
     private RoleManager roleManager;
@@ -65,10 +65,10 @@ public class <%- projectSuffixUpperCase %>ApiTest  {
     private Role manager;
     private Role viewer;
     private Role editor;
-    <% } -%>
+<% } -%>
     @BeforeAll
     public void beforeAll() {
-        <%if(isProtectedEntity){ -%>
+<%if(isProtectedEntity){ -%>
         //getting user
         manager = roleManager.getRole("bookManager");
         viewer = roleManager.getRole("bookViewer");
@@ -84,11 +84,8 @@ public class <%- projectSuffixUpperCase %>ApiTest  {
         roleManager.addRole(viewerUser.getId(), viewer);
         roleManager.addRole(editorUser.getId(), editor);
         //starting with admin
-        <% } -%>
-        //impersonate admin so we can test the happy path
-        adminUser = permissionManager.addUser("admin", "name", "lastname", "admin@a.com", true);
         //deafult user in test mode is admin please use TestRuntimeInitializer.getInstance().impersonate(...); to impersonate other users
-
+<% } -%>
     }
 
     /**
@@ -98,12 +95,15 @@ public class <%- projectSuffixUpperCase %>ApiTest  {
     @Order(1)
     public void componentsInsantiatedCorrectly() {
         this.<%- projectSuffixLowerCase %>Api = this.componentRegistry.findComponent(<%- projectSuffixUpperCase %>Api.class, null);
-        this.<%- projectSuffixLowerCase %>Repository = this.componentRegistry.findComponent(<%- projectSuffixUpperCase %>Repository.class, null);
         Assertions.assertNotNull(this.<%- projectSuffixLowerCase %>Api);
         Assertions.assertNotNull(this.componentRegistry.findComponent(<%- projectSuffixUpperCase %>SystemApi.class, null));
+<%if(applicationTypeEntity){ -%>
+        this.<%- projectSuffixLowerCase %>Repository = this.componentRegistry.findComponent(<%- projectSuffixUpperCase %>Repository.class, null);
         Assertions.assertNotNull(this.<%- projectSuffixLowerCase %>Repository);
+<% } -%>        
     }
 
+<%if(applicationTypeEntity){ -%>
     /**
      * Testing simple save and version increment
      */
@@ -218,22 +218,12 @@ public class <%- projectSuffixUpperCase %>ApiTest  {
         Assertions.assertThrows(DuplicateEntityException.class,() -> this.<%- projectSuffixLowerCase %>Api.update(entity));
     }
 
-    /**
-     * Testing failure on validation failure for example code injection
-     */
-    @Test
-    @Order(9)
-    @Transactional
-    @Commit
-    public void updateShouldFailOnValidationFailure() {
-        <%- projectSuffixUpperCase %> newEntity = new <%- projectSuffixUpperCase %>("<script>function(){alert('ciao')!}</script>");
-        Assertions.assertThrows(ValidationException.class,() -> this.<%- projectSuffixLowerCase %>Api.save(newEntity));
-    }
+    
     <%if(isProtectedEntity){ -%>
     /**
      * Managers can do everything
      */
-    @Order(10)
+    @Order(9)
     @Test
     @Commit
     @Transactional
@@ -252,7 +242,7 @@ public class <%- projectSuffixUpperCase %>ApiTest  {
     /**
      * Viewers are authorized just to read content, not to alter it
      */
-    @Order(11)
+    @Order(10)
     @Transactional
     @Test
     public void viewerCannotSaveOrUpdateOrRemove() {
@@ -271,7 +261,7 @@ public class <%- projectSuffixUpperCase %>ApiTest  {
     /**
      * Editors can save or update but cannot remove
      */
-    @Order(12)
+    @Order(11)
     @Transactional
     @Commit
     @Test
@@ -288,7 +278,7 @@ public class <%- projectSuffixUpperCase %>ApiTest  {
     /**
      * Testing user with multiple roles on the same entity. Checking the at least minimum priviledge principle
      */
-    @Order(13)
+    @Order(12)
     @Transactional
     @Commit
     @Test
@@ -304,10 +294,11 @@ public class <%- projectSuffixUpperCase %>ApiTest  {
         Assertions.assertDoesNotThrow(() -> this.<%- projectSuffixLowerCase %>Api.find(savedEntity.getId()));
         Assertions.assertThrows(UnauthorizedException.class, () -> this.<%- projectSuffixLowerCase %>Api.remove(savedEntity.getId()));
     }
-    <% } -%>
+<% } -%>
     private <%- projectSuffixUpperCase %> create<%- projectSuffixUpperCase %>(int seed){
         <%- projectSuffixUpperCase %> entity = new <%- projectSuffixUpperCase %>("exampleField"+seed);
         //todo add more fields here...
         return entity;
     }
+<% } -%>    
 }

@@ -50,11 +50,7 @@ module.exports = class extends Generator {
             message: 'Group ID',
             default: function (answers) {
                 let packageStr = "";
-                if (answers.projectName.toLowerCase().startsWith(self.getGlobalProjectName().toLowerCase())) {
-                    packageStr = 'it.' + answers.projectName.replace(/-/g, '.').toLowerCase()
-                } else {
-                    packageStr = 'it.' + self.getGlobalProjectName().toLowerCase() + '.' + answers.projectName.replace(/-/g, '.').toLowerCase()
-                }
+                packageStr = 'com.' + answers.projectName.replace(/-/g, '.').toLowerCase()
                 return packageStr;
             }
         }, {
@@ -83,8 +79,11 @@ module.exports = class extends Generator {
                     name: "Water",
                     value: "water"
                 }, {
-                    name: "Spring",
-                    value: "spring"
+                    name: "Spring 2.X",
+                    value: "spring2"
+                },{
+                    name: "Spring 3.X",
+                    value: "spring3"
                 }, {
                     name: "OSGi",
                     value: "osgi"
@@ -125,8 +124,8 @@ module.exports = class extends Generator {
             name: 'persistenceLib',
             message: 'Which persistence api does your application support?',
             default: false,
-            when: function (answer) {
-                return answer.applicationType === 'entity';
+            when: function (answers) {
+                return answers.applicationType === 'entity' && !answers.projectTechnology == "spring2" && !answers.projectTechnology == "spring3";
             },
             default: function(){
                 return "javax";
@@ -144,7 +143,9 @@ module.exports = class extends Generator {
             type: 'list',
             name: 'validationLib',
             message: 'Which validation api does your application support?',
-            default: false,
+            when: function(answers){
+                return !answers.projectTechnology == "spring2" && !answers.projectTechnology == "spring3"  
+            },
             default: function(){
                 return "jakarta";
             },
@@ -175,7 +176,7 @@ module.exports = class extends Generator {
             message: 'Would you like to use Spring repository instead of spring Water default repositories?',
             default: true,
             when: function (answer) {
-                return answer.projectTechnology === 'spring' && answer.applicationType === 'entity';
+                return (answer.projectTechnology === 'spring2' || answer.projectTechnology === 'spring3') && answer.applicationType === 'entity';
             }
         },
         {
@@ -230,6 +231,19 @@ module.exports = class extends Generator {
         ]).then((answers) => {
             let initialName = answers.projectName;
             this.projectTechnology = answers.projectTechnology;
+            let validationLib = answers.validationLib;
+            let persistenceLib = answers.persistenceLib;
+            if(this.projectTechnology === "spring2"){
+                //forcing validation and persistence to javax
+                validationLib = "jakarta";
+                persistenceLib = "javax";
+
+            } else if(this.projectTechnology === "spring3"){
+                //forcing validation and persistence to jakarata
+                validationLib = "jakarta";
+                persistenceLib = "jakarta";
+            } 
+
             if(answers.springRepository)
                 this.springRepository = answers.springRepository;
             let projectNameSplits = initialName.split("-");
@@ -294,8 +308,8 @@ module.exports = class extends Generator {
                 hasModel: this.hasModel,
                 isProtectedEntity: answers.isProtectedEntity,
                 isOwnedEntity:answers.isOwnedEntity,
-                persistenceLib:answers.persistenceLib,
-                validationLib:answers.validationLib,
+                persistenceLib: persistenceLib,
+                validationLib: validationLib,
                 projectPath: this.projectName,
                 projectApiPath: this.projectApiPath,
                 projectModelPath: this.projectModelPath,

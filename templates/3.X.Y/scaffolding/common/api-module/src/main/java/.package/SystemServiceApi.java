@@ -1,6 +1,6 @@
 package <%- apiPackage %>;
 
-import iit.water.core.api.service.BaseSystemApi;
+import it.water.core.api.service.BaseSystemApi;
 
 /**
  * 
