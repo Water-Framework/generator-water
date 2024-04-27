@@ -18,10 +18,12 @@
   
   <feature name="<%-projectSuffixLowerCase%>-feature" version="${project.version}" description="All <%-projectSuffixUpperCase%> Modules">
     <feature>water-core-features</feature>
-<% if(applicationTypeEntity){ -%>
+<% if(applicationTypeEntity && !hasRestServices){ -%>
     <feature>water-jpa-repository</feature>
 <% } -%>
-<% if(hasRestServices){ -%>
+<% if(hasRestServices ){ -%>
+    <!-- jpa module si required in rest module-->
+    <feature>water-jpa-repository</feature>
     <feature>water-rest</feature>
 <% } -%>    
     <!--All water bundles should start with 82 start-level at least -->

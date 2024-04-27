@@ -13,13 +13,18 @@ Import-Package: \
     org.hibernate.validator.*;version='${range;[=,+)}',\
     org.hibernate.annotations;version='[5,6)',\
     javassist.util.proxy,\
+<% if(validationLib === 'javax') {	-%>
+    javax.validation,\
+    javax.validation.*,\
+<% } else if(validationLib === 'jakarta'){ -%>
     jakarta.validation,\
     jakarta.validation.*,\
-<% if(persistenceLib === 'javax') {	-%>
+<% } -%>
+<% if(applicationTypeEntity && persistenceLib === 'javax') {	-%>
     javax.persistence,\
     javax.transaction,\
     javax.enterprise.*,\
-<% } else { -%>
+<% } else if(applicationTypeEntity && persistenceLib === 'jakarta'){ -%>
 	jakarta.persistence,\
     jakarta.transaction,\
     jakarta.enterprise.*,\
