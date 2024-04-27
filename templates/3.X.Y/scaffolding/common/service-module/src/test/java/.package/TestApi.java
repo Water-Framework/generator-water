@@ -1,6 +1,7 @@
 package <%-projectGroupId%>;
 
 import it.water.core.api.model.PaginableResult;
+import it.water.core.api.bundle.Runtime;
 import it.water.core.api.permission.Role;
 import it.water.core.api.permission.RoleManager;
 import it.water.core.api.registry.ComponentRegistry;
@@ -47,16 +48,17 @@ public class <%- projectSuffixUpperCase %>ApiTest implements Service {
     @Inject
     @Setter
     private <%- projectSuffixUpperCase %>Api <%- projectSuffixLowerCase %>Api;
+
+    @Inject
+    @Setter
+    private WaterRuntime runtime;
+
 <%if(applicationTypeEntity) { -%>
     @Inject
     @Setter
     private <%- projectSuffixUpperCase %>Repository <%- projectSuffixLowerCase %>Repository;
 <% } -%>
-<%if(isProtectedEntity){ -%>
-    @Inject
-    @Setter
-    private <%- projectSuffixUpperCase %>Repository <%- projectSuffixLowerCase %>Repository;
-    
+<%if(isProtectedEntity){ -%>    
     @Inject
     @Setter
     //default permission manager in test environment;
@@ -87,7 +89,7 @@ public class <%- projectSuffixUpperCase %>ApiTest implements Service {
         Assertions.assertNotNull(<%- projectSuffixLowerCase %>ViewerRole);
         Assertions.assertNotNull(<%- projectSuffixLowerCase %>EditorRole);
         //impersonate admin so we can test the happy path
-        adminUser = permissionManager.addUser("admin", "name", "lastname", "admin@a.com", true);
+        adminUser = permissionManager.findUser("admin");
         <%- projectSuffixLowerCase %>ManagerUser = permissionManager.addUser("manager", "name", "lastname", "manager@a.com", false);
         <%- projectSuffixLowerCase %>ViewerUser = permissionManager.addUser("viewer", "name", "lastname", "viewer@a.com", false);
         <%- projectSuffixLowerCase %>EditorUser = permissionManager.addUser("editor", "name", "lastname", "editor@a.com", false);
@@ -107,7 +109,7 @@ public class <%- projectSuffixUpperCase %>ApiTest implements Service {
         this.<%- projectSuffixLowerCase %>Api = this.componentRegistry.findComponent(<%- projectSuffixUpperCase %>Api.class, null);
         Assertions.assertNotNull(this.<%- projectSuffixLowerCase %>Api);
         Assertions.assertNotNull(this.componentRegistry.findComponent(<%- projectSuffixUpperCase %>SystemApi.class, null));
-<%if(applicationTypeEntity){ -%>        
+<%if(applicationTypeEntity){ -%>
         this.<%- projectSuffixLowerCase %>Repository = this.componentRegistry.findComponent(<%- projectSuffixUpperCase %>Repository.class, null);
         Assertions.assertNotNull(this.<%- projectSuffixLowerCase %>Repository);
 <% } -%>
@@ -235,8 +237,8 @@ public class <%- projectSuffixUpperCase %>ApiTest implements Service {
     @Order(10)
     @Test
     public void managerCanDoEverything() {
-        TestRuntimeInitializer.getInstance().impersonate(managerUser);
-        final <%- projectSuffixUpperCase %> entity = createUser(101);
+        TestRuntimeInitializer.getInstance().impersonate(<%- projectSuffixLowerCase %>ManagerUser,runtime);
+        final <%- projectSuffixUpperCase %> entity = create<%- projectSuffixUpperCase %>(101);
         <%- projectSuffixUpperCase %> savedEntity = Assertions.assertDoesNotThrow(() -> this.<%- projectSuffixLowerCase %>Api.save(entity));
         savedEntity.setExampleField("newSavedEntity");
         Assertions.assertDoesNotThrow(() -> this.<%- projectSuffixLowerCase %>Api.update(entity));
@@ -248,8 +250,8 @@ public class <%- projectSuffixUpperCase %>ApiTest implements Service {
     @Order(11)
     @Test
     public void viewerCannotSaveOrUpdateOrRemove() {
-        TestRuntimeInitializer.getInstance().impersonate(viewerUser);
-        final <%- projectSuffixUpperCase %> entity = createUser(201);
+        TestRuntimeInitializer.getInstance().impersonate(<%- projectSuffixLowerCase %>ViewerUser,runtime);
+        final <%- projectSuffixUpperCase %> entity = create<%- projectSuffixUpperCase %>(201);
         Assertions.assertThrows(UnauthorizedException.class, () -> this.<%- projectSuffixLowerCase %>Api.save(entity));
         //viewer can search
         <%- projectSuffixUpperCase %> found = Assertions.assertDoesNotThrow(() -> this.<%- projectSuffixLowerCase %>Api.findAll(null, -1, -1, null).getResults().stream().findFirst()).get();
@@ -263,8 +265,8 @@ public class <%- projectSuffixUpperCase %>ApiTest implements Service {
     @Order(12)
     @Test
     public void editorCannotRemove() {
-        TestRuntimeInitializer.getInstance().impersonate(editorUser);
-        final <%- projectSuffixUpperCase %> entity = createUser(301);
+        TestRuntimeInitializer.getInstance().impersonate(<%- projectSuffixLowerCase %>EditorUser,runtime);
+        final <%- projectSuffixUpperCase %> entity = create<%- projectSuffixUpperCase %>(301);
         <%- projectSuffixUpperCase %> savedEntity = Assertions.assertDoesNotThrow(() -> this.<%- projectSuffixLowerCase %>Api.save(entity));
         savedEntity.setExampleField("editorNewSavedEntity");
         Assertions.assertDoesNotThrow(() -> this.<%- projectSuffixLowerCase %>Api.update(entity));
