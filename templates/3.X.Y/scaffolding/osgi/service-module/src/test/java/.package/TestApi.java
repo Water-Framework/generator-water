@@ -86,8 +86,10 @@ private static <%- projectSuffixUpperCase %>Repository <%- projectSuffixLowerCas
         Assert.assertNotNull(componentRegistry);
         <%- projectSuffixLowerCase %>Api = componentRegistry.findComponent(<%- projectSuffixUpperCase %>Api.class,null);
         Assert.assertNotNull(<%- projectSuffixLowerCase %>Api);
+<% if(applicationTypeEntity){ -%>        
         <%- projectSuffixLowerCase %>Repository = componentRegistry.findComponent(<%- projectSuffixUpperCase %>Repository.class,null);
         Assert.assertNotNull(<%- projectSuffixLowerCase %>Repository);
+<% } -%>        
         permissionManager = componentRegistry.findComponent(TestPermissionManager.class,null);
         Assert.assertNotNull(permissionManager);
         runtime = componentRegistry.findComponent(Runtime.class,null);
