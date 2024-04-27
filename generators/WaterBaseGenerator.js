@@ -288,7 +288,7 @@ module.exports = class extends AcsBaseGenerator {
         //Overriding tests with specific technology
         if(fs.existsSync(technologyTemplatePath+"/src/test/java/.package/TestApi.java"))
             this.fs.copyTpl(technologyTemplatePath+"/src/test/java/.package/TestApi.java", this.destinationPath(projectConf.projectServicePath)+projectConf.projectTestPath+"/"+projectConf.projectSuffixUpperCase+"ApiTest.java", projectConf);
-        if(fs.existsSync(technologyTemplatePath+"/src/test/java/.package/TestRestApi.java") && projectConf.hasRestServicesy)
+        if(fs.existsSync(technologyTemplatePath+"/src/test/java/.package/TestRestApi.java") && projectConf.hasRestServices)
             this.fs.copyTpl(technologyTemplatePath+"/src/test/java/.package/TestRestApi.java", this.destinationPath(projectConf.projectServicePath)+projectConf.projectTestPath+"/"+projectConf.projectSuffixUpperCase+"RestApiTest.java", projectConf);
         
         if(projectConf.projectTechnology === "spring2" || projectConf.projectTechnology === "spring3"){

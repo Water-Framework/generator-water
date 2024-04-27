@@ -13,17 +13,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 
 @ExtendWith(WaterTestExtension.class)
 public class <%- projectSuffixUpperCase %>RestApiTest {
-
-    @Inject
-    @Setter
-    //default permission manager in test environment;
-    private static TestPermissionManager permissionManager;
     
     @Karate.Test
     Karate restInterfaceTest() {
-        //impersonating admin before doing tests
-        User admin = permissionManager.addUser("admin", "name", "lastname", "admin@a.com", true);
-        TestRuntimeInitializer.getInstance().impersonate(admin);
         return Karate.run("classpath:karate");
     }
 }

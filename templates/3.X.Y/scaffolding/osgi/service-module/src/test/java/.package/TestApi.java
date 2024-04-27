@@ -3,7 +3,6 @@ package <%-projectGroupId%>;
 import it.water.core.api.bundle.Runtime;
 import it.water.core.api.model.PaginableResult;
 import it.water.core.api.registry.ComponentRegistry;
-import it.water.core.api.repository.query.Query;
 <%if(isProtectedEntity) {-%>
 import it.water.core.api.service.Service;
 import it.water.core.api.permission.Role;
@@ -14,13 +13,18 @@ import it.water.core.permission.exceptions.UnauthorizedException;
 <% } -%>
 import it.water.core.model.exceptions.ValidationException;
 import it.water.core.model.exceptions.WaterRuntimeException;
-import it.water.repository.entity.model.exceptions.DuplicateEntityException;
 import it.water.core.testing.utils.api.TestPermissionManager;
 import it.water.core.testing.utils.bundle.TestRuntimeInitializer;
 
 import <%-apiPackage%>.*;
+<%if(hasModel){-%>
 import <%-modelPackage%>.*;
+<% } -%>
+<%if(applicationTypeEntity){-%>
 import <%-repositoryPackage%>.*;
+import it.water.core.api.repository.query.Query;
+import it.water.repository.entity.model.exceptions.DuplicateEntityException;
+<% } -%>
 
 import lombok.Setter;
 
@@ -54,9 +58,11 @@ public class <%- projectSuffixUpperCase %>ApiTest extends KarafTestSupport {
     private static TestPermissionManager permissionManager;
     private static Runtime runtime;
     private static it.water.core.api.model.User adminUser;
-
+<%if(applicationTypeEntity) { -%>
+private static <%- projectSuffixUpperCase %>Repository <%- projectSuffixLowerCase %>Repository;
+<% } -%>
     <%if(isProtectedEntity){ -%>
-    private static <%- projectSuffixUpperCase %>Repository <%- projectSuffixLowerCase %>Repository;
+    
     //declaring user for permissions tests
     private static it.water.core.api.model.User managerUser;
     private static it.water.core.api.model.User viewerUser;

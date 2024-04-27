@@ -17,7 +17,9 @@ import it.water.repository.entity.model.exceptions.DuplicateEntityException;
 import it.water.core.testing.utils.junit.WaterTestExtension;
 
 import <%-apiPackage%>.*;
+<%if(hasModel){-%>
 import <%-modelPackage%>.*;
+<% } -%>
 
 import lombok.Setter;
 
@@ -43,7 +45,11 @@ public class <%- projectSuffixUpperCase %>ApiTest implements Service {
     @Inject
     @Setter
     private <%- projectSuffixUpperCase %>Api <%- projectSuffixLowerCase %>Api;
-
+<%if(applicationTypeEntity) { -%>
+    @Inject
+    @Setter
+    private <%- projectSuffixUpperCase %>Repository <%- projectSuffixLowerCase %>Repository;
+<% } -%>
 <%if(isProtectedEntity){ -%>
     @Inject
     @Setter

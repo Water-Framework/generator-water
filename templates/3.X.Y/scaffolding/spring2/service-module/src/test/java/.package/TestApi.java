@@ -15,7 +15,9 @@ import it.water.core.testing.utils.api.TestPermissionManager;
 import it.water.core.testing.utils.bundle.TestRuntimeInitializer;
 
 import <%-apiPackage%>.*;
+<%if(hasModel){-%>
 import <%-modelPackage%>.*;
+<% } -%>
 
 import org.junit.jupiter.api.*;
 
@@ -50,10 +52,11 @@ public class <%- projectSuffixUpperCase %>ApiTest  {
     private WaterRuntime runtime;
 
     private it.water.core.api.model.User adminUser;
-<%if(isProtectedEntity){ -%>
+<%if(applicationTypeEntity) { -%>
     @Autowired
     private <%- projectSuffixUpperCase %>Repository <%- projectSuffixLowerCase %>Repository;
-    
+<% } -%>    
+<%if(isProtectedEntity){ -%>
     @Autowired
     //default is test role manager
     private RoleManager roleManager;
