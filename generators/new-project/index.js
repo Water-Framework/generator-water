@@ -189,6 +189,9 @@ module.exports = class extends Generator {
             type: 'input',
             name: 'restContextRoot',
             message: 'Please insert your rest context root ex. /myEntity ?',
+            when: function (answer) {
+                return answer.hasRestServices === true;
+            },
             default: function(answers){
                 return "/"+self.camelize(answers.projectName)+"s";
             }
