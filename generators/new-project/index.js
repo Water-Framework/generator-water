@@ -123,9 +123,8 @@ module.exports = class extends Generator {
             type: 'list',
             name: 'persistenceLib',
             message: 'Which persistence api does your application support?',
-            default: false,
             when: function (answers) {
-                return answers.applicationType === 'entity' && !answers.projectTechnology == "spring2" && !answers.projectTechnology == "spring3";
+                return answers.applicationType === 'entity' && answers.projectTechnology !== "spring2" && !answers.projectTechnology !== "spring3";
             },
             default: function(){
                 return "javax";
@@ -144,7 +143,7 @@ module.exports = class extends Generator {
             name: 'validationLib',
             message: 'Which validation api does your application support?',
             when: function(answers){
-                return !answers.projectTechnology == "spring2" && !answers.projectTechnology == "spring3"  
+                return answers.projectTechnology !== "spring2" && answers.projectTechnology !== "spring3"  
             },
             default: function(){
                 return "jakarta";

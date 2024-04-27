@@ -7,7 +7,6 @@ import <%-apiPackage%>.rest.*;
 import <%-modelPackage%>.*;
 <% } -%>
 
-import it.water.service.rest.persistence.BaseEntityRestApi;
 import it.water.core.api.model.PaginableResult;
 
 import lombok.*;
@@ -16,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.http.ResponseEntity;
 <% if(applicationTypeEntity) {-%>
+import it.water.service.rest.persistence.BaseEntityRestApi;
 import org.springframework.transaction.annotation.Transactional;
 <% } -%>
 

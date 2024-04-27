@@ -12,7 +12,9 @@ import it.water.core.interceptors.annotations.Inject;
 import it.water.core.model.exceptions.ValidationException;
 import it.water.core.model.exceptions.WaterRuntimeException;
 import it.water.core.permission.exceptions.UnauthorizedException;
+<%if(applicationTypeEntity){-%>
 import it.water.repository.entity.model.exceptions.DuplicateEntityException;
+<% } -%>
 
 import it.water.core.testing.utils.junit.WaterTestExtension;
 
