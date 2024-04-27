@@ -1,5 +1,6 @@
 package <%- modelPackage %>;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import it.water.repository.jpa.model.AbstractJpaEntity;
 import it.water.core.validation.annotations.*;
 import it.water.core.api.service.rest.WaterJsonView;
@@ -93,6 +94,7 @@ public class <%- projectSuffixUpperCase %> extends AbstractJpaEntity<%-implement
 
 <% if(isOwnedEntity){ -%>
     @Override
+    @JsonIgnore
     public it.water.core.api.model.User getUserOwner() {
         //todo add logic to return the user who owns this entity
         return null;

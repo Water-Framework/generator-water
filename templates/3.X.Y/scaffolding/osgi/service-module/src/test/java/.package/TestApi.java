@@ -110,9 +110,7 @@ private static <%- projectSuffixUpperCase %>Repository <%- projectSuffixLowerCas
         roleManager.addRole(viewerUser.getId(), viewer);
         roleManager.addRole(editorUser.getId(), editor);
         //starting with admin
-        <% } -%>
-        //impersonate admin so we can test the happy path
-        adminUser = permissionManager.addUser("admin", "name", "lastname", "admin@a.com", true);
+<% } -%>
         //deafult user in test mode is admin please use TestRuntimeInitializer.getInstance().impersonate(...); to impersonate other users
     }
 
@@ -248,7 +246,7 @@ private static <%- projectSuffixUpperCase %>Repository <%- projectSuffixLowerCas
     @Test
     public void test010_managerCanDoEverything() {
         TestRuntimeInitializer.getInstance().impersonate(managerUser, runtime);
-        <%- projectSuffixUpperCase %> newEntity = create<%- projectSuffixUpperCase %>(1);
+        <%- projectSuffixUpperCase %> newEntity = create<%- projectSuffixUpperCase %>(4);
         <%- projectSuffixUpperCase %> entity = this.<%- projectSuffixLowerCase %>Api.save(newEntity);
         Assert.assertNotNull(entity);
         entity.setExampleField("newUpdatedExampleField");
@@ -276,11 +274,11 @@ private static <%- projectSuffixUpperCase %>Repository <%- projectSuffixLowerCas
         //viewer cannot update or remove
         found.setExampleField("changeIt!");
         try {
-            this.<%- projectSuffixLowerCase %>Api.update(entity)
+            this.<%- projectSuffixLowerCase %>Api.update(entity);
         } catch(Exception e){
             Assert.assertTrue(e instanceof UnauthorizedException);
         }
-        this.<%- projectSuffixLowerCase %>Api.update(entity)
+        this.<%- projectSuffixLowerCase %>Api.update(entity);
     }
 
     /**

@@ -9,7 +9,7 @@ import it.water.core.api.registry.filter.ComponentFilterBuilder;
 import it.water.repository.service.BaseEntitySystemServiceImpl;
 <% } else { -%>
 import it.water.core.service.BaseSystemServiceImpl;
-<% } -%>
+<% } -%>
 
 import org.osgi.service.cdi.annotations.Bean;
 import org.osgi.service.cdi.annotations.Reference;
@@ -30,7 +30,7 @@ let extendsStr = (applicationTypeEntity)?"BaseEntitySystemServiceImpl<"+projectS
 @SingleComponent
 @Bean
 @Service(value = <%- projectSuffixUpperCase %>SystemApi.class)
-public class <%- projectSuffixUpperCase %>SystemServiceImpl extends <%-extendsStr> implements <%- projectSuffixUpperCase %>SystemApi {
+public class <%- projectSuffixUpperCase %>SystemServiceImpl extends <%-extendsStr%> implements <%- projectSuffixUpperCase %>SystemApi {
 <%if(applicationTypeEntity){ -%>
     @Getter
     @Setter
