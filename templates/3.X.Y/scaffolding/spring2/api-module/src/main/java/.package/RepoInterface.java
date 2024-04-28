@@ -2,7 +2,7 @@ package <%- apiPackage %>;
 
 import it.water.core.api.repository.BaseRepository;
 import <%- modelPackage %>.<%-projectSuffixUpperCase %>;
-
+import it.water.repository.jpa.spring.SpringBaseJpaRepositoryImpl;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -12,7 +12,9 @@ import org.springframework.stereotype.Repository;
  * It is used for CRUD operations, and to interact with the persistence layer.
  *
  */
+<% if(springRepository){ -%>
 @Repository
+<% } -%>
 public interface <%- projectSuffixUpperCase %>Repository extends JpaRepository<<%- projectSuffixUpperCase %>, Long>, BaseRepository<<%- projectSuffixUpperCase %>> {
 	
 }
