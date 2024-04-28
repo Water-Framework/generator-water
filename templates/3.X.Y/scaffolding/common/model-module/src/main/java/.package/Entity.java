@@ -2,7 +2,6 @@ package <%- modelPackage %>;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import it.water.repository.jpa.model.AbstractJpaEntity;
-import it.water.core.validation.annotations.*;
 import it.water.core.api.service.rest.WaterJsonView;
 <%if(isProtectedEntity || isOwnedEntity){-%>
 import it.water.core.api.entity.owned.OwnedResource;
@@ -11,11 +10,13 @@ import it.water.core.permission.action.CrudActions;
 import it.water.core.permission.annotations.AccessControl;
 import it.water.core.permission.annotations.DefaultRoleAccess;
 <% } -%>
-
 import lombok.*;
-
+<% if(validationLib === 'javax') {-%>
+import it.water.core.validation.javax.annotations.*;
+<% } else if(validationLib === 'jakarta'){ -%>
+import it.water.core.validation.annotations.*;
+<% } -%>
 import <%-persistenceLib%>.persistence.*;
-
 import <%-validationLib%>.validation.constraints.*;
 
 import com.fasterxml.jackson.annotation.JsonView;

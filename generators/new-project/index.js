@@ -237,7 +237,7 @@ module.exports = class extends Generator {
             let persistenceLib = answers.persistenceLib;
             if(this.projectTechnology === "spring2"){
                 //forcing validation and persistence to javax
-                validationLib = "jakarta";
+                validationLib = "javax";
                 persistenceLib = "javax";
 
             } else if(this.projectTechnology === "spring3"){
