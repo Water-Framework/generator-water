@@ -5,36 +5,33 @@ plugins {
 dependencies {
 	//SLF4J
     implementation group: 'org.slf4j', name: 'slf4j-api', version: project.slf4jVersion
-	//OSGi
-	implementation group: "org.osgi", name: "osgi.core", version: project.osgiVersion
-	implementation group: "org.osgi", name: "osgi.cmpn", version: project.osgiCompendiumVersion
-	//CDI
-	implementation group: 'org.osgi', name: 'org.osgi.service.cdi', version: '1.0.1'
-	implementation group: 'javax.annotation', name: 'javax.annotation-api', version:'1.3.2'
-	implementation group: 'javax.enterprise', name: 'cdi-api', version: '2.0.SP1'
 	//Atteo
 	implementation 'org.atteo.classindex:classindex:' + project.atteoClassIndexVersion
     annotationProcessor('org.atteo.classindex:classindex:' + project.atteoClassIndexVersion)
 	//lombok
     implementation group: 'org.projectlombok', name: 'lombok', version: project.lombokVersion
     annotationProcessor 'org.projectlombok:lombok:' + project.lombokVersion
+	annotationProcessor('org.atteo.classindex:classindex:' + project.atteoClassIndexVersion)
 <%if(applicationTypeEntity) {-%>
 <% if(persistenceLib === 'javax') {	-%>
-	//hibernate
-	implementation 'org.hibernate:hibernate-core:'+project.hibernateVersion
 	//javax persistence
 	implementation 'javax.persistence:javax.persistence-api:'+project.javaxPersistenceVersion
 	//Water javax persistence
-	implementation 'it.water.repository.jpa:JpaRepository-osgi:'+project.waterVersion
+	implementation 'it.water.repository.jpa:JpaRepository-javax:'+project.waterVersion
 	implementation group: 'javax.transaction', name: 'javax.transaction-api', version: project.javaxTransactionApiVersion
+	//hibernate
+	implementation 'org.hibernate:hibernate-core:'+project.hibernateVersion
 <% } else { -%>
-	implementation 'org.hibernate:hibernate-core:'+project.hibernateJakartaVersion
 	//jakarta persistence
 	implementation 'jakarta.persistence:jakarta.persistence-api:'+project.jakartaPersistenceVersion
 	//Water javax persistence
 	implementation 'it.water.repository.jpa:JpaRepository-jakarta:'+project.waterVersion
 	implementation group: 'jakarta.transaction', name: 'jakarta.transaction-api', version: project.jakartaTransactionApiVersion
 <% } -%>	
+	//Water Persistence
+	implementation group:'it.water.repository', name:'Repository-entity', version:project.waterVersion
+	implementation group:'it.water.repository', name:'Repository-persistence', version:project.waterVersion
+	implementation group:'it.water.repository', name:'Repository-service', version:project.waterVersion
 <%} -%>
 	//Validation
 <% if(validationLib === 'javax') {	-%>
@@ -51,11 +48,20 @@ dependencies {
     //Encryption
     implementation group: 'org.bouncycastle', name: 'bcmail-jdk15on', version: project.bouncyCastleVersion
     implementation group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: project.nimbusJoseJwtVersion
-    //Water Osgi Distribution
-	implementation group: 'it.water.distribution', name: 'Water-distribution-osgi', version: project.waterVersion
+	//Core Water Deps
+    implementation group: 'it.water.core', name: 'Core-api', version: project.waterVersion
+    implementation group: 'it.water.core', name: 'Core-bundle', version: project.waterVersion
+    implementation group: 'it.water.core', name: 'Core-interceptors', version: project.waterVersion
+    implementation group: 'it.water.core', name: 'Core-model', version: project.waterVersion
+    implementation group: 'it.water.core', name: 'Core-permission', version: project.waterVersion
+    implementation group: 'it.water.core', name: 'Core-registry', version: project.waterVersion
+    implementation group: 'it.water.core', name: 'Core-security', version: project.waterVersion
+    implementation group: 'it.water.core', name: 'Core-service', version: project.waterVersion
     
 <%if(hasRestServices) {-%>
 	//Rest Water Deps
+	implementation group: 'it.water.service.rest', name: 'Rest-api', version: project.waterVersion
+	implementation group: 'it.water.service.rest', name: 'Rest-security', version: project.waterVersion
 	implementation group: 'it.water.service.rest', name: 'Rest-service', version: project.waterVersion
 	implementation group: 'it.water.service.rest', name: 'Rest-jaxrs-api', version: project.waterVersion
 <% 		if(applicationTypeEntity){ -%>
@@ -65,15 +71,16 @@ dependencies {
     implementation group: 'io.swagger', name: 'swagger-jaxrs', version: project.swaggerJaxRsVersion
 <%} -%>
 
+	implementation project (":<%-projectName%>-api")
+	implementation project (":<%-projectName%>-model")
+
 	testImplementation group:'it.water.core',name:'Core-testing-utils',version:project.waterVersion
+
 	testAnnotationProcessor 'org.projectlombok:lombok:'+project.lombokVersion
-	testImplementation group: "org.apache.karaf.itests", name: "common", version: project.karafVersion
-    testImplementation group: "org.apache.karaf", name: "apache-karaf", version: project.karafVersion
-    testImplementation group: "org.apache.karaf.shell", name: "org.apache.karaf.shell.core", version: project.karafVersion
-    testImplementation group: "org.ops4j.pax.exam", name: "pax-exam-container-karaf", version: project.paxExamVersion
-    testImplementation group: "org.ops4j.pax.exam", name: "pax-exam-junit4", version: project.paxExamVersion
-    testImplementation group: "org.ops4j.pax.exam", name: "pax-exam", version: project.paxExamVersion
-	testImplementation 'org.awaitility:awaitility:4.2.1'
+	testImplementation 'org.mockito:mockito-core:4.6.1'
+	testImplementation 'org.mockito:mockito-junit-jupiter:4.6.1'
+	testImplementation 'org.junit.jupiter:junit-jupiter-api:' + project.junitJupiterVersion
+	testImplementation 'org.junit.jupiter:junit-jupiter-engine:' + project.junitJupiterVersion
 	testImplementation 'org.atteo.classindex:classindex:' + project.atteoClassIndexVersion
 <%if(applicationTypeEntity) {-%>	
 	//for testing purpose we use hibernate as persistence provider
@@ -81,7 +88,17 @@ dependencies {
 	testImplementation 'org.hsqldb:hsqldb:2.4.1'
 <%} -%>
 <%if(hasRestServices) {-%>	
-	testImplementation group: 'com.intuit.karate', name: 'karate-junit4', version: '1.4.0.RC3'
+	testImplementation group: 'it.water.service.rest', name: 'Rest-api-manager-apache-cxf', version: project.waterVersion
+	//Using jetty and apache cxf (jaxrs compliant framework) for testing 
+	testImplementation group: 'org.reflections', name: 'reflections', version: '0.10.2'
+	testImplementation group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.13'
+	testImplementation group: 'org.apache.cxf', name: 'cxf-rt-transports-http-jetty', version: project.cxfVersion
+	testImplementation group: 'org.springframework', name: 'spring-web', version: '5.3.22'
+	testImplementation group: 'org.springframework', name: 'spring-context', version: '5.3.22'
+	//with 9.4.4 tests won't work because of the integration between cxf and jetty outside karaf context
+	testImplementation group: 'org.eclipse.jetty', name: 'jetty-servlet', version: '9.4.49.v20220914'
+	// https://mvnrepository.com/artifact/com.intuit.karate/karate-junit5
+	testImplementation group: 'com.intuit.karate', name: 'karate-junit5', version: '1.4.1'
 <%} -%>
 }
 
@@ -94,10 +111,5 @@ publishing {
         	water(MavenPublication) {
             	from components.java
         	}
-
-            karaf(MavenPublication) {
-                artifact source: 'src/main/resources/features.xml', classifier: 'features'
-                artifactId '<%-projectName%>-karaf-features'
-            }
     }
  }
