@@ -30,6 +30,8 @@ dependencies {
 <%} -%>
 	//Validation - Spring 2.x better to use javax validation
 	implementation group:'javax.validation', name:'validation-api', version: '2.0.1.Final'
+	//hibernate validator
+	implementation group: "org.hibernate", name: "hibernate-validator", version: project.hibernateValidatorJavaxVersion
 <%if(hasRestServices) {-%>
 	// Rest Services
 	implementation group:'org.springframework.boot', name:'spring-boot-starter-web', version:project.springBootVersion
