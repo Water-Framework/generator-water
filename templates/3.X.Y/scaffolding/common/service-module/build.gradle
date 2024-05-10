@@ -80,10 +80,12 @@ dependencies {
 	//for testing purpose we use hibernate as persistence provider
     testImplementation 'org.hibernate:hibernate-core:'+project.hibernateVersion
 	testImplementation 'org.hsqldb:hsqldb:2.4.1'
+	//Using javax jpa for testing purpose
+	testImplementation group: 'it.water.repository.jpa', name: 'JpaRepository-test', version: project.waterVersion
 <%} -%>
 <%if(hasRestServices) {-%>	
-	testImplementation group: 'it.water.service.rest', name: 'Rest-api-manager-apache-cxf', version: project.waterVersion
 	//Using jetty and apache cxf (jaxrs compliant framework) for testing 
+	testImplementation group: 'it.water.service.rest', name: 'Rest-api-manager-apache-cxf', version: project.waterVersion
 	testImplementation group: 'org.reflections', name: 'reflections', version: '0.10.2'
 	testImplementation group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.13'
 	testImplementation group: 'org.apache.cxf', name: 'cxf-rt-transports-http-jetty', version: project.cxfVersion
