@@ -64,6 +64,7 @@ import javax.persistence.*;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @RequiredArgsConstructor
 @Getter
+@Setter(AccessLevel.PROTECTED)
 @ToString
 @EqualsAndHashCode(of = {"id","exampleField"/*todo add more fields for equals and hashcode, remember hashcode and equals are key methods for ORMs*/})
 <%- defineActionsAndRolesAnnotation -%>

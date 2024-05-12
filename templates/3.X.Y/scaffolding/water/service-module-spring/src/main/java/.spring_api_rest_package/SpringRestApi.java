@@ -20,6 +20,7 @@ import <%-apiPackage%>.*;
 import <%-modelPackage%>.*;
 
 import org.springframework.web.bind.annotation.*;
+import org.springframework.http.HttpStatus;
 
 /**
  * @Author Aristide Cittadino
@@ -30,10 +31,10 @@ import org.springframework.web.bind.annotation.*;
 @FrameworkRestApi
 public interface <%- projectSuffixUpperCase %>SpringRestApi extends <%- projectSuffixUpperCase %>RestApi {
     @PostMapping
-    <%- projectSuffixUpperCase %> save(<%- projectSuffixUpperCase %>  <%- projectSuffixLowerCase %>);
+    <%- projectSuffixUpperCase %> save(@RequestBody <%- projectSuffixUpperCase %>  <%- projectSuffixLowerCase %>);
 
     @PutMapping
-    <%- projectSuffixUpperCase %> update(<%- projectSuffixUpperCase %> <%- projectSuffixLowerCase %>);
+    <%- projectSuffixUpperCase %> update(@RequestBody <%- projectSuffixUpperCase %> <%- projectSuffixLowerCase %>);
 
     @GetMapping("/{id}")
     <%- projectSuffixUpperCase %> find(@PathVariable("id") long id);
@@ -42,5 +43,6 @@ public interface <%- projectSuffixUpperCase %>SpringRestApi extends <%- projectS
     PaginableResult<<%- projectSuffixUpperCase %>> findAll();
 
     @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     void remove(@PathVariable("id") long id);
 }
