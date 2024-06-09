@@ -4,7 +4,7 @@
 <% if(applicationTypeEntity ) { -%>
 Feature: Check <%-projectSuffixUpperCase%> Rest Api Response
 
-  Scenario: Adding new <%-projectSuffixUpperCase%> with POST
+  Scenario: <%-projectSuffixUpperCase%> CRUD Operations
 
     Given header Content-Type = 'application/json'
     And header Accept = 'application/json'
@@ -17,58 +17,56 @@ Feature: Check <%-projectSuffixUpperCase%> Rest Api Response
     # ---- Matching required response json ----
     And match response ==
     """
-      { "id": 1,
+      { "id": #number,
         "entityVersion":1,
         "entityCreateDate":'#number',
         "entityModifyDate":'#number',
         "exampleField": 'exampleField'
        }
     """
-    # --------------------------------------------
-
-  Scenario: Updating <%-projectSuffixUpperCase%> entity with PUT
+    * def entityId = response.id
+    
+    # --------------- UPDATE -----------------------------
 
     Given header Content-Type = 'application/json'
     And header Accept = 'application/json'
     Given url 'http://localhost:8080/water<%- restContextRoot %>'
     # ---- Add entity fields here -----
-    And request { "id":1,"entityVersion":1,"exampleField": "exampleFieldUpdated"}
+    And request { "id":"#(entityId)","entityVersion":1,"exampleField": "exampleFieldUpdated"}
     # ---------------------------------
     When method PUT
     Then status 200
     # ---- Matching required response json ----
     And match response ==
     """
-      { "id": 1,
+      { "id": #number,
         "entityVersion":2,
         "entityCreateDate":'#number',
         "entityModifyDate":'#number',
         "exampleField": 'exampleFieldUpdated'
        }
     """
-    # --------------------------------------------
-
-  Scenario: Find existing <%-projectSuffixUpperCase%> with GET
+  
+  # --------------- FIND -----------------------------
 
     Given header Content-Type = 'application/json'
     And header Accept = 'application/json'
-    Given url 'http://localhost:8080/water<%- restContextRoot %>/1'
+    Given url 'http://localhost:8080/water<%- restContextRoot %>/'+entityId
     # ---------------------------------
     When method GET
     Then status 200
     # ---- Matching required response json ----
     And match response ==
     """
-      { "id": 1,
+      { "id": #number,
         "entityVersion":2,
         "entityCreateDate":'#number',
         "entityModifyDate":'#number',
         "exampleField": 'exampleFieldUpdated'
        }
     """
-    # --------------------------------------------
-
-  Scenario: Testing GET <%-projectSuffixUpperCase%> (find all) response
+    
+  # --------------- FIND ALL -----------------------------
 
     Given header Content-Type = 'application/json'
     And header Accept = 'application/json'
@@ -84,7 +82,7 @@ Feature: Check <%-projectSuffixUpperCase%> Rest Api Response
         "delta":20,
         "results":[
           {
-            "id": 1,
+            "id": #number,
             "entityVersion":2,
             "entityCreateDate":'#number',
             "entityModifyDate":'#number',
@@ -93,13 +91,12 @@ Feature: Check <%-projectSuffixUpperCase%> Rest Api Response
         ]
       }
     """
-    # --------------------------------------------
-
-  Scenario: Deleting existing <%-projectSuffixUpperCase%> entity with DELETE
+  
+  # --------------- DELETE -----------------------------
 
     Given header Content-Type = 'application/json'
     And header Accept = 'application/json'
-    Given url 'http://localhost:8080/water<%- restContextRoot %>/1'
+    Given url 'http://localhost:8080/water<%- restContextRoot %>/'+entityId
     When method DELETE
     # 204 because delete response is empty, so the status code is "no content" but is ok
     Then status 204

@@ -14,19 +14,13 @@ dependencies {
 	annotationProcessor('org.atteo.classindex:classindex:' + project.atteoClassIndexVersion)
 <%if(applicationTypeEntity) {-%>
 <% if(persistenceLib === 'javax') {	-%>
-	//javax persistence
-	implementation 'javax.persistence:javax.persistence-api:'+project.javaxPersistenceVersion
 	//Water javax persistence
 	implementation 'it.water.repository.jpa:JpaRepository-javax:'+project.waterVersion
-	implementation group: 'javax.transaction', name: 'javax.transaction-api', version: project.javaxTransactionApiVersion
 	//hibernate
 	implementation 'org.hibernate:hibernate-core:'+project.hibernateVersion
 <% } else { -%>
-	//jakarta persistence
-	implementation 'jakarta.persistence:jakarta.persistence-api:'+project.jakartaPersistenceVersion
 	//Water javax persistence
 	implementation 'it.water.repository.jpa:JpaRepository-jakarta:'+project.waterVersion
-	implementation group: 'jakarta.transaction', name: 'jakarta.transaction-api', version: project.jakartaTransactionApiVersion
 <% } -%>	
 	//Water Persistence
 	implementation group:'it.water.repository', name:'Repository-entity', version:project.waterVersion
@@ -84,7 +78,8 @@ dependencies {
 	testImplementation 'org.atteo.classindex:classindex:' + project.atteoClassIndexVersion
 <%if(applicationTypeEntity) {-%>	
 	//for testing purpose we use hibernate as persistence provider
-    testImplementation 'org.hibernate:hibernate-core:'+project.hibernateVersion
+	testImplementation 'it.water.repository.jpa:JpaRepository-test:'+ project.waterVersion
+	testImplementation 'org.hibernate:hibernate-core:'+project.hibernateVersion
 	testImplementation 'org.hsqldb:hsqldb:2.4.1'
 <%} -%>
 <%if(hasRestServices) {-%>	

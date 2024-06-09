@@ -34,11 +34,11 @@ import javax.persistence.*;
             '@AccessControl(availableActions = {CrudActions.SAVE, CrudActions.UPDATE, CrudActions.FIND, CrudActions.REMOVE},\n'+
             'rolesPermissions = {\n'+
             '       //Admin role can do everything\n'+
-            '        @DefaultRoleAccess(roleName = '+projectSuffixUpperCase+'.DEFAULT_MANAGER_ROLE, actions = {CrudActions.SAVE, CrudActions.UPDATE, CrudActions.FIND, CrudActions.REMOVE}),\n'+
+            '        @DefaultRoleAccess(roleName = '+projectSuffixUpperCase+'.DEFAULT_MANAGER_ROLE, actions = {CrudActions.SAVE, CrudActions.UPDATE, CrudActions.FIND,CrudActions.FIND_ALL, CrudActions.REMOVE}),\n'+
             '        //Viwer has read only access\n'+
-            '        @DefaultRoleAccess(roleName = '+projectSuffixUpperCase+'.DEFAULT_VIEWER_ROLE, actions = {CrudActions.FIND}),\n'+
+            '        @DefaultRoleAccess(roleName = '+projectSuffixUpperCase+'.DEFAULT_VIEWER_ROLE, actions = {CrudActions.FIND,CrudActions.FIND_ALL}),\n'+
             '        //Editor can do anything but remove\n'+
-            '        @DefaultRoleAccess(roleName = '+projectSuffixUpperCase+'.DEFAULT_EDITOR_ROLE, actions = {CrudActions.SAVE, CrudActions.UPDATE, CrudActions.FIND})\n'+
+            '        @DefaultRoleAccess(roleName = '+projectSuffixUpperCase+'.DEFAULT_EDITOR_ROLE, actions = {CrudActions.SAVE, CrudActions.UPDATE, CrudActions.FIND,CrudActions.FIND_ALL})\n'+
             '})';
      implementedInterfaces += "ProtectedEntity"
    }

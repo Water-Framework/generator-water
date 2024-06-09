@@ -25,7 +25,7 @@
         <properties>
             <!-- Configurazione della connessione al database -->
             <property name="javax.persistence.jdbc.driver" value="org.hsqldb.jdbcDriver"/>
-            <property name="javax.persistence.jdbc.url" value="jdbc:hsqldb:mem:testdb"/>
+            <property name="javax.persistence.jdbc.url" value="jdbc:hsqldb:mem:testdb;;sql.syntax_mys=true"/>
             <property name="javax.persistence.jdbc.user" value="sa"/>
             <property name="javax.persistence.jdbc.password" value=""/>
             <!-- Configurazione di Hibernate -->
