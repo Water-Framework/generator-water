@@ -47,6 +47,8 @@ dependencies {
 <% 		if(applicationTypeEntity){ -%>
 	implementation group: 'it.water.service.rest', name: 'Rest-persistence', version: project.waterVersion
 <% 		} -%>
+	//Jackson Json Views
+	implementation group: 'com.fasterxml.jackson.jaxrs', name: 'jackson-jaxrs-json-provider', version: project.jacksonJsonProviderVersion
 	// https://mvnrepository.com/artifact/io.swagger/swagger-jaxrs
     implementation group: 'io.swagger', name: 'swagger-jaxrs', version: project.swaggerJaxRsVersion
 <%} -%>
