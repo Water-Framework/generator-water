@@ -83,6 +83,8 @@ private static <%- projectSuffixUpperCase %>Repository <%- projectSuffixLowerCas
     @Test
     public void test000_beforeAll() {
         componentRegistry = getOsgiService(ComponentRegistry.class);
+        //waits for bundle to be deployed
+        getOsgiService(<%- projectSuffixUpperCase %>Api.class);
         Assert.assertNotNull(componentRegistry);
         <%- projectSuffixLowerCase %>Api = componentRegistry.findComponent(<%- projectSuffixUpperCase %>Api.class,null);
         Assert.assertNotNull(<%- projectSuffixLowerCase %>Api);
