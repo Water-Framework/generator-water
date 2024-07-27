@@ -2,6 +2,9 @@ Bundle-Name: <%- projectSuffixUpperCase %> Service Bundle
 Bundle-SymbolicName: <%- projectSuffixUpperCase %>
 Bundle-Activator: it.water.implementation.osgi.bundle.WaterBundleActivator
 Import-Package: \
+    javax.inject,\
+    javax.enterprise.*,\
+    javax.validation.*,\
     org.osgi.framework.*,\
     org.osgi.service.*,\
     org.osgi.util.*,\
@@ -13,22 +16,11 @@ Import-Package: \
     org.hibernate.validator.*,\
     org.hibernate.annotations,\
     javassist.util.proxy,\
-<% if(validationLib === 'javax') {	-%>
-    javax.validation,\
-    javax.validation.*,\
-<% } else if(validationLib === 'jakarta'){ -%>
     jakarta.validation,\
     jakarta.validation.*,\
-<% } -%>
-<% if(applicationTypeEntity && persistenceLib === 'javax') {	-%>
-    javax.persistence,\
-    javax.transaction,\
-    javax.enterprise.*,\
-<% } else if(applicationTypeEntity && persistenceLib === 'jakarta'){ -%>
 	jakarta.persistence,\
     jakarta.transaction,\
     jakarta.enterprise.*,\
-<% } -%>
     it.water.core.*,\
     it.water.repository.*,\
     it.water.service.rest.*,\
