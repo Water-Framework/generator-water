@@ -25,7 +25,7 @@ import com.fasterxml.jackson.annotation.JsonView;
    if(isProtectedEntity){
         defineActionsAndRolesAnnotation = ''+
             '//Actions and default roles access\n'+
-            '@AccessControl(availableActions = {CrudActions.SAVE, CrudActions.UPDATE, CrudActions.FIND, CrudActions.REMOVE},\n'+
+            '@AccessControl(availableActions = {CrudActions.SAVE, CrudActions.UPDATE, CrudActions.FIND,CrudActions.FIND_ALL, CrudActions.REMOVE},\n'+
             'rolesPermissions = {\n'+
             '       //Admin role can do everything\n'+
             '        @DefaultRoleAccess(roleName = '+projectSuffixUpperCase+'.DEFAULT_MANAGER_ROLE, actions = {CrudActions.SAVE, CrudActions.UPDATE, CrudActions.FIND,CrudActions.FIND_ALL, CrudActions.REMOVE}),\n'+

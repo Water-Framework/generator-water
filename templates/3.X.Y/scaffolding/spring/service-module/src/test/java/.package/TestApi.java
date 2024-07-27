@@ -234,7 +234,7 @@ public class <%- projectSuffixUpperCase %>ApiTest  {
         TestRuntimeInitializer.getInstance().impersonate(managerUser, runtime);
         <%- projectSuffixUpperCase %> newEntity = create<%- projectSuffixUpperCase %>(1);
         <%- projectSuffixUpperCase %> entity = this.<%- projectSuffixLowerCase %>Api.save(newEntity);
-        Assert.notNull(entity);
+        Assertions.assertNotNull(entity);
         entity.setExampleField("newUpdatedExampleField");
         Assertions.assertDoesNotThrow(() -> this.<%- projectSuffixLowerCase %>Api.update(entity));
         Assertions.assertDoesNotThrow(() -> this.<%- projectSuffixLowerCase %>Api.remove(entity.getId()));
