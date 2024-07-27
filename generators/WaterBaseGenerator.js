@@ -291,7 +291,7 @@ module.exports = class extends AcsBaseGenerator {
         if(fs.existsSync(technologyTemplatePath+"/src/test/java/.package/TestRestApi.java") && projectConf.hasRestServices)
             this.fs.copyTpl(technologyTemplatePath+"/src/test/java/.package/TestRestApi.java", this.destinationPath(projectConf.projectServicePath)+projectConf.projectTestPath+"/"+projectConf.projectSuffixUpperCase+"RestApiTest.java", projectConf);
         
-        if(projectConf.projectTechnology === "spring2" || projectConf.projectTechnology === "spring3"){
+        if(projectConf.projectTechnology === "spring"){
             //using the same destination path for tests, in order to cover also spring requirements
             this.log.info("Generating Spring application...")
             this.fs.copyTpl(technologyTemplatePath+"/src/main/java/.service_package/Application.java", this.destinationPath(projectConf.projectServicePath)+projectConf.projectBasePath+"/"+projectConf.projectSuffixUpperCase+"Application.java", projectConf);

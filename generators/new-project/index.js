@@ -79,11 +79,8 @@ module.exports = class extends Generator {
                     name: "Water",
                     value: "water"
                 }, {
-                    name: "Spring 2.X",
-                    value: "spring2"
-                },{
                     name: "Spring 3.X",
-                    value: "spring3"
+                    value: "spring"
                 }, {
                     name: "OSGi",
                     value: "osgi"
@@ -118,44 +115,6 @@ module.exports = class extends Generator {
             when: function (answer) {
                 return answer.applicationType === 'entity';
             }
-        },
-        {
-            type: 'list',
-            name: 'persistenceLib',
-            message: 'Which persistence api does your application support?',
-            when: function (answers) {
-                return answers.applicationType === 'entity' && answers.projectTechnology !== "spring2" && !answers.projectTechnology !== "spring3";
-            },
-            default: function(){
-                return "javax";
-            },
-            choices: [
-                {
-                    name: "javax ",
-                    value: "javax"
-                }, {
-                    name: "jakarta",
-                    value: "jakarta"
-                }]
-        },
-        {
-            type: 'list',
-            name: 'validationLib',
-            message: 'Which validation api does your application support?',
-            when: function(answers){
-                return answers.projectTechnology !== "spring2" && answers.projectTechnology !== "spring3"  
-            },
-            default: function(){
-                return "jakarta";
-            },
-            choices: [
-                {
-                    name: "javax",
-                    value: "javax"
-                }, {
-                    name: "jakarta",
-                    value: "jakarta"
-                }]
         },
         /*{
             type: 'confirm',
@@ -233,18 +192,9 @@ module.exports = class extends Generator {
         ]).then((answers) => {
             let initialName = answers.projectName;
             this.projectTechnology = answers.projectTechnology;
-            let validationLib = answers.validationLib;
-            let persistenceLib = answers.persistenceLib;
-            if(this.projectTechnology === "spring2"){
-                //forcing validation and persistence to javax
-                validationLib = "javax";
-                persistenceLib = "javax";
-
-            } else if(this.projectTechnology === "spring3"){
-                //forcing validation and persistence to jakarata
-                validationLib = "jakarta";
-                persistenceLib = "jakarta";
-            } 
+            //forcing on jakarta maybe in the future can be different
+            let validationLib = "jakarta"
+            let persistenceLib = "jakarta"; 
 
             if(answers.springRepository)
                 this.springRepository = answers.springRepository;

@@ -14,9 +14,7 @@ import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerA
 import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
 <% } -%>
 import org.springframework.context.annotation.ComponentScan;
-<%if(hasRestServices){ -%>
-import springfox.documentation.swagger2.annotations.EnableSwagger2;
-<% } -%>
+
 <% if(applicationTypeEntity){ -%>
 @SpringBootApplication
 <% } else {-%>
@@ -26,9 +24,6 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 <%if(applicationTypeEntity) { -%>
 @EnableJpaRepositories(basePackages={"it.water.*","<%-projectGroupId%>.*"},repositoryFactoryBeanClass = RepositoryFactory.class)
 @EntityScan({"it.water.*","<%-projectGroupId%>.*"})
-<% } -%>
-<%if(hasRestServices){ -%>
-@EnableSwagger2
 <% } -%>
 @ComponentScan({"it.water.*","<%-projectGroupId%>.*"})
 public class <%- projectSuffixUpperCase %>Application {

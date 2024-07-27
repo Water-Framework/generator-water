@@ -9,34 +9,20 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok:' + project.lombokVersion
 	annotationProcessor('org.atteo.classindex:classindex:' + project.atteoClassIndexVersion)
 <%if(applicationTypeEntity) {-%>
-<% if(persistenceLib === 'javax') {	-%>
-	//javax persistence
-	implementation 'javax.persistence:javax.persistence-api:'+project.javaxPersistenceVersion
-	//Water javax persistence
-	implementation 'it.water.repository.jpa:JpaRepository-javax:'+project.waterVersion
-	implementation group: 'javax.transaction', name: 'javax.transaction-api', version: project.javaxTransactionApiVersion
-<% } else { -%>
 	//jakarta persistence
 	implementation 'jakarta.persistence:jakarta.persistence-api:'+project.jakartaPersistenceVersion
-	//Water javax persistence
-	implementation 'it.water.repository.jpa:JpaRepository-jakarta:'+project.waterVersion
+	//Water Jakarta persistence
+	implementation 'it.water.repository.jpa:JpaRepository-api:'+project.waterVersion
 	implementation group: 'jakarta.transaction', name: 'jakarta.transaction-api', version: project.jakartaTransactionApiVersion
-<% } -%>	
 	//Water Persistence
 	implementation group:'it.water.repository', name:'Repository-entity', version:project.waterVersion
 	implementation group:'it.water.repository', name:'Repository-persistence', version:project.waterVersion
 	implementation group:'it.water.repository', name:'Repository-service', version:project.waterVersion
 <%} -%>
 	//Validation
-<% if(validationLib === 'javax') {	-%>
-	implementation 'it.water.core:Core-validation-javax:'+project.waterVersion
-    implementation group: 'javax.validation', name: 'validation-api', version: project.javaxValidationVersion
-    implementation group: "org.hibernate", name: "hibernate-validator", version: project.hibernateValidatorJavaxVersion
-<% } else { -%>
 	implementation 'it.water.core:Core-validation:'+project.waterVersion
     implementation group: 'jakarta.validation', name: 'jakarta.validation-api', version: project.jakartaValidationVersion
     implementation group: "org.hibernate", name: "hibernate-validator", version: project.hibernateValidatorVersion
-<% } -%>
 	//Jackson
     implementation group: 'com.fasterxml.jackson.jaxrs', name: 'jackson-jaxrs-json-provider', version: project.jacksonVersion
     //Encryption
@@ -80,8 +66,8 @@ dependencies {
 	//for testing purpose we use hibernate as persistence provider
     testImplementation 'org.hibernate:hibernate-core:'+project.hibernateVersion
 	testImplementation 'org.hsqldb:hsqldb:2.4.1'
-	//Using javax jpa for testing purpose
-	testImplementation group: 'it.water.repository.jpa', name: 'JpaRepository-test', version: project.waterVersion
+	//Using Jakarta jpa for testing purpose
+	testImplementation group: 'it.water.repository.jpa', name: 'JpaRepository-test-utils', version: project.waterVersion
 <%} -%>
 <%if(hasRestServices) {-%>	
 	//Using jetty and apache cxf (jaxrs compliant framework) for testing 

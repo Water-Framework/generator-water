@@ -7,14 +7,14 @@ dependencies {
 	//lombok
     implementation group: 'org.projectlombok', name: 'lombok', version: project.lombokVersion
     annotationProcessor 'org.projectlombok:lombok:' + project.lombokVersion
-	//Validation - Spring 2.x better to use javax validation
-	implementation group:'javax.validation', name:'validation-api', version: '2.0.1.Final'
+	//Validation 
+	implementation group:'jakarta.validation', name:'jakarta.validation-api', version: project.jakartaValidationVersion
 	//Core Water Deps
 	implementation group: 'it.water.distribution', name: 'Water-distribution-spring', version: project.waterVersion
 	// JPA Repository
 	implementation 'it.water.repository.jpa:JpaRepository-spring:'+project.waterVersion
 	//hibernate validator
-	implementation group: "org.hibernate", name: "hibernate-validator", version: project.hibernateValidatorJavaxVersion
+	implementation group: "org.hibernate", name: "hibernate-validator", version: project.hibernateValidatorVersion
 	//Rest Modules
 	implementation group: 'it.water.service.rest', name: 'Rest-spring-api', version: project.waterVersion
 
@@ -22,11 +22,8 @@ dependencies {
 	implementation project (":<%- projectSuffixUpperCase %>-model")
 	implementation project (":<%- projectSuffixUpperCase %>-service")
 
-	implementation group: 'org.springframework', name: 'spring-web', version: '5.3.22'
-	implementation group: 'org.springframework', name: 'spring-context', version: '5.3.22'
-	implementation (group:'io.springfox', name:'springfox-swagger2', version:'3.0.0'){
-		exclude group : "com.fasterxml.jackson.core"
-	}
+	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:'+project.springOpenApiWebMvcVersion
+	
 	implementation group:'io.springfox', name:'springfox-swagger-ui', version:'3.0.0'
 	implementation group:'org.springframework.boot', name:'spring-boot-starter-aop', version:project.springBootVersion
 	implementation group: 'org.springframework.data', name: 'spring-data-jpa', version: project.springBootVersion

@@ -11,17 +11,11 @@ import it.water.core.permission.annotations.AccessControl;
 import it.water.core.permission.annotations.DefaultRoleAccess;
 <% } -%>
 import lombok.*;
-<% if(validationLib === 'javax') {-%>
-import it.water.core.validation.javax.annotations.*;
-<% } else if(validationLib === 'jakarta'){ -%>
 import it.water.core.validation.annotations.*;
-<% } -%>
 import <%-persistenceLib%>.persistence.*;
 import <%-validationLib%>.validation.constraints.*;
 
 import com.fasterxml.jackson.annotation.JsonView;
-
-import javax.persistence.*;
 
 <%
  let implementedInterfaces = "";

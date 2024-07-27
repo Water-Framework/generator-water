@@ -19,33 +19,17 @@ dependencies {
     implementation group: 'org.projectlombok', name: 'lombok', version: project.lombokVersion
     annotationProcessor 'org.projectlombok:lombok:' + project.lombokVersion
 <%if(applicationTypeEntity) {-%>
-<% if(persistenceLib === 'javax') {	-%>
-	//hibernate
 	implementation 'org.hibernate:hibernate-core:'+project.hibernateVersion
-	//javax persistence
-	implementation 'javax.persistence:javax.persistence-api:'+project.javaxPersistenceVersion
-	//Water javax persistence
-	implementation 'it.water.repository.jpa:JpaRepository-osgi:'+project.waterVersion
-	implementation group: 'javax.transaction', name: 'javax.transaction-api', version: project.javaxTransactionApiVersion
-<% } else { -%>
-	implementation 'org.hibernate:hibernate-core:'+project.hibernateJakartaVersion
 	//jakarta persistence
 	implementation 'jakarta.persistence:jakarta.persistence-api:'+project.jakartaPersistenceVersion
 	//Water javax persistence
 	implementation 'it.water.repository.jpa:JpaRepository-jakarta:'+project.waterVersion
 	implementation group: 'jakarta.transaction', name: 'jakarta.transaction-api', version: project.jakartaTransactionApiVersion
-<% } -%>	
 <%} -%>
 	//Validation
-<% if(validationLib === 'javax') {	-%>
-	implementation 'it.water.core:Core-validation-javax:'+project.waterVersion
-    implementation group: 'javax.validation', name: 'validation-api', version: project.javaxValidationVersion
-    implementation group: "org.hibernate", name: "hibernate-validator", version: project.hibernateValidatorJavaxVersion
-<% } else { -%>
 	implementation 'it.water.core:Core-validation:'+project.waterVersion
     implementation group: 'jakarta.validation', name: 'jakarta.validation-api', version: project.jakartaValidationVersion
     implementation group: "org.hibernate", name: "hibernate-validator", version: project.hibernateValidatorVersion
-<% } -%>
 	//Jackson
     implementation group: 'com.fasterxml.jackson.jaxrs', name: 'jackson-jaxrs-json-provider', version: project.jacksonVersion
     //Encryption

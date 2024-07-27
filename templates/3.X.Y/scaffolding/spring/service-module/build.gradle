@@ -1,7 +1,6 @@
 dependencies {
     //SLF4J
 	implementation group: 'org.slf4j', name: 'slf4j-api', version: project.slf4jVersion
-	implementation group: "javax.ws.rs", name: "javax.ws.rs-api", version: project.jaxWsRsApiVersion
 	//lombok
 	implementation group: 'org.projectlombok', name: 'lombok', version: project.lombokVersion
 	annotationProcessor 'org.projectlombok:lombok:' + project.lombokVersion
@@ -18,28 +17,22 @@ dependencies {
 	implementation group: 'org.springframework.data', name: 'spring-data-jpa', version: project.springBootVersion
 	//Water Persistence
 	implementation group:'it.water.repository.jpa', name:'JpaRepository-spring', version:project.waterVersion
-<% if(persistenceLib === 'javax') {	-%>
-	//javax persistence
-	implementation group:'javax.persistence', name:'javax.persistence-api', version:project.javaxPersistenceVersion
-<% } else { -%>
-	//Water jakarta persistence
-	implementation group:'it.water.repository.jpa', name:'JpaRepository-jakarta', version:project.waterVersion
 	//jakarta persistence
 	implementation group:'jakarta.persistence', name:'jakarta.persistence-api', version:project.jakartaPersistenceVersion
-<% } -%>	
 <%} -%>
-	//Validation - Spring 2.x better to use javax validation
-	implementation group:'javax.validation', name:'validation-api', version: '2.0.1.Final'
+
+	implementation group:'jakarta.validation', name:'jakarta.validation-api', version: project.jakartaValidationVersion
 	//hibernate validator
-	implementation group: "org.hibernate", name: "hibernate-validator", version: project.hibernateValidatorJavaxVersion
+	implementation group: "org.hibernate", name: "hibernate-validator", version: project.hibernateValidatorVersion
 <%if(hasRestServices) {-%>
 	// Rest Services
 	implementation group:'org.springframework.boot', name:'spring-boot-starter-web', version:project.springBootVersion
 	// Rest Water Deps
 	implementation group: 'it.water.service.rest', name: 'Rest-spring-api', version: project.waterVersion
 	// Swagger
-    implementation group:'io.springfox', name:'springfox-swagger2', version:'3.0.0'
-    implementation group:'io.springfox', name:'springfox-swagger-ui', version:'3.0.0'
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:'+project.springOpenApiWebMvcVersion
+	// https://mvnrepository.com/artifact/io.swagger/swagger-jaxrs
+    implementation group: 'io.swagger', name: 'swagger-jaxrs', version: project.swaggerJaxRsVersion
 <%} -%>
 	//Spring for spring source set
 	implementation group:'org.springframework.boot', name:'spring-boot-starter-aop', version:project.springBootVersion
@@ -51,9 +44,7 @@ dependencies {
 	testAnnotationProcessor('org.atteo.classindex:classindex:' + project.atteoClassIndexVersion)
 	testAnnotationProcessor 'org.projectlombok:lombok:' + project.lombokVersion
 	// https://mvnrepository.com/artifact/com.intuit.karate/karate-junit5
-	testImplementation ('com.intuit.karate:karate-junit5:1.4.1') {
-		exclude group : "ch.qos.logback"
-	}
+	testImplementation ('com.intuit.karate:karate-junit5:1.4.1')
 }
 
 test {
