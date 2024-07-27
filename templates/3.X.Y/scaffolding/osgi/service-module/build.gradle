@@ -23,7 +23,7 @@ dependencies {
 	//jakarta persistence
 	implementation 'jakarta.persistence:jakarta.persistence-api:'+project.jakartaPersistenceVersion
 	//Water javax persistence
-	implementation 'it.water.repository.jpa:JpaRepository-jakarta:'+project.waterVersion
+	implementation 'it.water.repository.jpa:JpaRepository-osgi:'+project.waterVersion
 	implementation group: 'jakarta.transaction', name: 'jakarta.transaction-api', version: project.jakartaTransactionApiVersion
 <%} -%>
 	//Validation

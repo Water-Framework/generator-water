@@ -27,13 +27,13 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 @KarateOptions(features = "classpath:karate")
 public class <%- projectSuffixUpperCase %>RestApiTest {
 
-    private static final Logger log = LoggerFactory.getLogger(BookRestApiTest.class);
+    private static final Logger log = LoggerFactory.getLogger(<%- projectSuffixUpperCase %>RestApiTest.class);
     private static TestContainer testContainer;
 
     @BeforeClass
     public static void test000_runKaraf() throws Exception {
         //Running karaf externally
-        testContainer = PaxExamRuntime.createContainer(BookTestConfiguration.class.getName());
+        testContainer = PaxExamRuntime.createContainer(<%- projectSuffixUpperCase %>TestConfiguration.class.getName());
         HttpClient httpClient = HttpClients.createDefault();
         HttpGet request = new HttpGet("http://localhost:8080/water/status");
         await().pollInterval(5,SECONDS).atMost(30, SECONDS).until(() -> {
