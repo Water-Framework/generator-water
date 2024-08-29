@@ -65,7 +65,7 @@ dependencies {
 	testImplementation 'org.atteo.classindex:classindex:' + project.atteoClassIndexVersion
 <%if(applicationTypeEntity) {-%>	
 	//for testing purpose we use hibernate as persistence provider
-	testImplementation 'it.water.repository.jpa:JpaRepository-test:'+ project.waterVersion
+	testImplementation 'it.water.repository.jpa:JpaRepository-test-utils:'+ project.waterVersion
 	testImplementation 'org.hibernate:hibernate-core:'+project.hibernateVersion
 	testImplementation 'org.hsqldb:hsqldb:2.4.1'
 <%} -%>
