@@ -11,7 +11,6 @@ dependencies {
 	//lombok
     implementation group: 'org.projectlombok', name: 'lombok', version: project.lombokVersion
     annotationProcessor 'org.projectlombok:lombok:' + project.lombokVersion
-	annotationProcessor('org.atteo.classindex:classindex:' + project.atteoClassIndexVersion)
 <%if(applicationTypeEntity) {-%>
 	//Water Jakarta persistence
 	implementation 'it.water.repository.jpa:JpaRepository-api:'+project.waterVersion
@@ -70,17 +69,19 @@ dependencies {
 	testImplementation 'org.hsqldb:hsqldb:2.4.1'
 <%} -%>
 <%if(hasRestServices) {-%>	
+	//Using jetty and apache cxf (jaxrs compliant framework) for testing
 	testImplementation group: 'it.water.service.rest', name: 'Rest-api-manager-apache-cxf', version: project.waterVersion
-	//Using jetty and apache cxf (jaxrs compliant framework) for testing 
+	//Using javax jpa for testing purpose
+	testImplementation group: 'it.water.repository.jpa', name: 'JpaRepository-test-utils', version: project.waterVersion
 	testImplementation group: 'org.reflections', name: 'reflections', version: '0.10.2'
 	testImplementation group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.13'
 	testImplementation group: 'org.apache.cxf', name: 'cxf-rt-transports-http-jetty', version: project.cxfVersion
 	testImplementation group: 'org.springframework', name: 'spring-web', version: '5.3.22'
 	testImplementation group: 'org.springframework', name: 'spring-context', version: '5.3.22'
 	//with 9.4.4 tests won't work because of the integration between cxf and jetty outside karaf context
-	testImplementation group: 'org.eclipse.jetty', name: 'jetty-servlet', version: '9.4.49.v20220914'
+	testImplementation group: 'org.eclipse.jetty', name: 'jetty-servlet', version: project.jettyVersion
 	// https://mvnrepository.com/artifact/com.intuit.karate/karate-junit5
-	testImplementation group: 'com.intuit.karate', name: 'karate-junit5', version: '1.4.1'
+	testImplementation group: 'com.intuit.karate', name: 'karate-junit5', version: project.karateVersion
 <%} -%>
 }
 

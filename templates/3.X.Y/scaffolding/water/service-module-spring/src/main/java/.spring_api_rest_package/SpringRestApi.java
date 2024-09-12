@@ -30,19 +30,29 @@ import org.springframework.http.HttpStatus;
 @RequestMapping("<%- restContextRoot %>")
 @FrameworkRestApi
 public interface <%- projectSuffixUpperCase %>SpringRestApi extends <%- projectSuffixUpperCase %>RestApi {
+    @LoggedIn
     @PostMapping
+    @JsonView(WaterJsonView.Public.class)
     <%- projectSuffixUpperCase %> save(@RequestBody <%- projectSuffixUpperCase %>  <%- projectSuffixLowerCase %>);
 
+    @LoggedIn
     @PutMapping
+    @JsonView(WaterJsonView.Public.class)
     <%- projectSuffixUpperCase %> update(@RequestBody <%- projectSuffixUpperCase %> <%- projectSuffixLowerCase %>);
 
+    @LoggedIn
     @GetMapping("/{id}")
+    @JsonView(WaterJsonView.Public.class)
     <%- projectSuffixUpperCase %> find(@PathVariable("id") long id);
 
+    @LoggedIn
     @GetMapping
+    @JsonView(WaterJsonView.Public.class)
     PaginableResult<<%- projectSuffixUpperCase %>> findAll();
 
+    @LoggedIn
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @JsonView(WaterJsonView.Public.class)
     void remove(@PathVariable("id") long id);
 }

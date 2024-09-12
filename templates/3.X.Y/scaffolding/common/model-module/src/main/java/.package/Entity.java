@@ -85,7 +85,7 @@ public class <%- projectSuffixUpperCase %> extends AbstractJpaEntity<%-implement
     @NotNullOnPersist //--> field is required on the database
     @NonNull //--> field is required in the constructor
     @Setter
-    @JsonView(WaterJsonView.Public.class) //this fields will be visibile in crud responses
+    @JsonView(WaterJsonView.Extended.class) //this fields will be visibile in crud responses
     private String exampleField; 
 
 <% if(isOwnedEntity){ -%>

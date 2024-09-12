@@ -25,10 +25,12 @@
         <!-- Only used when transaction-type=JTA -->
         <jta-data-source>osgi:service/javax.sql.DataSource/(osgi.jndi.service.name=water)</jta-data-source>
         <properties>
-			<property name="hibernate.archive.autodetection" value="class"/>
-			<!-- Better without in order to support multiple sources -->
-			<!--  <property name="hibernate.dialect" value="org.hibernate.dialect.PostgreSQL94Dialect" />-->
-			<property name="hibernate.hbm2ddl.auto" value="update" />
+          <!-- disabling auto validation since system aoi Automatically validates entities -->
+          <property name="javax.persistence.validation.mode" value="NONE" />
+          <property name="hibernate.archive.autodetection" value="class"/>
+          <!-- Better without in order to support multiple sources -->
+          <!--  <property name="hibernate.dialect" value="org.hibernate.dialect.PostgreSQL94Dialect" />-->
+          <property name="hibernate.hbm2ddl.auto" value="update" />
         </properties>
     </persistence-unit>
 </persistence>

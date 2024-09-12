@@ -44,7 +44,9 @@ dependencies {
 	testImplementation group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.13'
 
 	// https://mvnrepository.com/artifact/com.intuit.karate/karate-junit5
-	testImplementation group: 'com.intuit.karate', name: 'karate-junit5', version: project.karateVersion
+	testImplementation ('com.intuit.karate:karate-junit5:1.4.1') {
+		exclude group : "ch.qos.logback"
+	}
 
 }
 

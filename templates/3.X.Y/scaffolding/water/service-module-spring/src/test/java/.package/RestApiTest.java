@@ -2,30 +2,18 @@
 package <%-projectGroupId%>;
 
 import com.intuit.karate.junit5.Karate;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
-import org.springframework.boot.SpringApplication;
-import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.TestPropertySource;
 
+@SpringBootTest(classes = <%- projectSuffixUpperCase %>Application.class,
+        webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
+@TestPropertySource(properties = {
+        "water.rest.security.jwt.validate=false"
+})
 public class <%- projectSuffixUpperCase %>RestApiTest {
-    private static ConfigurableApplicationContext context;
-
-    @BeforeAll
-    public static void beforeClass() {
-        context = SpringApplication.run(<%- projectSuffixUpperCase %>Application.class);
-    }
 
     @Karate.Test
     Karate restInterfaceTest() {
-        return Karate.run("classpath:karate");
+        return Karate.run("../"+<%- projectSuffixUpperCase %>+"-service/src/test/resources/karate");
     }
-
-    @AfterAll
-    public static void afterClass() {
-        // Arresta l'applicazione Spring Boot
-        if (context != null) {
-            context.close();
-        }
-    }
-
 }

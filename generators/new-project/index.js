@@ -243,6 +243,8 @@ module.exports = class extends Generator {
             let restContextRoot = "na"
             if(answers.hasRestServices){
                 restContextRoot = answers.restContextRoot;
+                if(!restContextRoot.trim().startsWith("/"))
+                    restContextRoot= "/"+restContextRoot
             }
 
             this.projectConf = {

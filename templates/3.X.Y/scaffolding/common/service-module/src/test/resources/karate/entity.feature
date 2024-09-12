@@ -10,7 +10,8 @@ Feature: Check <%-projectSuffixUpperCase%> Rest Api Response
     And header Accept = 'application/json'
     Given url 'http://localhost:8080/water<%- restContextRoot %>'
     # ---- Add entity fields here -----
-    And request { "exampleField": "exampleField"}
+    And request 
+    """ { "exampleField": "exampleField"} """
     # ---------------------------------
     When method POST
     Then status 200
@@ -32,7 +33,13 @@ Feature: Check <%-projectSuffixUpperCase%> Rest Api Response
     And header Accept = 'application/json'
     Given url 'http://localhost:8080/water<%- restContextRoot %>'
     # ---- Add entity fields here -----
-    And request { "id":"#(entityId)","entityVersion":1,"exampleField": "exampleFieldUpdated"}
+    And request 
+    """ { 
+          "id":"#(entityId)",
+          "entityVersion":1,
+          "exampleField": "exampleFieldUpdated"
+    } 
+    """
     # ---------------------------------
     When method PUT
     Then status 200
