@@ -44,7 +44,7 @@ dependencies {
 	testAnnotationProcessor('org.atteo.classindex:classindex:' + project.atteoClassIndexVersion)
 	testAnnotationProcessor 'org.projectlombok:lombok:' + project.lombokVersion
 	// https://mvnrepository.com/artifact/com.intuit.karate/karate-junit5
-	testImplementation ('com.intuit.karate:karate-junit5:1.4.1')
+	testImplementation ('io.karatelabs:karate-junit5:'+project.karateVersion)
 }
 
 test {

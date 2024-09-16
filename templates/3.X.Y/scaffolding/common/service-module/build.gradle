@@ -83,7 +83,7 @@ dependencies {
 	//with 9.4.4 tests won't work because of the integration between cxf and jetty outside karaf context
 	testImplementation group: 'org.eclipse.jetty', name: 'jetty-servlet', version: project.jettyVersion
 	// https://mvnrepository.com/artifact/com.intuit.karate/karate-junit5
-	testImplementation group: 'com.intuit.karate', name: 'karate-junit5', version: project.karateVersion
+	testImplementation ('io.karatelabs:karate-junit5:'+project.karateVersion)
 <%} -%>
 }
 
