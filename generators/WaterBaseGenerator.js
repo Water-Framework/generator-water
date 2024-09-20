@@ -237,6 +237,7 @@ module.exports = class extends AcsBaseGenerator {
         this.log.info(chalk.bold.yellow("Creating Service module..."));
         this.createBasicProjectFiles(this.destinationPath(projectConf.projectServicePath),projectConf);
         let serviceTemplatePath = this.getWaterTemplatePath(this.waterVersion)+"/scaffolding/common/service-module";
+        
         this.log.info("Service Common Template path is: "+serviceTemplatePath)
         let technologyTemplatePath = this.getWaterTemplatePath(this.waterVersion)+"/scaffolding/"+projectConf.projectTechnology+"/service-module";
         let technologyTemplatePathExists = fs.existsSync(technologyTemplatePath);
@@ -318,6 +319,16 @@ module.exports = class extends AcsBaseGenerator {
             this.fs.delete(appProperties,{ recursive: true, force: true })
             this.log.info("Removing "+certsPath);
             this.fs.delete(certsPath,{ recursive: true, force: true })
+        } else if(projectConf.projectTechnology ==  "water") {
+            //Creating spring module also
+            let serviceSpringTemplatePath = this.getWaterTemplatePath(this.waterVersion)+"/scaffolding/water/service-module-spring";
+            let serviceSpringDestinationPath = this.destinationPath(projectConf.projectServicePath)+"-spring";
+            this.log.info("Starting from spring tempalte in " + serviceSpringTemplatePath+" and copying to ");
+            this.fs.copyTpl(serviceSpringTemplatePath, serviceSpringDestinationPath, projectConf);
+            //Copying java classes
+            this.fs.copyTpl(serviceSpringTemplatePath+"/src/main/java/.spring_api_rest_package/SpringRestApi.java", serviceSpringDestinationPath+projectConf.serviceRestPackagePath+"/spring/"+projectConf.projectSuffixUpperCase+"SpringRestApi.java", projectConf);
+            this.fs.copyTpl(serviceSpringTemplatePath+"/src/main/java/.spring_service_rest_package/SpringRestControllerImpl.java", serviceSpringDestinationPath+projectConf.serviceRestPackagePath+"/spring/"+projectConf.projectSuffixUpperCase+"SpringRestControllerImpl.java", projectConf);
+            this.fs.copyTpl(serviceSpringTemplatePath+"/src/main/java/Application.java", serviceSpringDestinationPath+projectConf.serviceRestPackagePath+projectConf.projectSuffixUpperCase+"Application.java", projectConf);
         }
 
         if(!projectConf.hasRestServices){
