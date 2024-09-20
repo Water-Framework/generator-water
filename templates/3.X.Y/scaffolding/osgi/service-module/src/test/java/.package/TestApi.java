@@ -15,6 +15,7 @@ import it.water.core.model.exceptions.ValidationException;
 import it.water.core.model.exceptions.WaterRuntimeException;
 import it.water.core.testing.utils.api.TestPermissionManager;
 import it.water.core.testing.utils.bundle.TestRuntimeInitializer;
+import it.water.core.testing.utils.runtime.TestRuntimeUtils;
 
 import <%-apiPackage%>.*;
 <%if(hasModel){-%>
@@ -113,7 +114,7 @@ private static <%- projectSuffixUpperCase %>Repository <%- projectSuffixLowerCas
         roleManager.addRole(managerUser.getId(), manager);
         roleManager.addRole(viewerUser.getId(), viewer);
         roleManager.addRole(editorUser.getId(), editor);
-        //starting with admin
+        TestRuntimeUtils.impersonateAdmin(componentRegistry);
 <% } -%>
         //deafult user in test mode is admin please use TestRuntimeInitializer.getInstance().impersonate(...); to impersonate other users
     }

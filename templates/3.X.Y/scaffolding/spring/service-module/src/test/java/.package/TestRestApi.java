@@ -2,31 +2,35 @@
 package <%-projectGroupId%>;
 
 import com.intuit.karate.junit5.Karate;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
 import org.springframework.boot.SpringApplication;
-import org.springframework.context.ConfigurableApplicationContext;
+import it.water.core.api.registry.ComponentRegistry;
+import it.water.core.testing.utils.runtime.TestRuntimeUtils;
+import org.junit.jupiter.api.BeforeEach;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.TestPropertySource;
 
+
+@SpringBootTest(classes = <%- projectSuffixUpperCase %>.class,
+        webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
+@TestPropertySource(properties = {
+        "water.rest.security.jwt.validate=false",
+        "water.testMode=true"
+})
 public class <%- projectSuffixUpperCase %>RestApiTest {
 
-    private static ConfigurableApplicationContext context;
+    @Autowired
+    private ComponentRegistry componentRegistry;
 
-    @BeforeAll
-    public static void beforeClass() {
-        // Avvia l'applicazione Spring Boot e ottieni il contesto dell'applicazione
-        context = SpringApplication.run(<%- projectSuffixUpperCase %>Application.class);
+    @BeforeEach
+    void impersonateAdmin() {
+        //jwt token service is disabled, we just inject admin user for bypassing permission system
+        //just remove this line if you want test with permission system working
+        TestRuntimeUtils.impersonateAdmin(componentRegistry);
     }
     
     @Karate.Test
     Karate restInterfaceTest() {
         return Karate.run("classpath:karate");
-    }
-
-    @AfterAll
-    public static void afterClass() {
-        // Arresta l'applicazione Spring Boot
-        if (context != null) {
-            context.close();
-        }
     }
 }

@@ -13,6 +13,7 @@ import it.water.core.interceptors.annotations.Inject;
 import it.water.core.model.exceptions.ValidationException;
 import it.water.core.model.exceptions.WaterRuntimeException;
 import it.water.core.permission.exceptions.UnauthorizedException;
+import it.water.core.testing.utils.runtime.TestRuntimeUtils;
 <%if(applicationTypeEntity){-%>
 import it.water.repository.entity.model.exceptions.DuplicateEntityException;
 <% } -%>
@@ -98,7 +99,8 @@ public class <%- projectSuffixUpperCase %>ApiTest implements Service {
         roleManager.addRole(<%- projectSuffixLowerCase %>ManagerUser.getId(), <%- projectSuffixLowerCase %>ManagerRole);
         roleManager.addRole(<%- projectSuffixLowerCase %>ViewerUser.getId(), <%- projectSuffixLowerCase %>ViewerRole);
         roleManager.addRole(<%- projectSuffixLowerCase %>EditorUser.getId(), <%- projectSuffixLowerCase %>EditorRole);
-        //default security context in test environment is admin
+        //default security context is admin
+        TestRuntimeUtils.impersonateAdmin(componentRegistry);
     }
 <% } -%>
     /**

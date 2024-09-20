@@ -13,6 +13,7 @@ import it.water.core.permission.exceptions.UnauthorizedException;
 import it.water.repository.entity.model.exceptions.DuplicateEntityException;
 import it.water.core.testing.utils.api.TestPermissionManager;
 import it.water.core.testing.utils.bundle.TestRuntimeInitializer;
+import it.water.core.testing.utils.runtime.TestRuntimeUtils;
 
 import <%-apiPackage%>.*;
 <%if(hasModel){-%>
@@ -87,7 +88,7 @@ public class <%- projectSuffixUpperCase %>ApiTest  {
         roleManager.addRole(viewerUser.getId(), viewer);
         roleManager.addRole(editorUser.getId(), editor);
         //starting with admin
-        //deafult user in test mode is admin please use TestRuntimeInitializer.getInstance().impersonate(...); to impersonate other users
+        TestRuntimeUtils.impersonateAdmin(componentRegistry);
 <% } -%>
     }
 
