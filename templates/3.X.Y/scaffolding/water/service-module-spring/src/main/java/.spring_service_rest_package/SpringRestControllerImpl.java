@@ -1,12 +1,10 @@
 
-package <%-projectGroupId%>.spring;
+package <%-servicePackage%>.rest.spring;
 
-import it.water.core.api.model.PaginableResult;
-import it.water.core.api.repository.query.Query;
-import it.water.core.api.repository.query.QueryOrder;
-import it.water.user.api.rest.spring.UserSpringRestApi;
-import it.water.user.model.User;
-import it.water.user.service.rest.UserRestControllerImpl;
+import it.water.core.api.model.*;
+import it.water.core.api.repository.*;
+import <%-apiPackage%>.*;
+import <%-modelPackage%>.*;
 import org.springframework.web.bind.annotation.RestController;
 
 

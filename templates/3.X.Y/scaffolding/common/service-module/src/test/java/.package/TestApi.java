@@ -2,12 +2,13 @@ package <%-projectGroupId%>;
 
 import it.water.core.api.model.PaginableResult;
 import it.water.core.api.bundle.Runtime;
-import it.water.core.api.permission.Role;
+import it.water.core.api.model.Role;
 import it.water.core.api.permission.RoleManager;
+import it.water.core.api.user.UserManager;
 import it.water.core.api.registry.ComponentRegistry;
 import it.water.core.api.repository.query.Query;
 import it.water.core.api.service.Service;
-import it.water.core.testing.utils.api.TestPermissionManager;
+import it.water.core.api.permission.PermissionManager;
 import it.water.core.testing.utils.bundle.TestRuntimeInitializer;
 import it.water.core.interceptors.annotations.Inject;
 import it.water.core.model.exceptions.ValidationException;
@@ -64,8 +65,13 @@ public class <%- projectSuffixUpperCase %>ApiTest implements Service {
     @Inject
     @Setter
     //default permission manager in test environment;
-    private TestPermissionManager permissionManager;
+    private PermissionManager permissionManager;
 
+    @Inject
+    @Setter
+    //test role manager
+    private UserManager userManager;
+    
     @Inject
     @Setter
     //test role manager
@@ -91,10 +97,10 @@ public class <%- projectSuffixUpperCase %>ApiTest implements Service {
         Assertions.assertNotNull(<%- projectSuffixLowerCase %>ViewerRole);
         Assertions.assertNotNull(<%- projectSuffixLowerCase %>EditorRole);
         //impersonate admin so we can test the happy path
-        adminUser = permissionManager.findUser("admin");
-        <%- projectSuffixLowerCase %>ManagerUser = permissionManager.addUser("manager", "name", "lastname", "manager@a.com", false);
-        <%- projectSuffixLowerCase %>ViewerUser = permissionManager.addUser("viewer", "name", "lastname", "viewer@a.com", false);
-        <%- projectSuffixLowerCase %>EditorUser = permissionManager.addUser("editor", "name", "lastname", "editor@a.com", false);
+        adminUser = userManager.findUser("admin");
+        <%- projectSuffixLowerCase %>ManagerUser = userManager.addUser("manager", "name", "lastname", "manager@a.com","TempPassword1_","salt", false);
+        <%- projectSuffixLowerCase %>ViewerUser = userManager.addUser("viewer", "name", "lastname", "viewer@a.com","TempPassword1_","salt", false);
+        <%- projectSuffixLowerCase %>EditorUser = userManager.addUser("editor", "name", "lastname", "editor@a.com","TempPassword1_","salt", false);
         //starting with admin permissions
         roleManager.addRole(<%- projectSuffixLowerCase %>ManagerUser.getId(), <%- projectSuffixLowerCase %>ManagerRole);
         roleManager.addRole(<%- projectSuffixLowerCase %>ViewerUser.getId(), <%- projectSuffixLowerCase %>ViewerRole);

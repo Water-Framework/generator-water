@@ -3,6 +3,7 @@ package <%-projectGroupId%>;
 
 import it.water.core.api.service.Service;
 
+import it.water.core.api.registry.ComponentRegistry;
 import com.intuit.karate.junit5.Karate;
 import it.water.core.interceptors.annotations.Inject;
 import it.water.core.testing.utils.junit.WaterTestExtension;

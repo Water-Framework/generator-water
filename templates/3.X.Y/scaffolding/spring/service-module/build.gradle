@@ -19,6 +19,7 @@ dependencies {
 	implementation group:'it.water.repository.jpa', name:'JpaRepository-spring', version:project.waterVersion
 	//jakarta persistence
 	implementation group:'jakarta.persistence', name:'jakarta.persistence-api', version:project.jakartaPersistenceVersion
+	implementation group: 'jakarta.transaction', name: 'jakarta.transaction-api', version: project.jakartaTransactionApiVersion
 <%} -%>
 
 	implementation group:'jakarta.validation', name:'jakarta.validation-api', version: project.jakartaValidationVersion
