@@ -73,8 +73,6 @@ dependencies {
 <%if(hasRestServices) {-%>	
 	//Using jetty and apache cxf (jaxrs compliant framework) for testing
 	testImplementation group: 'it.water.service.rest', name: 'Rest-api-manager-apache-cxf', version: project.waterVersion
-	//Using javax jpa for testing purpose
-	testImplementation group: 'it.water.repository.jpa', name: 'JpaRepository-test-utils', version: project.waterVersion
 	testImplementation group: 'org.reflections', name: 'reflections', version: '0.10.2'
 	testImplementation group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.13'
 	testImplementation group: 'org.apache.cxf', name: 'cxf-rt-transports-http-jetty', version: project.cxfVersion
