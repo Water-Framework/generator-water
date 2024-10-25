@@ -329,6 +329,7 @@ module.exports = class extends AcsBaseGenerator {
             this.fs.copyTpl(serviceSpringTemplatePath+"/src/main/java/.spring_api_rest_package/SpringRestApi.java", serviceSpringDestinationPath+projectConf.serviceRestPackagePath+"/spring/"+projectConf.projectSuffixUpperCase+"SpringRestApi.java", projectConf);
             this.fs.copyTpl(serviceSpringTemplatePath+"/src/main/java/.spring_service_rest_package/SpringRestControllerImpl.java", serviceSpringDestinationPath+projectConf.serviceRestPackagePath+"/spring/"+projectConf.projectSuffixUpperCase+"SpringRestControllerImpl.java", projectConf);
             this.fs.copyTpl(serviceSpringTemplatePath+"/src/main/java/.Application.java", serviceSpringDestinationPath+projectConf.servicePackagePath+projectConf.projectSuffixUpperCase+"Application.java", projectConf);
+            this.fs.copyTpl(serviceSpringTemplatePath+"/src/test/java/.package/RestApiTest.java", serviceSpringDestinationPath+projectConf.testPackagePath+projectConf.projectSuffixUpperCase+"RestSpringApiTest.java", projectConf);
         }
 
         if(!projectConf.hasRestServices){
