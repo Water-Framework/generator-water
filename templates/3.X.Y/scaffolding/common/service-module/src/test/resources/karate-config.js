@@ -16,7 +16,7 @@
 
 function fn() {
     //getting system property
-    let sysProp1 = karate.systemProp1;
+    let sysProp1 = karate.properties["systemProp1"];
     
     return {
         "myCustomVar":1,
