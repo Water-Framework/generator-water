@@ -1,0 +1,14 @@
+{
+	"id": "e1f71395-1946-4b5c-8f8b-083626f270a4",
+	"values": [
+		{
+			"key": "JWT Token",
+			"value": "{{jwtToken}}",
+			"enabled": true
+		}
+	],
+	"name": "<%-projectName%> Globals",
+	"_postman_variable_scope": "globals",
+	"_postman_exported_at": "2020-11-20T08:32:24.305Z",
+	"_postman_exported_using": "Postman/7.34.0"
+}

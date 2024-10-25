@@ -1,0 +1,33 @@
+Bundle-Name: <%- projectSuffixUpperCase %> Service Bundle
+Bundle-SymbolicName: <%- projectSuffixUpperCase %>
+Bundle-Activator: it.water.implementation.osgi.bundle.WaterBundleActivator
+Import-Package: \
+    javax.inject,\
+    javax.enterprise.*,\
+    javax.validation.*,\
+    org.osgi.framework.*,\
+    org.osgi.service.*,\
+    org.osgi.util.*,\
+    org.slf4j.*,\
+    org.apache.aries.jpa.*,\
+    org.apache.aries.cdi.*,\
+    org.hibernate.proxy,\
+    org.hibernate.validator,\
+    org.hibernate.validator.*,\
+    org.hibernate.annotations,\
+    javassist.util.proxy,\
+    jakarta.validation,\
+    jakarta.validation.*,\
+	jakarta.persistence,\
+    jakarta.transaction,\
+    jakarta.enterprise.*,\
+    it.water.core.*,\
+    it.water.repository.*,\
+    it.water.service.rest.*,\
+    it.water.implementation.osgi.*
+Export-Package: \
+    <%-projectGroupId%>.*
+DynamicImport-Package: *
+Meta-Persistence: META-INF/persistence.xml
+-cdiannotations: *;discover=annotated_by_bean
+-fixupmessages "Classes found in the wrong directory"; restrict:=error; is:=warning

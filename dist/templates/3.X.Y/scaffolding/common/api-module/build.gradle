@@ -1,0 +1,35 @@
+dependencies {
+	//SLF4J
+    implementation group: 'org.slf4j', name: 'slf4j-api', version: project.slf4jVersion
+	//Atteo
+	implementation 'org.atteo.classindex:classindex:' + project.atteoClassIndexVersion
+	annotationProcessor('org.atteo.classindex:classindex:' + project.atteoClassIndexVersion)
+	//Water Core dependencies
+    implementation group: "it.water.core", name: "Core-api", version: project.waterVersion
+	implementation group: "it.water.core", name:"Core-interceptors", version:project.waterVersion
+<% if(applicationTypeEntity || hasModel) {-%>
+    implementation group: "it.water.core", name: "Core-model", version: project.waterVersion
+	implementation 'it.water.repository:Repository-entity:'+project.waterVersion
+	implementation project(":<%-projectName%>-model")
+	//jakarta persistence
+	implementation 'jakarta.persistence:jakarta.persistence-api:'+project.jakartaPersistenceVersion
+	//Water jakarta persistence
+	implementation 'it.water.repository.jpa:JpaRepository-api:'+project.waterVersion
+<% } -%>
+<% if(hasRestServices){ -%>
+	//Rest services
+	implementation group: "it.water.service.rest", name: "Rest-api", version: project.waterVersion
+	// https://mvnrepository.com/artifact/io.swagger/swagger-jaxrs
+    implementation group: 'io.swagger', name: 'swagger-jaxrs', version: project.swaggerJaxRsVersion
+<% } -%>
+}
+
+<% if(publishModule){ -%>
+publishing {
+    	publications {
+        	hyperiot(MavenPublication) {
+            	from components.java
+        }
+    }
+ }
+ <% } -%>

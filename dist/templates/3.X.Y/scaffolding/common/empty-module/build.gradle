@@ -1,0 +1,29 @@
+
+dependencies {
+	//SLF4J
+    implementation group: 'org.slf4j', name: 'slf4j-api', version: project.slf4jVersion
+	//lombok
+    implementation group: 'org.projectlombok', name: 'lombok', version: project.lombokVersion
+    annotationProcessor 'org.projectlombok:lombok:'+project.lombokVersion
+
+	testAnnotationProcessor 'org.projectlombok:lombok:'+project.lombokVersion
+	testImplementation 'org.mockito:mockito-core:4.6.1'
+	testImplementation 'org.mockito:mockito-junit-jupiter:4.6.1'
+	testImplementation 'org.junit.jupiter:junit-jupiter-api:' + project.junitJupiterVersion
+	testImplementation 'org.junit.jupiter:junit-jupiter-engine:' + project.junitJupiterVersion
+	testImplementation 'org.atteo.classindex:classindex:' + project.atteoClassIndexVersion
+}
+
+test {
+	useJUnitPlatform()
+}
+
+<% if(publishModule){ -%>
+publishing {
+    	publications {
+        	water(MavenPublication) {
+            	from components.java
+        	}
+    }
+ }
+ <% } -%>

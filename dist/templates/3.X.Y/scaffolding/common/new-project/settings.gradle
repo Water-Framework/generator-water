@@ -1,0 +1,17 @@
+buildscript{
+    repositories {
+        mavenLocal()
+        maven {
+            name = 'WaterPublicRepo'
+            url = "https://nexus.acsoftware.it/nexus/repository/maven-water/"
+        }
+    }
+
+    dependencies {
+        classpath 'it.water.gradle.plugins.workspace:WaterWorkspaceGradlePlugin:3.0.0'
+    }
+}
+
+
+apply plugin: 'it.water.workspace'
+

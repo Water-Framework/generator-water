@@ -1,7 +1,6 @@
 let Graph = require("graph-data-structure");
 let chalk = require('chalk');
 
-
 class CycleError extends Error {
     constructor(message) {
         super(message);

@@ -1,0 +1,9 @@
+{
+    "generator-water": {
+        "inner-project": true,
+        "project-type": "api",
+        "projectName": "<%- projectName %>",
+        "projectGroupId": "<%- projectGroupId %>",
+        "projectVersion": "<%- projectVersion %>"
+    }
+}
