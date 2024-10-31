@@ -1,5 +1,5 @@
 let Generator = require('../WaterBaseGenerator.js');
-
+const DepCycleChecker = require('../WaterDepCycleChecker.js');
 let projectsName = [];
 let results = {};
 let chalk = require('chalk');
@@ -8,6 +8,8 @@ module.exports = class extends Generator {
 
     constructor(args, opts) {
         super(args, opts);
+        this.depCycleChecker = new DepCycleChecker();
+        
     }
 
 
@@ -24,10 +26,11 @@ module.exports = class extends Generator {
     }
 
     checkDepCycles(){
-        super.checkDepCycles(true);
+        this.depCycleChecker.checkDepCycles(true,this);
     }
 
     install() {
+
         let repoUsername = this.options.username;
         let repoPassword  = this.options.password;
         if(!repoUsername || !repoPassword)
