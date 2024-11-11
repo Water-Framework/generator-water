@@ -1,0 +1,87 @@
+plugins {
+    id "biz.aQute.bnd.builder"
+}
+
+dependencies {
+	//SLF4J
+    implementation group: 'org.slf4j', name: 'slf4j-api', version: project.slf4jVersion
+	//OSGi
+	implementation group: "org.osgi", name: "osgi.core", version: project.osgiVersion
+	implementation group: "org.osgi", name: "osgi.cmpn", version: project.osgiCompendiumVersion
+	//CDI
+	implementation group: 'org.osgi', name: 'org.osgi.service.cdi', version: '1.0.1'
+	implementation group: 'javax.annotation', name: 'javax.annotation-api', version:'1.3.2'
+	implementation group: 'javax.enterprise', name: 'cdi-api', version: '2.0.SP1'
+	//Atteo
+	implementation 'org.atteo.classindex:classindex:' + project.atteoClassIndexVersion
+    annotationProcessor('org.atteo.classindex:classindex:' + project.atteoClassIndexVersion)
+	//lombok
+    implementation group: 'org.projectlombok', name: 'lombok', version: project.lombokVersion
+    annotationProcessor 'org.projectlombok:lombok:' + project.lombokVersion
+<%if(applicationTypeEntity) {-%>
+	implementation 'org.hibernate:hibernate-core:'+project.hibernateVersion
+	//jakarta persistence
+	implementation 'jakarta.persistence:jakarta.persistence-api:'+project.jakartaPersistenceVersion
+	//Water javax persistence
+	implementation 'it.water.repository.jpa:JpaRepository-osgi:'+project.waterVersion
+	implementation group: 'jakarta.transaction', name: 'jakarta.transaction-api', version: project.jakartaTransactionApiVersion
+<%} -%>
+	//Validation
+	implementation 'it.water.core:Core-validation:'+project.waterVersion
+    implementation group: 'jakarta.validation', name: 'jakarta.validation-api', version: project.jakartaValidationVersion
+    implementation group: "org.hibernate", name: "hibernate-validator", version: project.hibernateValidatorVersion
+	//Jackson
+    implementation group: 'com.fasterxml.jackson.jaxrs', name: 'jackson-jaxrs-json-provider', version: project.jacksonVersion
+    //Encryption
+    implementation group: 'org.bouncycastle', name: 'bcmail-jdk15on', version: project.bouncyCastleVersion
+    implementation group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: project.nimbusJoseJwtVersion
+    //Water Osgi Distribution
+	implementation group: 'it.water.distribution', name: 'Water-distribution-osgi', version: project.waterVersion
+    
+<%if(hasRestServices) {-%>
+	//Rest Water Deps
+	implementation group: 'it.water.service.rest', name: 'Rest-service', version: project.waterVersion
+	implementation group: 'it.water.service.rest', name: 'Rest-jaxrs-api', version: project.waterVersion
+<% 		if(applicationTypeEntity){ -%>
+	implementation group: 'it.water.service.rest', name: 'Rest-persistence', version: project.waterVersion
+<% 		} -%>
+	// https://mvnrepository.com/artifact/io.swagger/swagger-jaxrs
+    implementation group: 'io.swagger', name: 'swagger-jaxrs', version: project.swaggerJaxRsVersion
+<%} -%>
+
+	testImplementation group:'it.water.core',name:'Core-testing-utils',version:project.waterVersion
+	testAnnotationProcessor 'org.projectlombok:lombok:'+project.lombokVersion
+	testImplementation group: "org.apache.karaf.itests", name: "common", version: project.karafVersion
+    testImplementation group: "org.apache.karaf", name: "apache-karaf", version: project.karafVersion
+    testImplementation group: "org.apache.karaf.shell", name: "org.apache.karaf.shell.core", version: project.karafVersion
+    testImplementation group: "org.ops4j.pax.exam", name: "pax-exam-container-karaf", version: project.paxExamVersion
+    testImplementation group: "org.ops4j.pax.exam", name: "pax-exam-junit4", version: project.paxExamVersion
+    testImplementation group: "org.ops4j.pax.exam", name: "pax-exam", version: project.paxExamVersion
+	testImplementation 'org.awaitility:awaitility:4.2.1'
+	testImplementation 'org.atteo.classindex:classindex:' + project.atteoClassIndexVersion
+<%if(applicationTypeEntity) {-%>	
+	//for testing purpose we use hibernate as persistence provider
+    testImplementation 'org.hibernate:hibernate-core:'+project.hibernateVersion
+	testImplementation 'org.hsqldb:hsqldb:2.4.1'
+<%} -%>
+<%if(hasRestServices) {-%>	
+	testImplementation group: 'com.intuit.karate', name: 'karate-junit4', version: '1.4.0.RC3'
+<%} -%>
+}
+
+test {
+	useJUnitPlatform()
+}
+
+publishing {
+    	publications {
+        	water(MavenPublication) {
+            	from components.java
+        	}
+
+            karaf(MavenPublication) {
+                artifact source: 'src/main/resources/features.xml', classifier: 'features'
+                artifactId '<%-projectName%>-karaf-features'
+            }
+    }
+ }

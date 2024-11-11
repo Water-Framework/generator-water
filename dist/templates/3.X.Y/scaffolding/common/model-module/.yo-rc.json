@@ -1,0 +1,9 @@
+{
+    "generator-water": {
+        "inner-project": true,
+        "project-type": "model",
+        "projectName": "<%- projectName %>",
+        "projectGroupId": "<%- projectGroupId %>",
+        "projectVersion": "<%- projectVersion %>"
+    }
+}

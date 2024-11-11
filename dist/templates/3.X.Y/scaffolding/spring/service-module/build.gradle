@@ -1,0 +1,56 @@
+dependencies {
+    //SLF4J
+	implementation group: 'org.slf4j', name: 'slf4j-api', version: project.slf4jVersion
+	//lombok
+	implementation group: 'org.projectlombok', name: 'lombok', version: project.lombokVersion
+	annotationProcessor 'org.projectlombok:lombok:' + project.lombokVersion
+	//Jackson
+	implementation group: 'com.fasterxml.jackson.jaxrs', name: 'jackson-jaxrs-json-provider', version: project.jacksonVersion
+	//Encryption
+	implementation group: 'org.bouncycastle', name: 'bcmail-jdk15on', version: project.bouncyCastleVersion
+	// Implementation
+	implementation group: 'it.water.distribution', name: 'Water-distribution-spring', version: project.waterVersion
+<%if(applicationTypeEntity || hasRestServices) {-%>
+	//todo remove and substitute with specific technology, used just as example
+	implementation group:'org.hsqldb', name:'hsqldb', version:'2.4.1'
+	// Persistence 
+	implementation group: 'org.springframework.data', name: 'spring-data-jpa', version: project.springBootVersion
+	//Water Persistence
+	implementation group:'it.water.repository.jpa', name:'JpaRepository-spring', version:project.waterVersion
+	//jakarta persistence
+	implementation group:'jakarta.persistence', name:'jakarta.persistence-api', version:project.jakartaPersistenceVersion
+	implementation group: 'jakarta.transaction', name: 'jakarta.transaction-api', version: project.jakartaTransactionApiVersion
+<%} -%>
+
+	implementation group:'jakarta.validation', name:'jakarta.validation-api', version: project.jakartaValidationVersion
+	//hibernate validator
+	implementation group: "org.hibernate", name: "hibernate-validator", version: project.hibernateValidatorVersion
+<%if(hasRestServices) {-%>
+	// Rest Services
+	implementation group:'org.springframework.boot', name:'spring-boot-starter-web', version:project.springBootVersion
+	// Rest Water Deps
+	implementation group: 'it.water.service.rest', name: 'Rest-spring-api', version: project.waterVersion
+	// Swagger
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:'+project.springOpenApiWebMvcVersion
+	// https://mvnrepository.com/artifact/io.swagger/swagger-jaxrs
+    implementation group: 'io.swagger', name: 'swagger-jaxrs', version: project.swaggerJaxRsVersion
+<%} -%>
+	//Spring for spring source set
+	implementation group:'org.springframework.boot', name:'spring-boot-starter-aop', version:project.springBootVersion
+	implementation group:'org.atteo.classindex', name:'classindex', version:project.atteoClassIndexVersion
+	annotationProcessor('org.atteo.classindex:classindex:' + project.atteoClassIndexVersion)
+
+	testImplementation group:'org.springframework.boot', name:'spring-boot-starter-test', version:project.springBootVersion
+	testImplementation group:'org.atteo.classindex', name:'classindex', version: project.atteoClassIndexVersion
+	testAnnotationProcessor('org.atteo.classindex:classindex:' + project.atteoClassIndexVersion)
+	testAnnotationProcessor 'org.projectlombok:lombok:' + project.lombokVersion
+	// https://mvnrepository.com/artifact/com.intuit.karate/karate-junit5
+	testImplementation ('io.karatelabs:karate-junit5:'+project.karateVersion)
+}
+
+test {
+	useJUnitPlatform()
+}
+	
+
+

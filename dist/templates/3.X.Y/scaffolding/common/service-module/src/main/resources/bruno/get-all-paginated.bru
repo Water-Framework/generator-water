@@ -1,0 +1,11 @@
+meta {
+  name: Get All <%-projectSuffixUpperCase%> entities Paginated
+  type: http
+  seq: 1
+}
+
+get {
+  url: http://localhost:8080/water<%- restContextRoot %>
+  body: none
+  auth: none
+}

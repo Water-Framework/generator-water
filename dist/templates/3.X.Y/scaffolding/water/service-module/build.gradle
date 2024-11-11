@@ -1,0 +1,100 @@
+plugins {
+    id "biz.aQute.bnd.builder"
+}
+
+dependencies {
+	//SLF4J
+    implementation group: 'org.slf4j', name: 'slf4j-api', version: project.slf4jVersion
+	//Atteo
+	implementation 'org.atteo.classindex:classindex:' + project.atteoClassIndexVersion
+    annotationProcessor('org.atteo.classindex:classindex:' + project.atteoClassIndexVersion)
+	//lombok
+    implementation group: 'org.projectlombok', name: 'lombok', version: project.lombokVersion
+    annotationProcessor 'org.projectlombok:lombok:' + project.lombokVersion
+<%if(applicationTypeEntity) {-%>
+	//Water Jakarta persistence
+	implementation 'it.water.repository.jpa:JpaRepository-api:'+project.waterVersion
+	implementation group: 'jakarta.transaction', name: 'jakarta.transaction-api', version: project.jakartaTransactionApiVersion
+	implementation group: 'jakarta.persistence', name: 'jakarta.persistence-api', version: project.jakartaPersistenceVersion
+	//Water Persistence
+	implementation group:'it.water.repository', name:'Repository-entity', version:project.waterVersion
+	implementation group:'it.water.repository', name:'Repository-persistence', version:project.waterVersion
+	implementation group:'it.water.repository', name:'Repository-service', version:project.waterVersion
+<%} -%>
+	//Validation
+	implementation 'it.water.core:Core-validation:'+project.waterVersion
+    implementation group: 'jakarta.validation', name: 'jakarta.validation-api', version: project.jakartaValidationVersion
+    implementation group: "org.hibernate", name: "hibernate-validator", version: project.hibernateValidatorVersion
+	//Jackson
+    implementation group: 'com.fasterxml.jackson.jaxrs', name: 'jackson-jaxrs-json-provider', version: project.jacksonVersion
+    //Encryption
+    implementation group: 'org.bouncycastle', name: 'bcmail-jdk15on', version: project.bouncyCastleVersion
+    implementation group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: project.nimbusJoseJwtVersion
+	//Core Water Deps
+    implementation group: 'it.water.core', name: 'Core-api', version: project.waterVersion
+    implementation group: 'it.water.core', name: 'Core-bundle', version: project.waterVersion
+    implementation group: 'it.water.core', name: 'Core-interceptors', version: project.waterVersion
+    implementation group: 'it.water.core', name: 'Core-model', version: project.waterVersion
+    implementation group: 'it.water.core', name: 'Core-permission', version: project.waterVersion
+    implementation group: 'it.water.core', name: 'Core-registry', version: project.waterVersion
+    implementation group: 'it.water.core', name: 'Core-security', version: project.waterVersion
+    implementation group: 'it.water.core', name: 'Core-service', version: project.waterVersion
+    
+<%if(hasRestServices) {-%>
+	//Rest Water Deps
+	implementation group: 'it.water.service.rest', name: 'Rest-api', version: project.waterVersion
+	implementation group: 'it.water.service.rest', name: 'Rest-security', version: project.waterVersion
+	implementation group: 'it.water.service.rest', name: 'Rest-service', version: project.waterVersion
+	implementation group: 'it.water.service.rest', name: 'Rest-jaxrs-api', version: project.waterVersion
+<% 		if(applicationTypeEntity){ -%>
+	implementation group: 'it.water.service.rest', name: 'Rest-persistence', version: project.waterVersion
+<% 		} -%>
+	// https://mvnrepository.com/artifact/io.swagger/swagger-jaxrs
+    implementation group: 'io.swagger', name: 'swagger-jaxrs', version: project.swaggerJaxRsVersion
+<%} -%>
+
+	implementation project (":<%-projectName%>-api")
+	implementation project (":<%-projectName%>-model")
+
+	testImplementation group:'it.water.core',name:'Core-testing-utils',version:project.waterVersion
+
+	testAnnotationProcessor 'org.projectlombok:lombok:'+project.lombokVersion
+	testImplementation 'org.mockito:mockito-core:4.6.1'
+	testImplementation 'org.mockito:mockito-junit-jupiter:4.6.1'
+	testImplementation 'org.junit.jupiter:junit-jupiter-api:' + project.junitJupiterVersion
+	testImplementation 'org.junit.jupiter:junit-jupiter-engine:' + project.junitJupiterVersion
+	testImplementation 'org.atteo.classindex:classindex:' + project.atteoClassIndexVersion
+<%if(applicationTypeEntity) {-%>	
+	//for testing purpose we use hibernate as persistence provider
+	testImplementation 'it.water.repository.jpa:JpaRepository-test-utils:'+ project.waterVersion
+	testImplementation 'org.hibernate:hibernate-core:'+project.hibernateVersion
+	testImplementation 'org.hsqldb:hsqldb:2.4.1'
+<%} -%>
+<%if(hasRestServices) {-%>	
+	//Using jetty and apache cxf (jaxrs compliant framework) for testing
+	testImplementation group: 'it.water.service.rest', name: 'Rest-api-manager-apache-cxf', version: project.waterVersion
+	//Using javax jpa for testing purpose
+	testImplementation group: 'it.water.repository.jpa', name: 'JpaRepository-test-utils', version: project.waterVersion
+	testImplementation group: 'org.reflections', name: 'reflections', version: '0.10.2'
+	testImplementation group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.13'
+	testImplementation group: 'org.apache.cxf', name: 'cxf-rt-transports-http-jetty', version: project.cxfVersion
+	testImplementation group: 'org.springframework', name: 'spring-web', version: '5.3.22'
+	testImplementation group: 'org.springframework', name: 'spring-context', version: '5.3.22'
+	//with 9.4.4 tests won't work because of the integration between cxf and jetty outside karaf context
+	testImplementation group: 'org.eclipse.jetty', name: 'jetty-servlet', version: project.jettyVersion
+	// https://mvnrepository.com/artifact/com.intuit.karate/karate-junit5
+	testImplementation group: 'com.intuit.karate', name: 'karate-junit5', version: project.karateVersion
+<%} -%>
+}
+
+test {
+	useJUnitPlatform()
+}
+
+publishing {
+    	publications {
+        	water(MavenPublication) {
+            	from components.java
+        	}
+    }
+ }
