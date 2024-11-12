@@ -14,6 +14,7 @@ module.exports = class extends Generator {
         this._private_getWorkspaceVersion();
         this._private_checkRequirements();
         this.automaticallyLinkProjects();
+        this.config.save();
     }
 
     /**
