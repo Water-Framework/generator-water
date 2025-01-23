@@ -1,6 +1,8 @@
+<% if(hasSonarqubeIntegration) { -%>
 plugins {
     id("org.sonarqube") version "5.1.0.4882"
 }
+<% } -%>
 
 allprojects {
 <% if(publishModule) { -%>
@@ -55,13 +57,14 @@ allprojects {
 	}
 <% } -%>
  
+ <% if(hasSonarqubeIntegration) { -%>
  test {
         finalizedBy jacocoTestReport
     }
-
+ <% } -%>
 }
 
-
+<% if(hasSonarqubeIntegration) { -%>
 sonarqube {
     properties {
         // Configurazione globale del progetto Sonar
@@ -100,4 +103,6 @@ task jacocoRootReport(type: JacocoReport) {
         html.destination file("${buildDir}/reports/jacoco/jacocoRootReport.html")
     }
 }
+
+<% } -%>
 

@@ -383,6 +383,7 @@ module.exports = class extends AcsBaseGenerator {
         let workspaceDir = process.cwd();
         //if water is not inside the specific project folder it runs into it
         let restorePreviousFolder = false;
+        //TODO remove or change this check since it can generat ambigous behaviorus
         if(!workspaceDir.endsWith(projectName)){
             restorePreviousFolder = true;
             process.chdir(projectName);

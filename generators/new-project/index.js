@@ -188,6 +188,12 @@ module.exports = class extends Generator {
                 return answers.publishModule === true;
             }
 
+        },
+        {
+            type: 'confirm',
+            name: 'hasSonarqubeIntegration',
+            message: 'Do you want to add Sonarqube properties for Sonarqube integration?',
+            default: false
         }
         ]).then((answers) => {
             let initialName = answers.projectName;
@@ -248,6 +254,7 @@ module.exports = class extends Generator {
             }
 
             this.projectConf = {
+                hasSonarqubeIntegration: answers.hasSonarqubeIntegration,
                 applicationTypeEntity: this.applicationTypeEntity,
                 applicationType: answers.applicationType,
                 projectSuffix: this.projectSuffix,
