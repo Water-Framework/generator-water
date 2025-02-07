@@ -1,8 +1,10 @@
 
 package <%-servicePackage%>.rest.spring;
 
+import <%-servicePackage%>.rest.<%- projectSuffixUpperCase %>RestControllerImpl;
 import it.water.core.api.model.*;
 import it.water.core.api.repository.*;
+import it.water.core.api.repository.query.*;
 import <%-apiPackage%>.*;
 import <%-modelPackage%>.*;
 import org.springframework.web.bind.annotation.RestController;

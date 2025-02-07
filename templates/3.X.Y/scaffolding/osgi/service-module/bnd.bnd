@@ -28,6 +28,4 @@ Import-Package: \
 Export-Package: \
     <%-projectGroupId%>.*
 DynamicImport-Package: *
-Meta-Persistence: META-INF/persistence.xml
 -cdiannotations: *;discover=annotated_by_bean
--fixupmessages "Classes found in the wrong directory"; restrict:=error; is:=warning

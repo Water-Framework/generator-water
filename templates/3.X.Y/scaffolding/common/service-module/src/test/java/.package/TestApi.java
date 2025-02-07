@@ -2,8 +2,8 @@ package <%-projectGroupId%>;
 
 import it.water.core.api.model.PaginableResult;
 import it.water.core.api.bundle.Runtime;
-import it.water.core.api.model .Role;
-import it.water.core.api.permission.RoleManager;
+import it.water.core.api.model.Role;
+import it.water.core.api.role.RoleManager;
 import it.water.core.api.user.UserManager;
 import it.water.core.api.registry.ComponentRegistry;
 import it.water.core.api.repository.query.Query;

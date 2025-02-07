@@ -17,13 +17,14 @@
 package <%-servicePackage%>.rest.spring;
 import it.water.core.api.*;
 import <%-apiPackage%>.*;
+import <%-apiPackage%>.rest.*;
 import <%-modelPackage%>.*;
 
 import it.water.core.api.model.PaginableResult;
 import it.water.core.api.service.rest.FrameworkRestApi;
 import it.water.core.api.service.rest.WaterJsonView;
 import it.water.service.rest.api.security.LoggedIn;
-
+import com.fasterxml.jackson.annotation.JsonView;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.HttpStatus;
 
