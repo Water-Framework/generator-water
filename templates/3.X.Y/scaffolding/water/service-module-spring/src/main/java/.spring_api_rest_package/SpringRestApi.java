@@ -15,7 +15,6 @@
  */
 
 package <%-servicePackage%>.rest.spring;
-import it.water.core.api.*;
 import <%-apiPackage%>.*;
 import <%-apiPackage%>.rest.*;
 import <%-modelPackage%>.*;

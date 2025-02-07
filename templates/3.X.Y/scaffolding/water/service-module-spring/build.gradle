@@ -9,6 +9,7 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok:' + project.lombokVersion
 	//Validation 
 	implementation group:'jakarta.validation', name:'jakarta.validation-api', version: project.jakartaValidationVersion
+	implementation group: 'jakarta.persistence', name: 'jakarta.persistence-api', version: project.jakartaPersistenceVersion
 	//Core Water Deps
 	implementation group: 'it.water.distribution', name: 'Water-distribution-spring', version: project.waterVersion
 	// JPA Repository
@@ -32,6 +33,7 @@ dependencies {
 	implementation group:'org.hsqldb', name:'hsqldb', version:'2.4.1'
 
 	testImplementation group:'it.water.core',name:'Core-testing-utils',version:project.waterVersion
+	testImplementation 'org.springframework.boot:spring-boot-starter-test:' + project.springBootVersion
 	testAnnotationProcessor 'org.projectlombok:lombok:'+project.lombokVersion
 	testImplementation 'org.mockito:mockito-core:4.6.1'
 	testImplementation 'org.mockito:mockito-junit-jupiter:4.6.1'
