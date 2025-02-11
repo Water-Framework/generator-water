@@ -156,6 +156,47 @@ module.exports = class extends Generator {
         },
         {
             type: 'confirm',
+            name: 'hasAuthentication',
+            message: 'do you want to add automatic login management to your rest services (@Login annotation) ?',
+            when: function (answer) {
+                return answer.hasRestServices === true;
+            },
+            default: function(answers){
+                return true;
+            }
+        },
+        {
+            type: 'confirm',
+            name: 'moreModules',
+            message: 'do you want to add other modules to have out of the box features?',
+            default: function(answers){
+                return false;
+            },
+        },
+        {
+            type: 'checkbox',
+            name: 'modules',
+            message: 'Please select modules you want to add yo your microservice ?',
+            when: function (answer) {
+                return answer.moreModules === true;
+            },
+            choices: [
+                {
+                    name: "User Integration - for querying user's services remotely",
+                    value: "group: 'it.water.user', name:'User-integration', version:project.waterVersion"
+                }, {
+                    name: "Role Integration - for querying role's services remotely",
+                    value: "group: 'it.water.role', name:'Role-integration', version:project.waterVersion"
+                }, {
+                    name: "Permission - to integrate permission management locally",
+                    value: "group: 'it.water.permission', name:'Permission-service', version:project.waterVersion"
+                }, {
+                    name: "Shared Entity Integration - for querying shared entity's services remotely",
+                    value: "group: 'it.water.shared.entity', name:'SharedEntity-service', version:project.waterVersion"
+                }]
+        },
+        {
+            type: 'confirm',
             name: 'publishModule',
             message: 'Project should be deployed to remote maven repository ?',
             default: false
@@ -198,6 +239,7 @@ module.exports = class extends Generator {
         ]).then((answers) => {
             let initialName = answers.projectName;
             this.projectTechnology = answers.projectTechnology;
+            this.log.info("MODULES CHOSEN: ",answers.modules)
             //forcing on jakarta maybe in the future can be different
             let validationLib = "jakarta"
             let persistenceLib = "jakarta"; 
@@ -255,6 +297,8 @@ module.exports = class extends Generator {
 
             this.projectConf = {
                 hasSonarqubeIntegration: answers.hasSonarqubeIntegration,
+                hasAuthentication:answers.hasAuthentication,
+                featuresModules: answers.modules,
                 applicationTypeEntity: this.applicationTypeEntity,
                 applicationType: answers.applicationType,
                 projectSuffix: this.projectSuffix,

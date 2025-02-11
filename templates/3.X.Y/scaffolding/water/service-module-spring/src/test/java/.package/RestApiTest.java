@@ -13,6 +13,7 @@ import <%-projectGroupId%>.service.<%-projectSuffixUpperCase%>Application;
 @SpringBootTest(classes = <%- projectSuffixUpperCase %>Application.class,
         webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @TestPropertySource(properties = {
+        "water.rest.security.jwt.validate.by.jws=false",
         "water.rest.security.jwt.validate=false",
         "water.testMode=true"
 })

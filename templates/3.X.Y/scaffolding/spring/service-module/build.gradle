@@ -35,6 +35,14 @@ dependencies {
 	// https://mvnrepository.com/artifact/io.swagger/swagger-jaxrs
     implementation group: 'io.swagger', name: 'swagger-jaxrs', version: project.swaggerJaxRsVersion
 <%} -%>
+
+	<%if(featuresModules != null && featuresModules.lenght > 0){-%>
+	//Adding Features modules
+		<% for (let i = 0; i < featuresModules.length; i++) { -%>
+	<%-featuresModules[i] %>
+		<% } -%>
+	<%}-%>
+
 	//Spring for spring source set
 	implementation group:'org.springframework.boot', name:'spring-boot-starter-aop', version:project.springBootVersion
 	implementation group:'org.atteo.classindex', name:'classindex', version:project.atteoClassIndexVersion

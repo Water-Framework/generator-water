@@ -51,6 +51,13 @@ dependencies {
 	// https://mvnrepository.com/artifact/io.swagger/swagger-jaxrs
     implementation group: 'io.swagger', name: 'swagger-jaxrs', version: project.swaggerJaxRsVersion
 <%} -%>
+	
+	<%if(featuresModules != null && featuresModules.lenght > 0){-%>
+	//Adding Features modules
+		<% for (let i = 0; i < featuresModules.length; i++) { -%>
+	<%-featuresModules[i] %>
+		<% } -%>
+	<%}-%>
 
 	implementation project (":<%-projectName%>-api")
 	implementation project (":<%-projectName%>-model")
