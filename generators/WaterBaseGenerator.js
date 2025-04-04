@@ -4,7 +4,7 @@ const axios = require("axios");
 const path = require("path");
 let fs = require('fs');
 let chalk = require('chalk');
-
+/* global Promise */
 let splash = '' +
     '@@@  @@@  @@@   @@@@@@   @@@@@@@  @@@@@@@@  @@@@@@@   \n'+
     '@@@  @@@  @@@  @@@@@@@@  @@@@@@@  @@@@@@@@  @@@@@@@@  \n'+
