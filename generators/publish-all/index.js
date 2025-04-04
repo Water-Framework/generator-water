@@ -18,7 +18,7 @@ module.exports = class extends Generator {
         projectsName = super.getAllProjectsInWorkspace();
     }
 
-    install() {
+    async install() {
         let repoUsername = this.options.username;
         let repoPassword  = this.options.password;
         if(!repoUsername || !repoPassword)

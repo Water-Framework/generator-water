@@ -354,7 +354,7 @@ module.exports = class extends AcsBaseGenerator {
         return results;
     }
 
-    launchProjectsPublish(projectsName, repoUsername, repoPassword) {
+    async launchProjectsPublish(projectsName, repoUsername, repoPassword) {
         let results = [];
         let workspaceDir = process.cwd();
         for (let i = 0; i < projectsName.length; i++) {
@@ -369,7 +369,7 @@ module.exports = class extends AcsBaseGenerator {
                             this.log.error("Please insert --sonarHost and --sonarToken in order!");
                         } else {
                             this.log.info("Starting sonarqube analysis at ",this.options.sonarHost);
-                            testOk = this.launchSingleProjectSonar(projectsName[i],this.options.sonarHost,this.options.sonarToken);
+                            testOk = await this.launchSingleProjectSonar(projectsName[i],this.options.sonarHost,this.options.sonarToken);
                         }
                     } else {
                         this.log.info("Starting tests ...")
@@ -458,24 +458,31 @@ module.exports = class extends AcsBaseGenerator {
         return publishOk;
     }
 
-    launchSingleProjectSonar(projectName, sonarHost, sonarToken) {
+    async launchSingleProjectSonar(projectName, sonarHost, sonarToken) {
         let sonarOK = false;
         let sonarArg = ["clean","test","jacocoRootReport","sonar", "-Dsonar.host.url=" + sonarHost,"-Dsonar.login="+sonarToken];
         process.chdir(projectName);
+        let projectPath = process.cwd();
         let sonarResult = this.spawnCommandSync("gradle", sonarArg);
+        process.chdir("../");
         sonarOK = sonarResult.status === 0;
         //checks sonarqube quality gate results
-        if (sonarOK && this.checkSonarQualityGate(sonarToken)) {
-            this.log.ok("Sonar quality gate for " + projectName + " passed!");
-        } else {
-            this.log.error("Sonar quality gate for " + projectName + " failed!");
+        try {
+            let sonarQGOk = await this.checkSonarQualityGate(projectPath,sonarToken);
+            if (sonarOK && sonarQGOk) {
+                this.log.ok("Sonar quality gate for " + projectName + " passed!");
+            } else {
+                this.log.error("Sonar quality gate for " + projectName + " failed!");
+                sonarOK = false;
+            }
+        } catch(error){
+            this.log.error(error);
         }
-        process.chdir("../");
         return sonarOK;
     }
 
-    async checkSonarQualityGate(sonarToken){
-        const REPORT_PATH = path.resolve("build", "sonar", "report-task.txt");
+    async checkSonarQualityGate(projectPath,sonarToken){
+        const REPORT_PATH = projectPath + "/build/sonar/report-task.txt";
         if (!fs.existsSync(REPORT_PATH)) {
             this.log.error(`report-task.txt non trovato in ${REPORT_PATH}`);
             process.exit(1);
@@ -484,25 +491,45 @@ module.exports = class extends AcsBaseGenerator {
             .split("\n")
             .filter(line => line.includes("="))
             .reduce((acc, line) => {
-                const [key, value] = line.split("=");
-                acc[key.trim()] = value.trim();
+                const i = line.indexOf("=");
+                const key = line.substring(0, i).trim();
+                const value = line.substring(i + 1).trim();
+                acc[key] = value;
                 return acc;
             }, {});
-        const ceTaskUrl = props["ceTaskUrl"];
+        
+        let ceTaskUrl = props["ceTaskUrl"];
         if (!ceTaskUrl) {
-            this.log.error("ceTaskUrl non trovato in report-task.txt");
-            process.exit(1);
+                this.log.error("ceTaskUrl not found in build/sonar/report-task.txt");
+                process.exit(1);
+        } else {
+                this.log.info("Retrieving Sonar task status from: "+ceTaskUrl);
         }
-
-        const qgResp = await axios.get(ceTaskUrl, {
-            auth: {
-                username: sonarToken,
-                password: "",
-            },
-        });
-
-        const status = qgResp.data.projectStatus.status;
-        console.log(`✅ Quality Gate Status: ${status}`);
-        return status === 'SUCCESS';
+        let qgResp = await this.fetchSonarStatus(ceTaskUrl,sonarToken);
+        this.log.info(`Quality Gate Status IS: ${qgResp}`);
+        return qgResp === 'SUCCESS';
     }
+
+    async fetchSonarStatus(ceTaskUrl,sonarToken, retries = 4, delayMs = 2000) {
+        let status = "PENDING";
+        try {
+          // API call to sonarqube
+          const response = await axios.get(ceTaskUrl, {
+            auth: {
+              username: sonarToken,
+              password: "",
+            },
+          });
+          status = response.data.task.status;
+        } catch (err) {
+          if (retries === 0) {
+            status = "FAIL";
+          } 
+        }
+        if(status === 'PENDING' || status === 'IN_PROGRESS'){
+            await new Promise(resolve => setTimeout(resolve, delayMs));
+            return this.fetchSonarStatus(ceTaskUrl, sonarToken, retries - 1, delayMs); 
+        }
+        return status;
+      }
 };
