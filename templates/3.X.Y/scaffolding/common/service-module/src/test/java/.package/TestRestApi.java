@@ -7,6 +7,7 @@ import it.water.core.api.registry.ComponentRegistry;
 import com.intuit.karate.junit5.Karate;
 import it.water.core.interceptors.annotations.Inject;
 import it.water.core.testing.utils.junit.WaterTestExtension;
+import it.water.core.testing.utils.bundle.TestRuntimeInitializer;
 import it.water.core.testing.utils.runtime.TestRuntimeUtils;
 import org.junit.jupiter.api.extension.ExtendWith;
 import lombok.Setter;
@@ -28,6 +29,9 @@ public class <%- projectSuffixUpperCase %>RestApiTest implements Service {
     
     @Karate.Test
     Karate restInterfaceTest() {
-        return Karate.run("classpath:karate");
+        return Karate.run("classpath:karate")
+                .systemProperty("webServerPort", TestRuntimeInitializer.getInstance().getRestServerPort())
+                .systemProperty("host", "localhost")
+                .systemProperty("protocol", "http");
     }
 }

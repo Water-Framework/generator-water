@@ -321,7 +321,7 @@ module.exports = class extends AcsBaseGenerator {
             this.fs.delete(appProperties,{ recursive: true, force: true })
             this.log.info("Removing "+certsPath);
             this.fs.delete(certsPath,{ recursive: true, force: true })
-        } else if(projectConf.projectTechnology ===  "water") {
+        } else if(projectConf.projectTechnology ===  "water" && projectConf.hasRestServices) {
             //Creating spring module also
             let serviceSpringTemplatePath = this.getWaterTemplatePath(this.waterVersion)+"/scaffolding/water/service-module-spring";
             let serviceSpringDestinationPath = this.destinationPath(projectConf.projectServicePath)+"-spring";

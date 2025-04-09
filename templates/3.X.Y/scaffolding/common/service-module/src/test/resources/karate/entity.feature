@@ -8,7 +8,7 @@ Feature: Check <%-projectSuffixUpperCase%> Rest Api Response
 
     Given header Content-Type = 'application/json'
     And header Accept = 'application/json'
-    Given url 'http://localhost:8080/water<%- restContextRoot %>'
+    Given url serviceBaseUrl+'/water<%- restContextRoot %>'
     # ---- Add entity fields here -----
     And request 
     """ { "exampleField": "exampleField"} """
@@ -31,7 +31,7 @@ Feature: Check <%-projectSuffixUpperCase%> Rest Api Response
 
     Given header Content-Type = 'application/json'
     And header Accept = 'application/json'
-    Given url 'http://localhost:8080/water<%- restContextRoot %>'
+    Given url serviceBaseUrl+'/water<%- restContextRoot %>'
     # ---- Add entity fields here -----
     And request 
     """ { 
@@ -58,7 +58,7 @@ Feature: Check <%-projectSuffixUpperCase%> Rest Api Response
 
     Given header Content-Type = 'application/json'
     And header Accept = 'application/json'
-    Given url 'http://localhost:8080/water<%- restContextRoot %>/'+entityId
+    Given url serviceBaseUrl+'/water<%- restContextRoot %>/'+entityId
     # ---------------------------------
     When method GET
     Then status 200
@@ -77,7 +77,7 @@ Feature: Check <%-projectSuffixUpperCase%> Rest Api Response
 
     Given header Content-Type = 'application/json'
     And header Accept = 'application/json'
-    Given url 'http://localhost:8080/water<%- restContextRoot %>'
+    Given url serviceBaseUrl+'/water<%- restContextRoot %>'
     When method GET
     Then status 200
     And match response ==
@@ -103,7 +103,7 @@ Feature: Check <%-projectSuffixUpperCase%> Rest Api Response
 
     Given header Content-Type = 'application/json'
     And header Accept = 'application/json'
-    Given url 'http://localhost:8080/water<%- restContextRoot %>/'+entityId
+    Given url serviceBaseUrl+'/water<%- restContextRoot %>/'+entityId
     When method DELETE
     # 204 because delete response is empty, so the status code is "no content" but is ok
     Then status 204
