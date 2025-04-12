@@ -461,7 +461,7 @@ module.exports = class extends AcsBaseGenerator {
 
     async launchSingleProjectTest(projectName, sonarHost, sonarToken) {
         let testOk = false;
-        let hasSonar = sonarHost != null && sonarToken != null
+        let hasSonar = sonarHost !== null && sonarToken !== null
         let testArg = ["clean","test"];
         if(hasSonar)
             testArg.push("jacocoRootReport","sonar", "-Dsonar.host.url=" + sonarHost,"-Dsonar.login="+sonarToken);
