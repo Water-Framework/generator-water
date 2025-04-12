@@ -4,6 +4,7 @@ const axios = require("axios");
 const path = require("path");
 let fs = require('fs');
 let chalk = require('chalk');
+const tty = require("tty");
 /* global Promise */
 let splash = '' +
     '@@@  @@@  @@@   @@@@@@   @@@@@@@  @@@@@@@@  @@@@@@@   \n'+
@@ -369,11 +370,11 @@ module.exports = class extends AcsBaseGenerator {
                             this.log.error("Please insert --sonarHost and --sonarToken in order!");
                         } else {
                             this.log.info("Starting sonarqube analysis at ",this.options.sonarHost);
-                            testOk = await this.launchSingleProjectSonar(projectsName[i],this.options.sonarHost,this.options.sonarToken);
+                            testOk = await this.launchSingleProjectTest(projectsName[i],this.options.sonarHost,this.options.sonarToken);
                         }
                     } else {
                         this.log.info("Starting tests ...")
-                        testOk = this.launchSingleProjectTestSuite(projectsName[i]);
+                        testOk = this.launchSingleProjectTest(projectsName[i],null,null);
                     }
                     
                 }
@@ -458,27 +459,37 @@ module.exports = class extends AcsBaseGenerator {
         return publishOk;
     }
 
-    async launchSingleProjectSonar(projectName, sonarHost, sonarToken) {
-        let sonarOK = false;
-        let sonarArg = ["clean","test","jacocoRootReport","sonar", "-Dsonar.host.url=" + sonarHost,"-Dsonar.login="+sonarToken];
+    async launchSingleProjectTest(projectName, sonarHost, sonarToken) {
+        let testOk = false;
+        let hasSonar = sonarHost != null && sonarToken != null
+        let testArg = ["clean","test"];
+        if(hasSonar)
+            testArg.push("jacocoRootReport","sonar", "-Dsonar.host.url=" + sonarHost,"-Dsonar.login="+sonarToken);
         process.chdir(projectName);
         let projectPath = process.cwd();
-        let sonarResult = this.spawnCommandSync("gradle", sonarArg);
+        let testResult = this.spawnCommandSync("gradle", testArg);
         process.chdir("../");
-        sonarOK = sonarResult.status === 0;
+        testOk = testResult.status === 0;
         //checks sonarqube quality gate results
         try {
-            let sonarQGOk = await this.checkSonarQualityGate(projectPath,sonarToken);
-            if (sonarOK && sonarQGOk) {
-                this.log.ok("Sonar quality gate for " + projectName + " passed!");
+            let sonarQGOk = true;
+            if(hasSonar) {
+                sonarQGOk = await this.checkSonarQualityGate(projectPath, sonarToken);
+            }
+            if (testOk && sonarQGOk) {
+                this.log.ok("Test for " + projectName + " passed!");
+                if(hasSonar)
+                    this.log.ok("Sonarqube Quality Gate for " + projectName + " passed!");
+            } else if (!testOk) {
+                this.log.error("Test for " + projectName + " failed!");
+                testOk = false;
             } else {
-                this.log.error("Sonar quality gate for " + projectName + " failed!");
-                sonarOK = false;
+                this.log.error("Sonarqube Quality Gate for " + projectName + " failed!");
             }
         } catch(error){
             this.log.error(error);
         }
-        return sonarOK;
+        return testOk;
     }
 
     async checkSonarQualityGate(projectPath,sonarToken){

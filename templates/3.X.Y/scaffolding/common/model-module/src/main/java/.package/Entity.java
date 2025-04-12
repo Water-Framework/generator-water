@@ -89,16 +89,11 @@ public class <%- projectSuffixUpperCase %> extends AbstractJpaEntity<%-implement
     private String exampleField; 
 
 <% if(isOwnedEntity){ -%>
-    @Override
+    //Owner user id of the entity
+    @Setter
+    @NonNull
     @JsonIgnore
-    public it.water.core.api.model.User getUserOwner() {
-        //todo add logic to return the user who owns this entity
-        return null;
-    }
-
-    @Override
-    public void setUserOwner(it.water.core.api.model.User user) {
-        //todo add logic to set the user who owns this entity
-    }
+    @JsonView({WaterJsonView.Extended.class})
+    private Long ownerUserId;
 <% } -%>
 }

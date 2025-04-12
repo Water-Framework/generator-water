@@ -282,6 +282,21 @@ public class <%- projectSuffixUpperCase %>ApiTest implements Service {
         Assertions.assertDoesNotThrow(() -> this.<%- projectSuffixLowerCase %>Api.find(savedEntity.getId()));
         Assertions.assertThrows(UnauthorizedException.class, () -> this.<%- projectSuffixLowerCase %>Api.remove(savedEntity.getId()));
     }
+    <%} -%>
+
+    <% if(isOwnedEntity){ -%>
+    @Order(13)
+    @Test
+    public void ownedResourceShouldBeAccessedOnlyByOwner() {
+        TestRuntimeInitializer.getInstance().impersonate(<%- projectSuffixLowerCase %>EditorUser, runtime);
+        final <%- projectSuffixUpperCase %> entity = createCompany(401);
+        //saving as editor
+        <%- projectSuffixUpperCase %> savedEntity = Assertions.assertDoesNotThrow(() -> this.<%- projectSuffixLowerCase %>Api.save(entity));
+        Assertions.assertDoesNotThrow(() -> this.c<%- projectSuffixLowerCase %>Api.find(savedEntity.getId()));
+        TestRuntimeInitializer.getInstance().impersonate(<%- projectSuffixLowerCase %>ManagerUser, runtime);
+        //find an owned entity with different user from the creator should raise an unauthorized exception
+        Assertions.assertThrows(NoResultException.class,() -> this.<%- projectSuffixLowerCase %>Api.find(savedEntity.getId()));
+    }
     
 <% } -%>
     private <%- projectSuffixUpperCase %> create<%- projectSuffixUpperCase %>(int seed){
