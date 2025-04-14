@@ -42,7 +42,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 @ExtendWith(WaterTestExtension.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class <%- projectSuffixUpperCase %>ApiTest implements Service {
+class <%- projectSuffixUpperCase %>ApiTest implements Service {
     
     @Inject
     @Setter
@@ -88,7 +88,7 @@ public class <%- projectSuffixUpperCase %>ApiTest implements Service {
     private Role <%- projectSuffixLowerCase %>EditorRole;
     
     @BeforeAll
-    public void beforeAll() {
+    void beforeAll() {
         //getting user
         <%- projectSuffixLowerCase %>ManagerRole = roleManager.getRole(<%- projectSuffixUpperCase %>.DEFAULT_MANAGER_ROLE);
         <%- projectSuffixLowerCase %>ViewerRole = roleManager.getRole(<%- projectSuffixUpperCase %>.DEFAULT_VIEWER_ROLE);
@@ -114,7 +114,7 @@ public class <%- projectSuffixUpperCase %>ApiTest implements Service {
      */
     @Test
     @Order(1)
-    public void componentsInsantiatedCorrectly() {
+    void componentsInsantiatedCorrectly() {
         this.<%- projectSuffixLowerCase %>Api = this.componentRegistry.findComponent(<%- projectSuffixUpperCase %>Api.class, null);
         Assertions.assertNotNull(this.<%- projectSuffixLowerCase %>Api);
         Assertions.assertNotNull(this.componentRegistry.findComponent(<%- projectSuffixUpperCase %>SystemApi.class, null));
@@ -130,7 +130,7 @@ public class <%- projectSuffixUpperCase %>ApiTest implements Service {
      */
     @Test
     @Order(2)
-    public void saveOk() {
+    void saveOk() {
         <%- projectSuffixUpperCase %> entity = create<%- projectSuffixUpperCase %>(0);
         entity = this.<%- projectSuffixLowerCase %>Api.save(entity);
         Assertions.assertEquals(1, entity.getEntityVersion());
@@ -143,7 +143,7 @@ public class <%- projectSuffixUpperCase %>ApiTest implements Service {
      */
     @Test
     @Order(3)
-    public void updateShouldWork() {
+    void updateShouldWork() {
         Query q = this.<%- projectSuffixLowerCase %>Repository.getQueryBuilderInstance().createQueryFilter("exampleField=exampleField0");
         <%- projectSuffixUpperCase %> entity = this.<%- projectSuffixLowerCase %>Api.find(q);
         Assertions.assertNotNull(entity);
@@ -158,7 +158,7 @@ public class <%- projectSuffixUpperCase %>ApiTest implements Service {
      */
     @Test
     @Order(4)
-    public void updateShouldFailWithWrongVersion() {
+    void updateShouldFailWithWrongVersion() {
         Query q = this.<%- projectSuffixLowerCase %>Repository.getQueryBuilderInstance().createQueryFilter("exampleField=exampleFieldUpdated");
         <%- projectSuffixUpperCase %> errorEntity = this.<%- projectSuffixLowerCase %>Api.find(q);
         Assertions.assertEquals("exampleFieldUpdated", errorEntity.getExampleField());
@@ -172,7 +172,7 @@ public class <%- projectSuffixUpperCase %>ApiTest implements Service {
      */
     @Test
     @Order(5)
-    public void findAllShouldWork() {
+    void findAllShouldWork() {
         PaginableResult<<%- projectSuffixUpperCase %>> all = this.<%- projectSuffixLowerCase %>Api.findAll(null, -1, -1, null);
         Assertions.assertTrue(all.getResults().size() == 1);
     }
@@ -183,7 +183,7 @@ public class <%- projectSuffixUpperCase %>ApiTest implements Service {
      */
     @Test
     @Order(6)
-    public void findAllPaginatedShouldWork() {
+    void findAllPaginatedShouldWork() {
         for (int i = 2; i < 11; i++) {
             <%- projectSuffixUpperCase %> u = create<%- projectSuffixUpperCase %>(i);
             this.<%- projectSuffixLowerCase %>Api.save(u);
@@ -203,7 +203,7 @@ public class <%- projectSuffixUpperCase %>ApiTest implements Service {
      */
     @Test
     @Order(7)
-    public void removeAllShouldWork() {
+    void removeAllShouldWork() {
         PaginableResult<<%- projectSuffixUpperCase %>> paginated = this.<%- projectSuffixLowerCase %>Api.findAll(null, -1, -1, null);
         paginated.getResults().forEach(entity -> {
             this.<%- projectSuffixLowerCase %>Api.remove(entity.getId());
@@ -216,7 +216,7 @@ public class <%- projectSuffixUpperCase %>ApiTest implements Service {
      */
     @Test
     @Order(8)
-    public void saveShouldFailOnDuplicatedEntity() {
+    void saveShouldFailOnDuplicatedEntity() {
         <%- projectSuffixUpperCase %> entity = create<%- projectSuffixUpperCase %>(1);
         this.<%- projectSuffixLowerCase %>Api.save(entity);
         <%- projectSuffixUpperCase %> duplicated = this.create<%- projectSuffixUpperCase %>(1);
@@ -234,7 +234,7 @@ public class <%- projectSuffixUpperCase %>ApiTest implements Service {
      */
     @Test
     @Order(9)
-    public void updateShouldFailOnValidationFailure() {
+    void updateShouldFailOnValidationFailure() {
         <%- projectSuffixUpperCase %> newEntity = new <%- projectSuffixUpperCase %>("<script>function(){alert('ciao')!}</script>");
         Assertions.assertThrows(ValidationException.class,() -> this.<%- projectSuffixLowerCase %>Api.save(newEntity));
     }
@@ -245,7 +245,7 @@ public class <%- projectSuffixUpperCase %>ApiTest implements Service {
      */
     @Order(10)
     @Test
-    public void managerCanDoEverything() {
+    void managerCanDoEverything() {
         TestRuntimeInitializer.getInstance().impersonate(<%- projectSuffixLowerCase %>ManagerUser,runtime);
         final <%- projectSuffixUpperCase %> entity = create<%- projectSuffixUpperCase %>(101);
         <%- projectSuffixUpperCase %> savedEntity = Assertions.assertDoesNotThrow(() -> this.<%- projectSuffixLowerCase %>Api.save(entity));
@@ -258,7 +258,7 @@ public class <%- projectSuffixUpperCase %>ApiTest implements Service {
 
     @Order(11)
     @Test
-    public void viewerCannotSaveOrUpdateOrRemove() {
+    void viewerCannotSaveOrUpdateOrRemove() {
         TestRuntimeInitializer.getInstance().impersonate(<%- projectSuffixLowerCase %>ViewerUser,runtime);
         final <%- projectSuffixUpperCase %> entity = create<%- projectSuffixUpperCase %>(201);
         Assertions.assertThrows(UnauthorizedException.class, () -> this.<%- projectSuffixLowerCase %>Api.save(entity));
@@ -273,7 +273,7 @@ public class <%- projectSuffixUpperCase %>ApiTest implements Service {
 
     @Order(12)
     @Test
-    public void editorCannotRemove() {
+    void editorCannotRemove() {
         TestRuntimeInitializer.getInstance().impersonate(<%- projectSuffixLowerCase %>EditorUser,runtime);
         final <%- projectSuffixUpperCase %> entity = create<%- projectSuffixUpperCase %>(301);
         <%- projectSuffixUpperCase %> savedEntity = Assertions.assertDoesNotThrow(() -> this.<%- projectSuffixLowerCase %>Api.save(entity));
@@ -287,7 +287,7 @@ public class <%- projectSuffixUpperCase %>ApiTest implements Service {
     <% if(isOwnedEntity){ -%>
     @Order(13)
     @Test
-    public void ownedResourceShouldBeAccessedOnlyByOwner() {
+    void ownedResourceShouldBeAccessedOnlyByOwner() {
         TestRuntimeInitializer.getInstance().impersonate(<%- projectSuffixLowerCase %>EditorUser, runtime);
         final <%- projectSuffixUpperCase %> entity = createCompany(401);
         //saving as editor
