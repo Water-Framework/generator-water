@@ -5,7 +5,7 @@
 The `generator-water` Yeoman generator is a powerful tool designed to streamline the creation of Java-based projects. It caters to various technologies (Spring, OSGi, and a custom "water" framework) and architectural patterns, simplifying the development process by generating model, API, and service modules.  Key features include dependency cycle detection, stability metrics calculation, and automated publishing to Maven repositories. This generator aims to improve developer productivity and consistency across multiple projects by standardizing project setup and build processes.  It's especially valuable for large projects or teams needing a unified approach to Java development, enforcing a consistent and well-structured coding pattern.
 
 ## Installation
-Simply run npm i -g generator-water --repository https://nexus.acsoftware.it/nexus/repository/npm-acs-public-repo/
+Simply run npm i -g generator-water --registry https://nexus.acsoftware.it/nexus/repository/npm-acs-public-repo/
 
 ## Technology Stack
 
