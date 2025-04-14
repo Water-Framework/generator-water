@@ -145,7 +145,7 @@ module.exports = class extends AcsBaseGenerator {
         let templatePath = this.getWaterTemplatePath(this.waterVersion)+"/scaffolding/common/empty-module";
         this.fs.copyTpl(templatePath, destFolder, conf);
         this.fs.copyTpl(templatePath + "/.yo-rc.json", destFolder + "/.yo-rc.json", conf);
-        this.fs.copyTpl(templatePath + "/.gitignore", destFolder + "/.gitignore", conf);
+        this.fs.copyTpl(templatePath + "/gitignore", destFolder + "/.gitignore", conf);
     }
 
     generateModelProject(projectConf) {
