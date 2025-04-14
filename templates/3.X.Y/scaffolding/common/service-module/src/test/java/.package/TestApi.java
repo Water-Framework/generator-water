@@ -267,8 +267,9 @@ class <%- projectSuffixUpperCase %>ApiTest implements Service {
         Assertions.assertDoesNotThrow(() -> this.<%- projectSuffixLowerCase %>Api.find(found.getId()));
         //viewer cannot update or remove
         found.setExampleField("changeIt!");
+        long foundId = found.getId();
         Assertions.assertThrows(UnauthorizedException.class, () -> this.<%- projectSuffixLowerCase %>Api.update(entity));
-        Assertions.assertThrows(UnauthorizedException.class, () -> this.<%- projectSuffixLowerCase %>Api.remove(found.getId()));
+        Assertions.assertThrows(UnauthorizedException.class, () -> this.<%- projectSuffixLowerCase %>Api.remove(foundId));
     }
 
     @Order(12)
