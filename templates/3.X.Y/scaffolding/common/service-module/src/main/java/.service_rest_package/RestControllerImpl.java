@@ -34,6 +34,7 @@ import org.slf4j.LoggerFactory;
  */
 @FrameworkRestController(referredRestApi = <%- projectSuffixUpperCase %>RestApi.class)
 public class <%- projectSuffixUpperCase %>RestControllerImpl <%-extendsDeclaration%> implements <%- projectSuffixUpperCase %>RestApi {
+    @SuppressWarnings("java:S1068") //still mantain the variable even if not used
     private static Logger log = LoggerFactory.getLogger(<%- projectSuffixUpperCase %>RestControllerImpl.class.getName());
     
     @Inject
