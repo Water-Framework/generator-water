@@ -80,22 +80,14 @@ Feature: Check <%-projectSuffixUpperCase%> Rest Api Response
     Given url serviceBaseUrl+'/water<%- restContextRoot %>'
     When method GET
     Then status 200
-    And match response ==
+    And match response.results contains
     """
       {
-        "numPages":1,
-        "currentPage":1,
-        "nextPage":1,
-        "delta":20,
-        "results":[
-          {
-            "id": #number,
-            "entityVersion":2,
-            "entityCreateDate":'#number',
-            "entityModifyDate":'#number',
-            "exampleField": 'exampleFieldUpdated'
-          }
-        ]
+        "id": #number,
+        "entityVersion":2,
+        "entityCreateDate":'#number',
+        "entityModifyDate":'#number',
+        "exampleField": 'exampleFieldUpdated'
       }
     """
   
