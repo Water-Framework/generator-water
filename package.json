@@ -1,6 +1,6 @@
 {
   "name": "generator-water",
-  "version": "3.2.5",
+  "version": "3.2.6",
   "description": "Yeoman Generator for project Water Framework",
   "files": [
     "generators",

@@ -174,7 +174,7 @@ class <%- projectSuffixUpperCase %>ApiTest implements Service {
     @Order(5)
     void findAllShouldWork() {
         PaginableResult<<%- projectSuffixUpperCase %>> all = this.<%- projectSuffixLowerCase %>Api.findAll(null, -1, -1, null);
-        Assertions.assertTrue(all.getResults().size() == 1);
+        Assertions.assertEquals(1,all.getResults().size());
     }
 
     /**
@@ -208,7 +208,7 @@ class <%- projectSuffixUpperCase %>ApiTest implements Service {
         paginated.getResults().forEach(entity -> {
             this.<%- projectSuffixLowerCase %>Api.remove(entity.getId());
         });
-        Assertions.assertTrue(this.<%- projectSuffixLowerCase %>Api.countAll(null) == 0);
+        Assertions.assertEquals(0,this.companyApi.countAll(null));
     }
 
     /**
@@ -280,7 +280,8 @@ class <%- projectSuffixUpperCase %>ApiTest implements Service {
         savedEntity.setExampleField("editorNewSavedEntity");
         Assertions.assertDoesNotThrow(() -> this.<%- projectSuffixLowerCase %>Api.update(entity));
         Assertions.assertDoesNotThrow(() -> this.<%- projectSuffixLowerCase %>Api.find(savedEntity.getId()));
-        Assertions.assertThrows(UnauthorizedException.class, () -> this.<%- projectSuffixLowerCase %>Api.remove(savedEntity.getId()));
+        long savedEntityId = savedEntity.getId();
+        Assertions.assertThrows(UnauthorizedException.class, () -> this.<%- projectSuffixLowerCase %>Api.remove(savedEntityId));
     }
     <%} -%>
 
@@ -295,7 +296,8 @@ class <%- projectSuffixUpperCase %>ApiTest implements Service {
         Assertions.assertDoesNotThrow(() -> this.c<%- projectSuffixLowerCase %>Api.find(savedEntity.getId()));
         TestRuntimeInitializer.getInstance().impersonate(<%- projectSuffixLowerCase %>ManagerUser, runtime);
         //find an owned entity with different user from the creator should raise an unauthorized exception
-        Assertions.assertThrows(NoResultException.class,() -> this.<%- projectSuffixLowerCase %>Api.find(savedEntity.getId()));
+        long savedEntityId = savedEntity.getId();
+        Assertions.assertThrows(NoResultException.class,() -> this.<%- projectSuffixLowerCase %>Api.find(savedEntityId));
     }
     
 <% } -%>
