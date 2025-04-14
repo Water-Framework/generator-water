@@ -208,7 +208,7 @@ class <%- projectSuffixUpperCase %>ApiTest implements Service {
         paginated.getResults().forEach(entity -> {
             this.<%- projectSuffixLowerCase %>Api.remove(entity.getId());
         });
-        Assertions.assertEquals(0,this.companyApi.countAll(null));
+        Assertions.assertEquals(0,this.<%- projectSuffixLowerCase %>Api.countAll(null));
     }
 
     /**
