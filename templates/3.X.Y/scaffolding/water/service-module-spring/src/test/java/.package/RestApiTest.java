@@ -5,6 +5,7 @@ import com.intuit.karate.junit5.Karate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.boot.test.web.server.LocalServerPort;
 import it.water.core.testing.utils.runtime.TestRuntimeUtils;
 import it.water.core.api.registry.ComponentRegistry;
 import org.junit.jupiter.api.BeforeEach;
