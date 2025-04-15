@@ -13,7 +13,11 @@ allprojects {
     project.ext.publishRepoPassword =  System.getProperty("publishRepoPassword","noPassword")
 <%  } -%>
 <% } -%>
+<% if(projectTechnology== "water") {-%>    
+    project.ext.<%- projectName %>Version = project.waterVersion
+<% } else { -%>
     project.ext.<%- projectName %>Version = '<%- projectVersion %>' 
+<% } -%>
     group '<%- projectGroupId %>'
 	version project.<%- projectName %>Version
     repositories{
@@ -23,7 +27,7 @@ allprojects {
          url "https://plugins.gradle.org/m2/"
       }
       maven {
-         url "https://nexus.acsoftware.it/nexus/repository/maven-water/"
+            url project.acsMavenRepository
       }
 	}
 	

@@ -2,8 +2,6 @@ package <%-projectGroupId%>;
 
 import it.water.core.api.model.PaginableResult;
 import it.water.core.api.model.User;
-import it.water.core.api.permission.Role;
-import it.water.core.api.permission.RoleManager;
 import it.water.core.api.registry.ComponentRegistry;
 import it.water.core.api.repository.query.Query;
 import it.water.core.model.exceptions.ValidationException;
@@ -87,9 +85,9 @@ public class <%- projectSuffixUpperCase %>ApiTest  {
         roleManager.addRole(managerUser.getId(), manager);
         roleManager.addRole(viewerUser.getId(), viewer);
         roleManager.addRole(editorUser.getId(), editor);
+<% } -%>
         //starting with admin
         TestRuntimeUtils.impersonateAdmin(componentRegistry);
-<% } -%>
     }
 
     /**

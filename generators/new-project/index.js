@@ -11,12 +11,12 @@ module.exports = class extends Generator {
         this.projectSuffixLowerCase = "";
         this.projectConf = {};
         this.projectGroupId = "";
-        this.projectVersion = "";
+        this.projectVersion = "project.waterVersion";
         this.hasRestServices = true;
         this.hasModel = true;
         this.applicationTypeEntity = true;
         this.projectTechnology = "water";
-        this.springRepository = false;
+        this.springRepository = true;
         // Packages paths
         this.apiPackagePath = "";
         this.modelPackagePath = "";
@@ -39,7 +39,28 @@ module.exports = class extends Generator {
     prompting() {
         let done = this.async();
         let self = this;
-        this.prompt([{
+        this.prompt([
+            {
+                type: 'list',
+                name: 'projectTechnology',
+                message: 'Which technology should be used?',
+                default: "water",
+                choices: [
+                    {
+                        name: "Water",
+                        value: "water"
+                    }, {
+                        name: "Spring 3.X",
+                        value: "spring"
+                    }, {
+                        name: "OSGi",
+                        value: "osgi"
+                    }, {
+                        name: "Quarkus",
+                        value: "quarkus"
+                    }]
+            },
+            {
             type: 'input',
             name: 'projectName',
             message: 'Project-Name',
@@ -57,7 +78,10 @@ module.exports = class extends Generator {
             type: 'input',
             name: 'projectVersion',
             message: 'Version',
-            default: "1.0.0"
+            default: "1.0.0",
+            when: function(answers){
+                return answers.projectTechnology !== "water"
+            }
         }, {
             type: 'list',
             name: "applicationType",
@@ -69,26 +93,7 @@ module.exports = class extends Generator {
                 name: "Integration application",
                 value: "service"
             }]
-        }, {
-            type: 'list',
-            name: 'projectTechnology',
-            message: 'Which technology should be used?',
-            default: "water",
-            choices: [
-                {
-                    name: "Water",
-                    value: "water"
-                }, {
-                    name: "Spring 3.X",
-                    value: "spring"
-                }, {
-                    name: "OSGi",
-                    value: "osgi"
-                }, {
-                    name: "Quarkus",
-                    value: "quarkus"
-                }]
-        },
+        }, 
         {
             type: 'confirm',
             name: 'hasModel',
@@ -134,7 +139,7 @@ module.exports = class extends Generator {
             message: 'Would you like to use Spring repository instead of spring Water default repositories?',
             default: true,
             when: function (answer) {
-                return (answer.projectTechnology === 'spring2' || answer.projectTechnology === 'spring3') && answer.applicationType === 'entity';
+                return (answer.projectTechnology === 'spring') && answer.applicationType === 'entity';
             }
         },
         {
@@ -266,7 +271,9 @@ module.exports = class extends Generator {
                 this.hasModel = false;
             }
 
-            this.projectVersion = answers.projectVersion;
+            //if not it remains the same as intialization project.waterVersion
+            if(this.projectTechnology !== "water")
+                this.projectVersion = answers.projectVersion;
             this.applicationTypeEntity = answers.applicationType === 'entity';
             let basePackageArr = this.projectGroupId.split(".");
 
