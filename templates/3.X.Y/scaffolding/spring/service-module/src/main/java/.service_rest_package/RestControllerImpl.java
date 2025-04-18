@@ -38,6 +38,7 @@ import org.slf4j.LoggerFactory;
 @Transactional
 <% } -%>
 public class <%- projectSuffixUpperCase %>RestControllerImpl <%-extendsDeclaration%> implements <%- projectSuffixUpperCase %>RestApi {
+    @SuppressWarnings("java:S1068") //still mantain the variable even if not used
     private static Logger log = LoggerFactory.getLogger(<%- projectSuffixUpperCase %>RestControllerImpl.class.getName());
 
     @Autowired
@@ -48,26 +49,31 @@ public class <%- projectSuffixUpperCase %>RestControllerImpl <%-extendsDeclarati
     //All CRUD methods are already exposed by BaseEntitytRestApi. Here all methods are wrapped in order to support spring standard
     //if you need to check which methods are exposed please go to <%-apiPackage%>.rest.<%- projectSuffixUpperCase %>
     @Override
+    @SuppressWarnings("java:S1185") //disabling sonar because spring needs to override this method
     public ResponseEntity<<%- projectSuffixUpperCase %>> saveApi(<%- projectSuffixUpperCase %> entity) {
         return ResponseEntity.ok(super.save(entity));
     }
 
     @Override
+    @SuppressWarnings("java:S1185") //disabling sonar because spring needs to override this method
     public ResponseEntity<<%- projectSuffixUpperCase %>> updateApi(<%- projectSuffixUpperCase %> entity) {
         return ResponseEntity.ok(super.update(entity));
     }
 
     @Override
+    @SuppressWarnings("java:S1185") //disabling sonar because spring needs to override this method
     public ResponseEntity<<%- projectSuffixUpperCase %>> findApi(long id) {
         return ResponseEntity.ok(super.find(id));
     }
 
     @Override
+    @SuppressWarnings("java:S1185") //disabling sonar because spring needs to override this method
     public ResponseEntity<PaginableResult<<%- projectSuffixUpperCase %>>> findAllApi() {
         return ResponseEntity.ok(super.findAll());
     }
 
     @Override
+    @SuppressWarnings("java:S1185") //disabling sonar because spring needs to override this method
     public ResponseEntity<<%- projectSuffixUpperCase %>> removeApi(long id) {
         super.remove(id);
         return ResponseEntity.status(204).build();

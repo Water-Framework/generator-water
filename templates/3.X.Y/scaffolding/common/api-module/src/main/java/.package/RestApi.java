@@ -27,7 +27,9 @@ import javax.ws.rs.core.MediaType;
 public interface <%- projectSuffixUpperCase %>RestApi extends RestApi {
 
 <% if(applicationTypeEntity) { -%>   
+    <% if(hasAuthentication) { -%>   
     @LoggedIn
+    <% } -%>
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
@@ -42,7 +44,9 @@ public interface <%- projectSuffixUpperCase %>RestApi extends RestApi {
     })
     <%- projectSuffixUpperCase %> save(<%- projectSuffixUpperCase %> <%- projectSuffixLowerCase %>);
 
+    <% if(hasAuthentication) { -%>   
     @LoggedIn
+    <% } -%>
     @PUT
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
@@ -57,7 +61,9 @@ public interface <%- projectSuffixUpperCase %>RestApi extends RestApi {
     })
     <%- projectSuffixUpperCase %> update(<%- projectSuffixUpperCase %> <%- projectSuffixLowerCase %>);
 
+    <% if(hasAuthentication) { -%>   
     @LoggedIn
+    <% } -%>
     @Path("/{id}")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
@@ -73,7 +79,9 @@ public interface <%- projectSuffixUpperCase %>RestApi extends RestApi {
     })
     <%- projectSuffixUpperCase %> find(@PathParam("id") long id);
 
+    <% if(hasAuthentication) { -%>   
     @LoggedIn
+    <% } -%>
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
@@ -88,7 +96,9 @@ public interface <%- projectSuffixUpperCase %>RestApi extends RestApi {
     })
     PaginableResult<<%- projectSuffixUpperCase %>> findAll();
 
+    <% if(hasAuthentication) { -%>   
     @LoggedIn
+    <% } -%>
     @Path("/{id}")
     @DELETE
     @Produces(MediaType.APPLICATION_JSON)

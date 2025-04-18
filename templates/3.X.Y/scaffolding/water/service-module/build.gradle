@@ -53,6 +53,13 @@ dependencies {
     implementation group: 'io.swagger', name: 'swagger-jaxrs', version: project.swaggerJaxRsVersion
 <%} -%>
 
+	<%if(featuresModules != null && featuresModules.lenght > 0){-%>
+	//Adding Features modules
+		<% for (let i = 0; i < featuresModules.length; i++) { -%>
+	<%-featuresModules[i] %>
+		<% } -%>
+	<%}-%>
+
 	implementation project (":<%-projectName%>-api")
 	implementation project (":<%-projectName%>-model")
 
@@ -70,6 +77,7 @@ dependencies {
 	testImplementation 'org.hibernate:hibernate-core:'+project.hibernateVersion
 	testImplementation 'org.hsqldb:hsqldb:2.4.1'
 <%} -%>
+
 <%if(hasRestServices) {-%>	
 	//Using jetty and apache cxf (jaxrs compliant framework) for testing
 	testImplementation group: 'it.water.service.rest', name: 'Rest-api-manager-apache-cxf', version: project.waterVersion
@@ -83,7 +91,7 @@ dependencies {
 	//with 9.4.4 tests won't work because of the integration between cxf and jetty outside karaf context
 	testImplementation group: 'org.eclipse.jetty', name: 'jetty-servlet', version: project.jettyVersion
 	// https://mvnrepository.com/artifact/com.intuit.karate/karate-junit5
-	testImplementation group: 'com.intuit.karate', name: 'karate-junit5', version: project.karateVersion
+	testImplementation ('io.karatelabs:karate-junit5:'+project.karateVersion)
 <%} -%>
 }
 

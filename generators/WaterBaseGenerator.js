@@ -1,8 +1,11 @@
 let { AcsBaseGenerator } = require('acs-abstract-generator');
 const DepCycleChecker = require('./WaterDepCycleChecker.js');
+const axios = require("axios");
+const path = require("path");
 let fs = require('fs');
 let chalk = require('chalk');
-
+const tty = require("tty");
+/* global Promise */
 let splash = '' +
     '@@@  @@@  @@@   @@@@@@   @@@@@@@  @@@@@@@@  @@@@@@@   \n'+
     '@@@  @@@  @@@  @@@@@@@@  @@@@@@@  @@@@@@@@  @@@@@@@@  \n'+
@@ -142,7 +145,7 @@ module.exports = class extends AcsBaseGenerator {
         let templatePath = this.getWaterTemplatePath(this.waterVersion)+"/scaffolding/common/empty-module";
         this.fs.copyTpl(templatePath, destFolder, conf);
         this.fs.copyTpl(templatePath + "/.yo-rc.json", destFolder + "/.yo-rc.json", conf);
-        this.fs.copyTpl(templatePath + "/.gitignore", destFolder + "/.gitignore", conf);
+        this.fs.copyTpl(templatePath + "/gitignore", destFolder + "/.gitignore", conf);
     }
 
     generateModelProject(projectConf) {
@@ -319,7 +322,7 @@ module.exports = class extends AcsBaseGenerator {
             this.fs.delete(appProperties,{ recursive: true, force: true })
             this.log.info("Removing "+certsPath);
             this.fs.delete(certsPath,{ recursive: true, force: true })
-        } else if(projectConf.projectTechnology ===  "water") {
+        } else if(projectConf.projectTechnology ===  "water" && projectConf.hasRestServices) {
             //Creating spring module also
             let serviceSpringTemplatePath = this.getWaterTemplatePath(this.waterVersion)+"/scaffolding/water/service-module-spring";
             let serviceSpringDestinationPath = this.destinationPath(projectConf.projectServicePath)+"-spring";
@@ -328,8 +331,8 @@ module.exports = class extends AcsBaseGenerator {
             //Copying java classes
             this.fs.copyTpl(serviceSpringTemplatePath+"/src/main/java/.spring_api_rest_package/SpringRestApi.java", serviceSpringDestinationPath+projectConf.serviceRestPackagePath+"/spring/"+projectConf.projectSuffixUpperCase+"SpringRestApi.java", projectConf);
             this.fs.copyTpl(serviceSpringTemplatePath+"/src/main/java/.spring_service_rest_package/SpringRestControllerImpl.java", serviceSpringDestinationPath+projectConf.serviceRestPackagePath+"/spring/"+projectConf.projectSuffixUpperCase+"SpringRestControllerImpl.java", projectConf);
-            this.fs.copyTpl(serviceSpringTemplatePath+"/src/main/java/.Application.java", serviceSpringDestinationPath+projectConf.servicePackagePath+projectConf.projectSuffixUpperCase+"Application.java", projectConf);
-            this.fs.copyTpl(serviceSpringTemplatePath+"/src/test/java/.package/RestApiTest.java", serviceSpringDestinationPath+projectConf.testPackagePath+projectConf.projectSuffixUpperCase+"RestSpringApiTest.java", projectConf);
+            this.fs.copyTpl(serviceSpringTemplatePath+"/src/main/java/.Application.java", serviceSpringDestinationPath+projectConf.servicePackagePath+"/"+projectConf.projectSuffixUpperCase+"Application.java", projectConf);
+            this.fs.copyTpl(serviceSpringTemplatePath+"/src/test/java/.package/RestApiTest.java", serviceSpringDestinationPath+projectConf.projectTestPath+"/"+projectConf.projectSuffixUpperCase+"RestSpringApiTest.java", projectConf);
         }
 
         if(!projectConf.hasRestServices){
@@ -352,7 +355,7 @@ module.exports = class extends AcsBaseGenerator {
         return results;
     }
 
-    launchProjectsPublish(projectsName, repoUsername, repoPassword) {
+    async launchProjectsPublish(projectsName, repoUsername, repoPassword) {
         let results = [];
         let workspaceDir = process.cwd();
         for (let i = 0; i < projectsName.length; i++) {
@@ -361,7 +364,19 @@ module.exports = class extends AcsBaseGenerator {
             let testOk = true;
             if (buildOk) {
                 if (!this.options.skipTest) {
-                    testOk = this.launchSingleProjectTestSuite(projectsName[i]);
+                    if(this.getProjectConfiguration(projectsName[i]).hasSonarqubeIntegration){
+                        if(!this.options.sonarHost || !this.options.sonarToken){
+                            testOk = false;
+                            this.log.error("Please insert --sonarHost and --sonarToken in order!");
+                        } else {
+                            this.log.info("Starting sonarqube analysis at ",this.options.sonarHost);
+                            testOk = await this.launchSingleProjectTest(projectsName[i],this.options.sonarHost,this.options.sonarToken);
+                        }
+                    } else {
+                        this.log.info("Starting tests ...")
+                        testOk = this.launchSingleProjectTest(projectsName[i],null,null);
+                    }
+                    
                 }
                 //test ok is true if test are not enabled
                 if (testOk) {
@@ -443,4 +458,89 @@ module.exports = class extends AcsBaseGenerator {
         }
         return publishOk;
     }
+
+    async launchSingleProjectTest(projectName, sonarHost, sonarToken) {
+        let testOk = false;
+        let hasSonar = sonarHost !== null && sonarToken !== null
+        let testArg = ["clean","test"];
+        if(hasSonar)
+            testArg.push("jacocoRootReport","sonar", "-Dsonar.host.url=" + sonarHost,"-Dsonar.login="+sonarToken);
+        process.chdir(projectName);
+        let projectPath = process.cwd();
+        let testResult = this.spawnCommandSync("gradle", testArg);
+        process.chdir("../");
+        testOk = testResult.status === 0;
+        //checks sonarqube quality gate results
+        try {
+            let sonarQGOk = true;
+            if(hasSonar) {
+                sonarQGOk = await this.checkSonarQualityGate(projectPath, sonarToken);
+            }
+            if (testOk && sonarQGOk) {
+                this.log.ok("Test for " + projectName + " passed!");
+                if(hasSonar)
+                    this.log.ok("Sonarqube Quality Gate for " + projectName + " passed!");
+            } else if (!testOk) {
+                this.log.error("Test for " + projectName + " failed!");
+                testOk = false;
+            } else {
+                this.log.error("Sonarqube Quality Gate for " + projectName + " failed!");
+            }
+        } catch(error){
+            this.log.error(error);
+        }
+        return testOk;
+    }
+
+    async checkSonarQualityGate(projectPath,sonarToken){
+        const REPORT_PATH = projectPath + "/build/sonar/report-task.txt";
+        if (!fs.existsSync(REPORT_PATH)) {
+            this.log.error(`report-task.txt non trovato in ${REPORT_PATH}`);
+            process.exit(1);
+        }
+        const props = fs.readFileSync(REPORT_PATH, "utf8")
+            .split("\n")
+            .filter(line => line.includes("="))
+            .reduce((acc, line) => {
+                const i = line.indexOf("=");
+                const key = line.substring(0, i).trim();
+                const value = line.substring(i + 1).trim();
+                acc[key] = value;
+                return acc;
+            }, {});
+        
+        let ceTaskUrl = props["ceTaskUrl"];
+        if (!ceTaskUrl) {
+                this.log.error("ceTaskUrl not found in build/sonar/report-task.txt");
+                process.exit(1);
+        } else {
+                this.log.info("Retrieving Sonar task status from: "+ceTaskUrl);
+        }
+        let qgResp = await this.fetchSonarStatus(ceTaskUrl,sonarToken);
+        this.log.info(`Quality Gate Status IS: ${qgResp}`);
+        return qgResp === 'SUCCESS';
+    }
+
+    async fetchSonarStatus(ceTaskUrl,sonarToken, retries = 4, delayMs = 2000) {
+        let status = "PENDING";
+        try {
+          // API call to sonarqube
+          const response = await axios.get(ceTaskUrl, {
+            auth: {
+              username: sonarToken,
+              password: "",
+            },
+          });
+          status = response.data.task.status;
+        } catch (err) {
+          if (retries === 0) {
+            status = "FAIL";
+          } 
+        }
+        if(status === 'PENDING' || status === 'IN_PROGRESS'){
+            await new Promise(resolve => setTimeout(resolve, delayMs));
+            return this.fetchSonarStatus(ceTaskUrl, sonarToken, retries - 1, delayMs); 
+        }
+        return status;
+      }
 };

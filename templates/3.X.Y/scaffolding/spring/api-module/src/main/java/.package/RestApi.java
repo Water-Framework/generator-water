@@ -24,7 +24,10 @@ import org.springframework.http.ResponseEntity;
 public interface <%- projectSuffixUpperCase %>RestApi extends RestApi {
 
 <% if(applicationTypeEntity) {-%>    
+
+    <% if(hasAuthentication) { -%>   
     @LoggedIn
+    <% } -%>
     @JsonView(WaterJsonView.Public.class)
     @PostMapping
     @ApiOperation(value = "/", notes = "<%- projectSuffixUpperCase %> Save API", httpMethod = "POST",consumes = MediaType.APPLICATION_JSON,produces = MediaType.APPLICATION_JSON)
@@ -37,7 +40,9 @@ public interface <%- projectSuffixUpperCase %>RestApi extends RestApi {
     })
     ResponseEntity<<%- projectSuffixUpperCase %>> saveApi(@RequestBody <%- projectSuffixUpperCase %> <%- projectSuffixLowerCase %>);
 
+    <% if(hasAuthentication) { -%>   
     @LoggedIn
+    <% } -%>
     @JsonView(WaterJsonView.Public.class)
     @PutMapping
     @ApiOperation(value = "/", notes = "<%- projectSuffixUpperCase %> Update API", httpMethod = "PUT", consumes = MediaType.APPLICATION_JSON,produces = MediaType.APPLICATION_JSON)
@@ -50,7 +55,9 @@ public interface <%- projectSuffixUpperCase %>RestApi extends RestApi {
     })
     ResponseEntity<<%- projectSuffixUpperCase %>> updateApi(@RequestBody <%- projectSuffixUpperCase %> <%- projectSuffixLowerCase %>);
 
+    <% if(hasAuthentication) { -%>   
     @LoggedIn
+    <% } -%>
     @JsonView(WaterJsonView.Public.class)
     @GetMapping("/{id}")
     @ApiOperation(value = "/{id}", notes = "<%- projectSuffixUpperCase %> Find API", httpMethod = "GET", consumes = MediaType.APPLICATION_JSON,produces = MediaType.APPLICATION_JSON)
@@ -63,7 +70,9 @@ public interface <%- projectSuffixUpperCase %>RestApi extends RestApi {
     })
     ResponseEntity<<%- projectSuffixUpperCase %>> findApi(@PathVariable("id") long id);
 
+    <% if(hasAuthentication) { -%>   
     @LoggedIn
+    <% } -%>
     @JsonView(WaterJsonView.Public.class)
     @GetMapping
     @ApiOperation(value = "/", notes = "<%- projectSuffixUpperCase %> Find All API", httpMethod = "GET", consumes = MediaType.APPLICATION_JSON,produces = MediaType.APPLICATION_JSON)
@@ -76,7 +85,9 @@ public interface <%- projectSuffixUpperCase %>RestApi extends RestApi {
     })
     ResponseEntity<PaginableResult<<%- projectSuffixUpperCase %>>> findAllApi();
 
+    <% if(hasAuthentication) { -%>   
     @LoggedIn
+    <% } -%>
     @JsonView(WaterJsonView.Public.class)
     @DeleteMapping("/{id}")
     @ApiOperation(value = "/{id}", notes = "<%- projectSuffixUpperCase %> Delete API", httpMethod = "DELETE", consumes = MediaType.APPLICATION_JSON,produces = MediaType.APPLICATION_JSON)

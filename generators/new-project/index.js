@@ -11,12 +11,12 @@ module.exports = class extends Generator {
         this.projectSuffixLowerCase = "";
         this.projectConf = {};
         this.projectGroupId = "";
-        this.projectVersion = "";
+        this.projectVersion = "project.waterVersion";
         this.hasRestServices = true;
         this.hasModel = true;
         this.applicationTypeEntity = true;
         this.projectTechnology = "water";
-        this.springRepository = false;
+        this.springRepository = true;
         // Packages paths
         this.apiPackagePath = "";
         this.modelPackagePath = "";
@@ -39,7 +39,28 @@ module.exports = class extends Generator {
     prompting() {
         let done = this.async();
         let self = this;
-        this.prompt([{
+        this.prompt([
+            {
+                type: 'list',
+                name: 'projectTechnology',
+                message: 'Which technology should be used?',
+                default: "water",
+                choices: [
+                    {
+                        name: "Water",
+                        value: "water"
+                    }, {
+                        name: "Spring 3.X",
+                        value: "spring"
+                    }, {
+                        name: "OSGi",
+                        value: "osgi"
+                    }, {
+                        name: "Quarkus",
+                        value: "quarkus"
+                    }]
+            },
+            {
             type: 'input',
             name: 'projectName',
             message: 'Project-Name',
@@ -57,7 +78,10 @@ module.exports = class extends Generator {
             type: 'input',
             name: 'projectVersion',
             message: 'Version',
-            default: "1.0.0"
+            default: "1.0.0",
+            when: function(answers){
+                return answers.projectTechnology !== "water"
+            }
         }, {
             type: 'list',
             name: "applicationType",
@@ -69,26 +93,7 @@ module.exports = class extends Generator {
                 name: "Integration application",
                 value: "service"
             }]
-        }, {
-            type: 'list',
-            name: 'projectTechnology',
-            message: 'Which technology should be used?',
-            default: "water",
-            choices: [
-                {
-                    name: "Water",
-                    value: "water"
-                }, {
-                    name: "Spring 3.X",
-                    value: "spring"
-                }, {
-                    name: "OSGi",
-                    value: "osgi"
-                }, {
-                    name: "Quarkus",
-                    value: "quarkus"
-                }]
-        },
+        }, 
         {
             type: 'confirm',
             name: 'hasModel',
@@ -134,7 +139,7 @@ module.exports = class extends Generator {
             message: 'Would you like to use Spring repository instead of spring Water default repositories?',
             default: true,
             when: function (answer) {
-                return (answer.projectTechnology === 'spring2' || answer.projectTechnology === 'spring3') && answer.applicationType === 'entity';
+                return (answer.projectTechnology === 'spring') && answer.applicationType === 'entity';
             }
         },
         {
@@ -153,6 +158,47 @@ module.exports = class extends Generator {
             default: function(answers){
                 return "/"+self.camelize(answers.projectName)+"s";
             }
+        },
+        {
+            type: 'confirm',
+            name: 'hasAuthentication',
+            message: 'do you want to add automatic login management to your rest services (@Login annotation) ?',
+            when: function (answer) {
+                return answer.hasRestServices === true;
+            },
+            default: function(answers){
+                return true;
+            }
+        },
+        {
+            type: 'confirm',
+            name: 'moreModules',
+            message: 'do you want to add other modules to have out of the box features?',
+            default: function(answers){
+                return false;
+            },
+        },
+        {
+            type: 'checkbox',
+            name: 'modules',
+            message: 'Please select modules you want to add yo your microservice ?',
+            when: function (answer) {
+                return answer.moreModules === true;
+            },
+            choices: [
+                {
+                    name: "User Integration - for querying user's services remotely",
+                    value: "group: 'it.water.user', name:'User-integration', version:project.waterVersion"
+                }, {
+                    name: "Role Integration - for querying role's services remotely",
+                    value: "group: 'it.water.role', name:'Role-integration', version:project.waterVersion"
+                }, {
+                    name: "Permission - to integrate permission management locally",
+                    value: "group: 'it.water.permission', name:'Permission-service', version:project.waterVersion"
+                }, {
+                    name: "Shared Entity Integration - for querying shared entity's services remotely",
+                    value: "group: 'it.water.shared.entity', name:'SharedEntity-service', version:project.waterVersion"
+                }]
         },
         {
             type: 'confirm',
@@ -198,6 +244,7 @@ module.exports = class extends Generator {
         ]).then((answers) => {
             let initialName = answers.projectName;
             this.projectTechnology = answers.projectTechnology;
+            this.log.info("MODULES CHOSEN: ",answers.modules)
             //forcing on jakarta maybe in the future can be different
             let validationLib = "jakarta"
             let persistenceLib = "jakarta"; 
@@ -224,7 +271,9 @@ module.exports = class extends Generator {
                 this.hasModel = false;
             }
 
-            this.projectVersion = answers.projectVersion;
+            //if not it remains the same as intialization project.waterVersion
+            if(this.projectTechnology !== "water")
+                this.projectVersion = answers.projectVersion;
             this.applicationTypeEntity = answers.applicationType === 'entity';
             let basePackageArr = this.projectGroupId.split(".");
 
@@ -255,6 +304,8 @@ module.exports = class extends Generator {
 
             this.projectConf = {
                 hasSonarqubeIntegration: answers.hasSonarqubeIntegration,
+                hasAuthentication:answers.hasAuthentication,
+                featuresModules: answers.modules,
                 applicationTypeEntity: this.applicationTypeEntity,
                 applicationType: answers.applicationType,
                 projectSuffix: this.projectSuffix,

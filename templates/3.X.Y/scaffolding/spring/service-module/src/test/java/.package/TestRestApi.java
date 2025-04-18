@@ -9,11 +9,12 @@ import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.boot.test.web.server.LocalServerPort;
 
-
-@SpringBootTest(classes = <%- projectSuffixUpperCase %>.class,
-        webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
+@SpringBootTest(classes = <%- projectSuffixUpperCase %>Application.class,
+        webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestPropertySource(properties = {
+        "water.rest.security.jwt.validate.by.jws=false",
         "water.rest.security.jwt.validate=false",
         "water.testMode=true"
 })
@@ -21,6 +22,9 @@ public class <%- projectSuffixUpperCase %>RestApiTest {
 
     @Autowired
     private ComponentRegistry componentRegistry;
+
+    @LocalServerPort
+    private int serverPort;
 
     @BeforeEach
     void impersonateAdmin() {
@@ -31,6 +35,9 @@ public class <%- projectSuffixUpperCase %>RestApiTest {
     
     @Karate.Test
     Karate restInterfaceTest() {
-        return Karate.run("classpath:karate");
+        return Karate.run("classpath:karate")
+                .systemProperty("webServerPort", String.valueOf(serverPort))
+                .systemProperty("host", "localhost")
+                .systemProperty("protocol", "http");
     }
 }

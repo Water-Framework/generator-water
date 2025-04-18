@@ -8,10 +8,6 @@ Import-Package: \
     org.slf4j.*,\
     org.apache.aries.jpa.*,\
     org.apache.aries.cdi.*,\
-    org.hibernate.proxy;version='[5,6)',\
-    org.hibernate.validator;version='${range;[=,+)}',\
-    org.hibernate.validator.*;version='${range;[=,+)}',\
-    org.hibernate.annotations;version='[5,6)',\
     javassist.util.proxy,\
 <% if(validationLib === 'javax') {	-%>
     javax.validation,\
@@ -36,6 +32,4 @@ Import-Package: \
 Export-Package: \
     <%-projectGroupId%>.*
 DynamicImport-Package: *
-Meta-Persistence: META-INF/persistence.xml
 -cdiannotations: *;discover=annotated_by_bean
--fixupmessages "Classes found in the wrong directory"; restrict:=error; is:=warning

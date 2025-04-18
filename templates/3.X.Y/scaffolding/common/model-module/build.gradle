@@ -7,9 +7,9 @@ dependencies {
 	//Atteo
 	implementation 'org.atteo.classindex:classindex:' + project.atteoClassIndexVersion
 	annotationProcessor('org.atteo.classindex:classindex:' + project.atteoClassIndexVersion)
-<% if(hasRestServices){ -%>
 	//Jackson
     implementation group: 'com.fasterxml.jackson.jaxrs', name: 'jackson-jaxrs-json-provider', version: project.jacksonVersion
+<% if(hasRestServices){ -%>
 	implementation 'it.water.service.rest:Rest-api:'+project.waterVersion
 <% } -%>
 	//jakarta persistence

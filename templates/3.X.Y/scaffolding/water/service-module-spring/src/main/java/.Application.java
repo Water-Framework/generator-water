@@ -1,4 +1,4 @@
-package <%-projectGroupId%>;
+package <%-projectGroupId%>.service;
 
 
 import it.water.implementation.spring.annotations.EnableWaterFramework;
@@ -11,12 +11,12 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 @SpringBootApplication
 @EnableWaterFramework
-@EnableJpaRepositories(basePackages = {"it.water.*", "it.water.<%-projectSuffixLowerCase%>.*"}, repositoryFactoryBeanClass = RepositoryFactory.class)
-@EntityScan({"it.water.*"})
-@ComponentScan({"it.water.*", "it.water.<%-projectSuffixLowerCase%>.*"})
+@EnableJpaRepositories(basePackages = {"it.water.*", "<%-projectGroupId%>.*"}, repositoryFactoryBeanClass = RepositoryFactory.class)
+@EntityScan({"it.water.*","<%-projectGroupId%>.*"})
+@ComponentScan({"it.water.*", "<%-projectGroupId%>.*"})
 public class <%-projectSuffixUpperCase%>Application {
     public static void main(String[] args) {
-        SpringApplication.run(<%-projectSuffixUpperCase%>Applicatio.class, args);
+        SpringApplication.run(<%-projectSuffixUpperCase%>Application.class, args);
     }
 
 }

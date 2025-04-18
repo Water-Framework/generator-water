@@ -9,7 +9,6 @@ module.exports = class extends Generator {
     constructor(args, opts) {
         super(args, opts);
         this.depCycleChecker = new DepCycleChecker();
-        
     }
 
 
@@ -29,8 +28,7 @@ module.exports = class extends Generator {
         this.depCycleChecker.checkDepCycles(true,this);
     }
 
-    install() {
-
+    async install() {
         let repoUsername = this.options.username;
         let repoPassword  = this.options.password;
         if(!repoUsername || !repoPassword)

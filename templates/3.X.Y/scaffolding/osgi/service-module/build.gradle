@@ -49,6 +49,13 @@ dependencies {
     implementation group: 'io.swagger', name: 'swagger-jaxrs', version: project.swaggerJaxRsVersion
 <%} -%>
 
+<%if(featuresModules != null && featuresModules.lenght > 0){-%>
+	//Adding Features modules
+		<% for (let i = 0; i < featuresModules.length; i++) { -%>
+	<%-featuresModules[i] %>
+		<% } -%>
+	<%}-%>
+
 	testImplementation group:'it.water.core',name:'Core-testing-utils',version:project.waterVersion
 	testAnnotationProcessor 'org.projectlombok:lombok:'+project.lombokVersion
 	testImplementation group: "org.apache.karaf.itests", name: "common", version: project.karafVersion

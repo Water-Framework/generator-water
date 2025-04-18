@@ -1,8 +1,10 @@
 
 package <%-servicePackage%>.rest.spring;
 
+import <%-servicePackage%>.rest.<%- projectSuffixUpperCase %>RestControllerImpl;
 import it.water.core.api.model.*;
 import it.water.core.api.repository.*;
+import it.water.core.api.repository.query.*;
 import <%-apiPackage%>.*;
 import <%-modelPackage%>.*;
 import org.springframework.web.bind.annotation.RestController;
@@ -16,31 +18,37 @@ import org.springframework.web.bind.annotation.RestController;
 public class <%- projectSuffixUpperCase %>SpringRestControllerImpl extends <%- projectSuffixUpperCase %>RestControllerImpl implements <%- projectSuffixUpperCase %>SpringRestApi {
     
     @Override
+    @SuppressWarnings("java:S1185") //disabling sonar because spring needs to override this method
     public <%- projectSuffixUpperCase %> save(<%- projectSuffixUpperCase %> entity) {
         return super.save(entity);
     }
 
     @Override
+    @SuppressWarnings("java:S1185") //disabling sonar because spring needs to override this method
     public <%- projectSuffixUpperCase %> update(<%- projectSuffixUpperCase %> entity) {
         return super.update(entity);
     }
 
     @Override
+    @SuppressWarnings("java:S1185") //disabling sonar because spring needs to override this method
     public void remove(long id) {
         super.remove(id);
     }
 
     @Override
+    @SuppressWarnings("java:S1185") //disabling sonar because spring needs to override this method
     public <%- projectSuffixUpperCase %> find(long id) {
         return super.find(id);
     }
 
     @Override
+    @SuppressWarnings("java:S1185") //disabling sonar because spring needs to override this method
     public PaginableResult<<%- projectSuffixUpperCase %>> findAll(Integer delta, Integer page, Query filter, QueryOrder order) {
         return super.findAll(delta, page, filter, order);
     }
 
     @Override
+    @SuppressWarnings("java:S1185") //disabling sonar because spring needs to override this method
     public PaginableResult<<%- projectSuffixUpperCase %>> findAll() {
         return super.findAll();
     }
