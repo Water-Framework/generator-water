@@ -301,10 +301,10 @@ module.exports = class extends Generator {
                 if(!restContextRoot.trim().startsWith("/"))
                     restContextRoot= "/"+restContextRoot
             }
-
+            let hasAuthentication = (answers.hasAuthentication)?answers.hasAuthentication:false
             this.projectConf = {
                 hasSonarqubeIntegration: answers.hasSonarqubeIntegration,
-                hasAuthentication:answers.hasAuthentication,
+                hasAuthentication:hasAuthentication,
                 featuresModules: answers.modules,
                 applicationTypeEntity: this.applicationTypeEntity,
                 applicationType: answers.applicationType,

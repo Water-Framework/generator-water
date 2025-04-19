@@ -291,7 +291,7 @@ class <%- projectSuffixUpperCase %>ApiTest implements Service {
     @Test
     void ownedResourceShouldBeAccessedOnlyByOwner() {
         TestRuntimeInitializer.getInstance().impersonate(<%- projectSuffixLowerCase %>EditorUser, runtime);
-        final <%- projectSuffixUpperCase %> entity = createCompany(401);
+        final <%- projectSuffixUpperCase %> entity = create<%- projectSuffixUpperCase %>(401);
         //saving as editor
         <%- projectSuffixUpperCase %> savedEntity = Assertions.assertDoesNotThrow(() -> this.<%- projectSuffixLowerCase %>Api.save(entity));
         Assertions.assertDoesNotThrow(() -> this.c<%- projectSuffixLowerCase %>Api.find(savedEntity.getId()));

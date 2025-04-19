@@ -5,8 +5,15 @@ dependencies {
 	//lombok
     implementation group: 'org.projectlombok', name: 'lombok', version: project.lombokVersion
     annotationProcessor 'org.projectlombok:lombok:'+project.lombokVersion
+	//Atteo
+	implementation 'org.atteo.classindex:classindex:' + project.atteoClassIndexVersion
+	annotationProcessor('org.atteo.classindex:classindex:' + project.atteoClassIndexVersion)
+	//Water basic modules
+	implementation group: "it.water.core", name: "Core-api", version: project.waterVersion
+	implementation group: "it.water.core", name:"Core-interceptors", version:project.waterVersion
 
 	testAnnotationProcessor 'org.projectlombok:lombok:'+project.lombokVersion
+	testAnnotationProcessor('org.atteo.classindex:classindex:' + project.atteoClassIndexVersion)
 	testImplementation 'org.mockito:mockito-core:4.6.1'
 	testImplementation 'org.mockito:mockito-junit-jupiter:4.6.1'
 	testImplementation 'org.junit.jupiter:junit-jupiter-api:' + project.junitJupiterVersion
