@@ -1,6 +1,6 @@
 {
   "name": "generator-water",
-  "version": "3.4.4",
+  "version": "3.4.5",
   "description": "Yeoman Generator for project Water Framework",
   "files": [
     "generators",
@@ -24,7 +24,7 @@
     "distributionRepoEnabled": true,
     "distributionRepoUpdateCheckUrl": "https://nexus.acsoftware.it/nexus/service/rest/v1/search",
     "distributionRepoName": "acs-npm-public",
-    "distributionRepoUrl": "https://nexus.acsoftware.it/nexus/repository/npm/",
+    "distributionRepoUrl": "https://nexus.acsoftware.it/nexus/repository/npm-acs-public-repo",
     "distributionRepoUpdateCheckUrlUsername": "",
     "distributionRepoUpdateCheckUrlPassword": "",
     "releaseNotesFile": "ReleaseNotes",
