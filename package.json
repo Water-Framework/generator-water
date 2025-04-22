@@ -1,6 +1,6 @@
 {
   "name": "generator-water",
-  "version": "3.4.2",
+  "version": "3.4.3",
   "description": "Yeoman Generator for project Water Framework",
   "files": [
     "generators",
@@ -68,7 +68,7 @@
   },
   "dependencies": {
     "abstract-syntax-tree": "^2.22.0",
-    "acs-abstract-generator": "5.0.5",
+    "acs-abstract-generator": "5.0.6",
     "acs-java-visitor": "1.1.3",
     "axios": "^1.8.4",
     "chalk": "^4.1.2",
