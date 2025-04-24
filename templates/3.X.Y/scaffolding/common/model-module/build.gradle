@@ -33,7 +33,6 @@ dependencies {
 	testImplementation 'org.atteo.classindex:classindex:' + project.atteoClassIndexVersion
 }
 
-<% if(publishModule){ -%>
 publishing {
     	publications {
         	hyperiot(MavenPublication) {
@@ -41,4 +40,3 @@ publishing {
         }
     }
  }
- <% } -%>

@@ -25,7 +25,6 @@ test {
 	useJUnitPlatform()
 }
 
-<% if(publishModule){ -%>
 publishing {
     	publications {
         	water(MavenPublication) {
@@ -33,4 +32,3 @@ publishing {
         	}
     }
  }
- <% } -%>
