@@ -6,6 +6,7 @@ module.exports = class extends Generator {
 
     constructor(args, opts) {
         super(args, opts);
+        this.entityName = "";
         this.projectName = "";
         this.projectSelected = "";
         this.projectSelectedGroupId = "";
@@ -29,30 +30,21 @@ module.exports = class extends Generator {
             name: 'project',
             message: 'Please select a project',
             choices: projects
+        },
+        {
+            type: 'input',
+            name: 'entityName',
+            message: 'Please insert entity name',
         }
         ]).then((answers) => {
             self.projectSelected = answers.project;
+            self.entityName = answers.entityName;
             done();
         });
     }
 
     configuring() {
-        this.log.ok("Starting creating rest module....\n");
-        let currentConf = this.getProjectConfiguration(this.projectSelected);
-        this.log.info(currentConf);
-        let modelName = "";
-        let modelNameLowerCase = "";
-        if(currentConf.applicationTypeEntity && currentConf.modelName){
-            modelName = currentConf.modelName;
-            modelName = currentConf.modelNameLowerCase;
-        } else {
-            modelName = currentConf.projectSuffixUpperCase;
-            modelNameLowerCase = currentConf.projectSuffixLowerCase;
-        }
-        currentConf.hasRestServices = true
-        currentConf.modelName = modelName
-        currentConf.modelNameLowerCase = modelNameLowerCase
-        this.generateRestClasses(currentConf,false);
+        //TODO ENTITY NAME
     }   
 
 

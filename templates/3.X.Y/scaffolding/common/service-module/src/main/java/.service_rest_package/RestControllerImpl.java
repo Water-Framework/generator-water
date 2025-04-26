@@ -9,10 +9,11 @@ import <%-modelPackage%>.*;
 
 <%if(applicationTypeEntity){ -%>
 import it.water.core.api.service.BaseEntityApi;
+import it.water.service.rest.persistence.BaseEntityRestApi;
 <% } -%>
 import it.water.core.api.service.rest.FrameworkRestController;
 import it.water.core.interceptors.annotations.*;
-import it.water.service.rest.persistence.BaseEntityRestApi;
+
 
 import lombok.*;
 
