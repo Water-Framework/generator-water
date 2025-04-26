@@ -328,7 +328,7 @@ module.exports = class extends AcsBaseGenerator {
             this.fs.copyTpl(serviceTemplatePath+"/src/main/java/.service_rest_package/RestControllerImpl.java", this.destinationPath(projectConf.projectServicePath)+projectConf.serviceRestPackagePath+"/"+modelName+"RestControllerImpl.java", projectConf);
             
             if(fs.existsSync(technologyTemplatePath+"/src/main/java/.service_rest_package/RestControllerImpl.java"))
-                this.fs.copyTpl(technologyTemplatePath+"/src/main/java/.service_rest_package/RestControllerImpl.java", this.destinationPath(projectConf.projectServicePath)+projectConf.serviceRestPackagePath+"/"+getModuleNamesCommaSeparated+"RestControllerImpl.java", projectConf);
+                this.fs.copyTpl(technologyTemplatePath+"/src/main/java/.service_rest_package/RestControllerImpl.java", this.destinationPath(projectConf.projectServicePath)+projectConf.serviceRestPackagePath+"/"+modelName+"RestControllerImpl.java", projectConf);
             
             if(projectConf.projectTechnology ===  "water") {
                 //Creating spring module also
@@ -345,6 +345,8 @@ module.exports = class extends AcsBaseGenerator {
 
             this.log.info("Creating Rest tests...")
             this.fs.copyTpl(serviceTemplatePath+"/src/test/java/.package/TestRestApi.java", this.destinationPath(projectConf.projectServicePath)+projectConf.projectTestPath+"/"+projectConf.projectSuffixUpperCase+"RestApiTest.java", projectConf);
+            if(fs.existsSync(technologyTemplatePath+"/src/test/java/.package/TestRestApi.java") && projectConf.hasRestServices)
+                this.fs.copyTpl(technologyTemplatePath+"/src/test/java/.package/TestRestApi.java", this.destinationPath(projectConf.projectServicePath)+projectConf.projectTestPath+"/"+projectConf.projectSuffixUpperCase+"RestApiTest.java", projectConf);
 
             if(!newProject){
                 this.fs.copyTpl(technologyTemplatePath+"/src/test/resources/karate",karatePath, projectConf);
