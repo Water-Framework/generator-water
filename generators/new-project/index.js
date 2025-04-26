@@ -17,6 +17,8 @@ module.exports = class extends Generator {
         this.applicationTypeEntity = true;
         this.projectTechnology = "water";
         this.springRepository = true;
+        this.modelName = "";
+        this.modelNameLowerCase = "";
         // Packages paths
         this.apiPackagePath = "";
         this.modelPackagePath = "";
@@ -104,6 +106,15 @@ module.exports = class extends Generator {
             }
         },
         {
+            type: 'input',
+            name: 'modelName',
+            message: 'Please insert model name?',
+            default: "MyEntityName",
+            when: function (answers) {
+                return (answers.applicationType === 'service' && answers.hasModel) || answers.applicationType === 'entity';
+            }
+        },
+        {
             type: 'confirm',
             name: 'isProtectedEntity',
             message: 'Is your aggregate model a "protected entity" so its access should be controlled by the Permission System?',
@@ -121,18 +132,6 @@ module.exports = class extends Generator {
                 return answer.applicationType === 'entity';
             }
         },
-        /*{
-            type: 'confirm',
-            name: 'automaticRepositories',
-            message: 'Would you like to use default implementation for CRUD repositories (only interfaces will be generated)?',
-            default: false,
-            when: function (answer) {
-                return answer.applicationType === 'entity';
-            },
-            default: function(){
-                return true;
-            }
-        },*/
         {
             type: 'confirm',
             name: 'springRepository',
@@ -270,12 +269,20 @@ module.exports = class extends Generator {
             } else {
                 this.hasModel = false;
             }
+            
 
             //if not it remains the same as intialization project.waterVersion
             if(this.projectTechnology !== "water")
                 this.projectVersion = answers.projectVersion;
             this.applicationTypeEntity = answers.applicationType === 'entity';
             let basePackageArr = this.projectGroupId.split(".");
+
+            if(this.hasModel && this.applicationTypeEntity){
+                this.modelName = this.capitalizeFirstLetter(this.camelize(answers.modelName));
+            } else {
+                this.modelName = this.projectSuffixUpperCase
+            }
+            this.modelNameLowerCase=this.lowerizeFirstLetter(this.modelName);
 
             let sourceFolderBasicPath = "/src/main/java/";
             let testFolderBasicPath = "/src/test/java/";
@@ -318,6 +325,8 @@ module.exports = class extends Generator {
                 hasRestServices: this.hasRestServices,
                 restContextRoot: restContextRoot,
                 hasModel: this.hasModel,
+                modelName: this.modelName,
+                modelNameLowerCase:this.modelNameLowerCase,
                 isProtectedEntity: answers.isProtectedEntity,
                 isOwnedEntity:answers.isOwnedEntity,
                 persistenceLib: persistenceLib,
@@ -390,6 +399,10 @@ module.exports = class extends Generator {
 
     generateServiceProject() {
         super.generateServiceProject(this.projectConf);
+    }
+
+    generateRestClasses(){
+        super.generateRestClasses(this.projectConf,true)
     }
 
     end() {

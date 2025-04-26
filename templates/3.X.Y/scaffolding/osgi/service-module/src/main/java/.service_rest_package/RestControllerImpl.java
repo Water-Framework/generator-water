@@ -18,7 +18,7 @@ import org.slf4j.LoggerFactory;
 <%
     let extendsDeclaration = "";
     if(applicationTypeEntity){
-        extendsDeclaration = "extends BaseEntityRestApi<"+projectSuffixUpperCase+">";
+        extendsDeclaration = "extends BaseEntityRestApi<"+modelName+">";
     }
 
 -%>
@@ -27,14 +27,14 @@ import org.slf4j.LoggerFactory;
  * Rest Api Class for <%- projectSuffixUpperCase %> entity.
  *
  */
-@FrameworkRestController(referredRestApi = <%- projectSuffixUpperCase %>RestApi.class)
-public class <%- projectSuffixUpperCase %>RestControllerImpl <%-extendsDeclaration%> implements <%- projectSuffixUpperCase %>RestApi {
-    private static Logger log = LoggerFactory.getLogger(<%- projectSuffixUpperCase %>RestControllerImpl.class.getName());
+@FrameworkRestController(referredRestApi = <%- modelName %>RestApi.class)
+public class <%- modelName %>RestControllerImpl <%-extendsDeclaration%> implements <%- modelName %>RestApi {
+    private static Logger log = LoggerFactory.getLogger(<%- modelName %>RestControllerImpl.class.getName());
 
     @Inject
     @Getter
     @Setter
-    private <%- projectSuffixUpperCase %>Api entityService;
+    private <%- modelName %>Api entityService;
 
     //todo add custom exposed methods or override CRUD operations
     //ATTENTION: use always <%- projectSuffixLowerCase %>Api object in order to ensure the user is requesting operations has the right privileges to do it

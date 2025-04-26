@@ -22,10 +22,10 @@ import org.springframework.context.annotation.ComponentScan;
 <% }-%>
 @EnableWaterFramework
 <%if(applicationTypeEntity) { -%>
-@EnableJpaRepositories(basePackages={"it.water.*","<%-projectGroupId%>.*"},repositoryFactoryBeanClass = RepositoryFactory.class)
-@EntityScan({"it.water","<%-projectGroupId%>.*"})
+@EnableJpaRepositories(basePackages={"it.water","<%-projectGroupId%>"},repositoryFactoryBeanClass = RepositoryFactory.class)
+@EntityScan({"it.water","<%-projectGroupId%>"})
 <% } -%>
-@ComponentScan({"it.water","<%-projectGroupId%>.*"})
+@ComponentScan({"it.water","<%-projectGroupId%>"})
 public class <%- projectSuffixUpperCase %>Application {
 	public static void main(String[] args) {
 		SpringApplication.run(<%- projectSuffixUpperCase %>Application.class, args);

@@ -17,7 +17,9 @@
 package <%-servicePackage%>.rest.spring;
 import <%-apiPackage%>.*;
 import <%-apiPackage%>.rest.*;
+<%if(hasModel){-%>
 import <%-modelPackage%>.*;
+<%}-%>
 
 import it.water.core.api.model.PaginableResult;
 import it.water.core.api.service.rest.FrameworkRestApi;
@@ -29,35 +31,37 @@ import org.springframework.http.HttpStatus;
 
 /**
  * @Author Aristide Cittadino
- * Interface exposing same methods of its parent <%- projectSuffixUpperCase %>RestApi but adding Spring annotations.
- * Swagger annotation should be found because they have been defined in the parent <%- projectSuffixUpperCase %>RestApi.
+ * Interface exposing same methods of its parent <%- modelName %>RestApi but adding Spring annotations.
+ * Swagger annotation should be found because they have been defined in the parent <%- modelName %>RestApi.
  */
 @RequestMapping("<%- restContextRoot %>")
 @FrameworkRestApi
-public interface <%- projectSuffixUpperCase %>SpringRestApi extends <%- projectSuffixUpperCase %>RestApi {
+public interface <%- modelName %>SpringRestApi extends <%- modelName %>RestApi {
+    <%if(applicationTypeEntity){-%>
     @LoggedIn
     @PostMapping
     @JsonView(WaterJsonView.Public.class)
-    <%- projectSuffixUpperCase %> save(@RequestBody <%- projectSuffixUpperCase %>  <%- projectSuffixLowerCase %>);
+    <%- modelName %> save(@RequestBody <%- modelName %>  <%- modelNameLowerCase %>);
 
     @LoggedIn
     @PutMapping
     @JsonView(WaterJsonView.Public.class)
-    <%- projectSuffixUpperCase %> update(@RequestBody <%- projectSuffixUpperCase %> <%- projectSuffixLowerCase %>);
+    <%- modelName %> update(@RequestBody <%- modelName %> <%- modelNameLowerCase %>);
 
     @LoggedIn
     @GetMapping("/{id}")
     @JsonView(WaterJsonView.Public.class)
-    <%- projectSuffixUpperCase %> find(@PathVariable("id") long id);
+    <%- modelName %> find(@PathVariable("id") long id);
 
     @LoggedIn
     @GetMapping
     @JsonView(WaterJsonView.Public.class)
-    PaginableResult<<%- projectSuffixUpperCase %>> findAll();
+    PaginableResult<<%- modelName %>> findAll();
 
     @LoggedIn
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @JsonView(WaterJsonView.Public.class)
     void remove(@PathVariable("id") long id);
+    <%}-%>
 }

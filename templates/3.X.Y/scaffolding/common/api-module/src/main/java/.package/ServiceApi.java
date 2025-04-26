@@ -7,6 +7,6 @@ import it.water.core.api.service.BaseApi;
  * This interface defines the externally exposed methods and allows interaction with them through a permission system.
  *
  */
-public interface <%- projectSuffixUpperCase %>Api extends BaseApi {
+public interface <%- modelName %>Api extends BaseApi {
 
 }

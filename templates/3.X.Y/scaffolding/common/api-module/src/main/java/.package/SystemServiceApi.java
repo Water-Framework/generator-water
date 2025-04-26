@@ -8,6 +8,6 @@ import it.water.core.api.service.BaseSystemApi;
  * This interface defines the internally exposed methods allows interaction with them bypassing permission system.
  * 
  */
-public interface <%- projectSuffixUpperCase %>SystemApi extends BaseSystemApi {
+public interface <%- modelName %>SystemApi extends BaseSystemApi {
 
 }
