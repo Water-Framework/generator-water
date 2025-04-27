@@ -14,7 +14,7 @@ dependencies {
 	//jakarta persistence
 	implementation group:'jakarta.persistence', name:'jakarta.persistence-api',version: project.jakartaPersistenceVersion
 	//Water jakarta persistence
-	implementation group:'it.water.repository.jpa', name:'JpaRepository-api:', version:project.waterVersion
+	implementation group:'it.water.repository.jpa', name:'JpaRepository-api', version:project.waterVersion
 <% } -%>
 <% if(hasRestServices){ -%>
 	//Rest services
