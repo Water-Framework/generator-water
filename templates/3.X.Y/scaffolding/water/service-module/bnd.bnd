@@ -5,7 +5,7 @@ Import-Package: \
     org.osgi.framework.*,\
     org.osgi.service.*,\
     org.osgi.util.*,\
-    org.slf4j.*,\
+    org.slf4j,\
     org.apache.aries.jpa.*,\
     org.apache.aries.cdi.*,\
     javassist.util.proxy,\

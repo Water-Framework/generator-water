@@ -21,7 +21,7 @@ dependencies {
 <%if(applicationTypeEntity) {-%>
 	implementation 'org.hibernate:hibernate-core:'+project.hibernateVersion
 	//jakarta persistence
-	implementation 'jakarta.persistence:jakarta.persistence-api:'+project.jakartaPersistenceVersion
+	implementation group:'jakarta.persistence', name:'jakarta.persistence-api',version: project.jakartaPersistenceVersion
 	//Water javax persistence
 	implementation 'it.water.repository.jpa:JpaRepository-osgi:'+project.waterVersion
 	implementation group: 'jakarta.transaction', name: 'jakarta.transaction-api', version: project.jakartaTransactionApiVersion

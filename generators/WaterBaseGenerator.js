@@ -54,6 +54,21 @@ module.exports = class extends AcsBaseGenerator {
         return this.config.get("workspaceTechnology");
     }
 
+    mustBeInWorkspace() {
+        let currentDir = process.cwd();
+        let parentDir = path.dirname(currentDir);
+        while (true) {
+            const yoRcPath = path.join(parentDir, '.yo-rc.json');
+            parentDir = path.dirname(parentDir);
+            if (fs.existsSync(yoRcPath)) {
+                console.error(`You must be in your workspace! please move to this directory or remove wrong .yo-rc file ${parentDir}.`);
+                process.exit(1);
+            } else {
+                return;
+            }
+        }
+    }
+
     getWaterTemplatePath(currentVersion) {
         if (!currentVersion)
             currentVersion = this.getWaterFrameworkVersion();
@@ -167,9 +182,23 @@ module.exports = class extends AcsBaseGenerator {
             //Overriding eventually with specific technologies files
             this.fs.copyTpl(technologyTemplatePath, this.destinationPath(finalPath), projectConf);
         }
+
+        this.addEntityModel(projectConf, modelName);
+
         if (fs.existsSync(technologyTemplatePath + "/.yo-rc.json"))
             this.fs.copyTpl(technologyTemplatePath + "/.yo-rc.json", this.destinationPath(finalPath) + "/.yo-rc.json", projectConf);
 
+        this.log.ok("Model Project created succesfully!");
+    }
+
+    addEntityModel(projectConf, modelName) {
+        let finalPath = projectConf.projectModelPath;
+        projectConf.modelName = modelName;
+        let technologyTemplatePath = this.getWaterTemplatePath(this.waterVersion) + "/scaffolding/" + projectConf.projectTechnology + "/model-module";
+        if (projectConf.projectTechnology !== "water") {
+            finalPath = projectConf.projectServicePath;
+        }
+        let modelTemplatePath = this.getWaterTemplatePath(this.waterVersion) + "/scaffolding/common/model-module";
         if (projectConf.hasModel || projectConf.applicationTypeEntity) {
             this.log.info("Creating Entity ...")
             this.fs.copyTpl(modelTemplatePath + "/src/main/java/.package/Entity.java", this.destinationPath(finalPath + "/" + projectConf.modelPackagePath + "/" + modelName + ".java"), projectConf);
@@ -177,7 +206,6 @@ module.exports = class extends AcsBaseGenerator {
             if (fs.existsSync(technologyTemplatePath + "/src/main/java/.package/Entity.java"))
                 this.fs.copyTpl(technologyTemplatePath + "/src/main/java/.package/Entity.java", this.destinationPath(finalPath + "/" + projectConf.modelPackagePath + "/" + modelName + ".java"), projectConf);
         }
-        this.log.ok("Model Project created succesfully!");
     }
 
     generateApiProject(projectConf) {
@@ -205,16 +233,7 @@ module.exports = class extends AcsBaseGenerator {
         if (fs.existsSync(technologyTemplatePath + "/.yo-rc.json"))
             this.fs.copyTpl(technologyTemplatePath + "/.yo-rc.json", this.destinationPath(finalPath) + "/.yo-rc.json", projectConf);
         if (projectConf.applicationTypeEntity) {
-            this.log.info("Creating Entity Api...")
-            this.fs.copyTpl(apiTemplatePath + "/src/main/java/.package/EntityApi.java", this.destinationPath(finalPath + "/" + projectConf.apiPackagePath + "/" + modelName + "Api.java"), projectConf);
-            this.log.info("Creating Entity System Api...")
-            this.fs.copyTpl(apiTemplatePath + "/src/main/java/.package/SystemEntityApi.java", this.destinationPath(finalPath + "/" + projectConf.apiPackagePath + "/" + modelName + "SystemApi.java"), projectConf);
-            this.log.info("Creating Repository Interface...")
-            this.fs.copyTpl(apiTemplatePath + "/src/main/java/.package/RepoInterface.java", this.destinationPath(finalPath + "/" + projectConf.apiPackagePath + "/" + modelName + "Repository.java"), projectConf);
-            if (technologyTemplatePathExists) {
-                //overriding with specific technology
-                this.fs.copyTpl(technologyTemplatePath + "/src/main/java/.package/RepoInterface.java", this.destinationPath(finalPath + "/" + projectConf.apiPackagePath + "/" + modelName + "Repository.java"), projectConf);
-            }
+            this.addEntityServices(projectConf, modelName)
         } else {
             this.fs.copyTpl(apiTemplatePath + "/src/main/java/.package/ServiceApi.java", this.destinationPath(finalPath + "/" + projectConf.apiPackagePath + "/" + modelName + "Api.java"), projectConf);
             this.fs.copyTpl(apiTemplatePath + "/src/main/java/.package/SystemServiceApi.java", this.destinationPath(finalPath + "/" + projectConf.apiPackagePath + "/" + modelName + "SystemApi.java"), projectConf);
@@ -228,6 +247,32 @@ module.exports = class extends AcsBaseGenerator {
         }
 
         this.log.ok("Api Project created succesfully!");
+    }
+
+    addEntityServices(projectConf, modelName, isNewProject) {
+        projectConf.modelName = modelName;
+        let finalPath = projectConf.projectApiPath;
+        let buildGradlePath = this.destinationPath(finalPath) + "/build.gradle";
+        let apiTemplatePath = this.getWaterTemplatePath(this.waterVersion) + "/scaffolding/common/api-module";
+        let technologyTemplatePath = this.getWaterTemplatePath(this.waterVersion) + "/scaffolding/" + projectConf.projectTechnology + "/api-module";
+        let technologyTemplatePathExists = fs.existsSync(technologyTemplatePath);
+        this.log.info("Creating Entity Api...")
+        this.fs.copyTpl(apiTemplatePath + "/src/main/java/.package/EntityApi.java", this.destinationPath(finalPath + "/" + projectConf.apiPackagePath + "/" + modelName + "Api.java"), projectConf);
+        this.log.info("Creating Entity System Api...")
+        this.fs.copyTpl(apiTemplatePath + "/src/main/java/.package/SystemEntityApi.java", this.destinationPath(finalPath + "/" + projectConf.apiPackagePath + "/" + modelName + "SystemApi.java"), projectConf);
+        this.log.info("Creating Repository Interface...")
+        this.fs.copyTpl(apiTemplatePath + "/src/main/java/.package/RepoInterface.java", this.destinationPath(finalPath + "/" + projectConf.apiPackagePath + "/" + modelName + "Repository.java"), projectConf);
+        if (technologyTemplatePathExists) {
+            //overriding with specific technology
+            this.fs.copyTpl(technologyTemplatePath + "/src/main/java/.package/RepoInterface.java", this.destinationPath(finalPath + "/" + projectConf.apiPackagePath + "/" + modelName + "Repository.java"), projectConf);
+        }
+
+        if (!isNewProject) {
+            this.addGradleInternalDependency(buildGradlePath, "project (\":" + projectConf.projectName + "-model\")")
+            this.addGradleDependency(buildGradlePath, "jakarta.persistence", "jakarta.persistence-api", "project.jakartaPersistenceVersion", true);
+            this.addGradleDependency(buildGradlePath, "it.water.repository.jpa", "JpaRepository-api", "project.waterVersion", true);
+            this.addGradleDependency(buildGradlePath, "it.water.repository", "Repository-entity", "project.waterVersion", true);
+        }
     }
 
     generateServiceProject(projectConf) {
@@ -251,6 +296,44 @@ module.exports = class extends AcsBaseGenerator {
         if (fs.existsSync(technologyTemplatePath + "/.yo-rc.json"))
             this.fs.copyTpl(technologyTemplatePath + "/.yo-rc.json", this.destinationPath(projectConf.projectServicePath) + "/.yo-rc.json", projectConf);
 
+        this.createServiceLayerApi(projectConf, modelName, true)
+
+        if (projectConf.projectTechnology === "spring") {
+            //using the same destination path for tests, in order to cover also spring requirements
+            this.log.info("Generating Spring application...")
+            this.fs.copyTpl(technologyTemplatePath + "/src/main/java/.service_package/Application.java", this.destinationPath(projectConf.projectServicePath) + projectConf.projectBasePath + "/" + projectConf.projectSuffixUpperCase + "Application.java", projectConf);
+            let testMetaInfFolder = this.destinationPath(projectConf.projectServicePath) + "/src/test/resources/META-INF";
+            let testAppPropFile = this.destinationPath(projectConf.projectServicePath) + "/src/test/resources/it.water.application.properties";
+            let certsPath = this.destinationPath(projectConf.projectServicePath) + "/src/test/resources/certs";
+            this.log.info("Removing " + testMetaInfFolder);
+            this.fs.delete(testMetaInfFolder, { recursive: true, force: true });
+            this.log.info("Removing " + testAppPropFile);
+            this.fs.delete(testAppPropFile, { force: true });
+            this.log.info("Removing " + certsPath);
+            this.fs.delete(certsPath, { recursive: true, force: true })
+
+        } else if (projectConf.projectTechnology === "osgi") {
+            this.fs.copyTpl(technologyTemplatePath + "/src/test/java/.package/TestConfiguration.java", this.destinationPath(projectConf.projectServicePath) + projectConf.projectTestPath + "/" + projectConf.projectSuffixUpperCase + "TestConfiguration.java", projectConf);
+            //removing persistence.xml from the common template
+            let persistenceXml = this.destinationPath(projectConf.projectServicePath) + "/src/test/resources/META-INF/persistence.xml";
+            //removing app properties which is not used
+            let appProperties = this.destinationPath(projectConf.projectServicePath) + "/src/test/resources/it.water.application.properties";
+            //removing certificates path
+            let certsPath = this.destinationPath(projectConf.projectServicePath) + "/src/test/resources/certs";
+            this.log.info("Removing " + persistenceXml);
+            this.fs.delete(persistenceXml, { recursive: true, force: true });
+            this.log.info("Removing " + appProperties);
+            this.fs.delete(appProperties, { recursive: true, force: true })
+            this.log.info("Removing " + certsPath);
+            this.fs.delete(certsPath, { recursive: true, force: true })
+        }
+
+        this.log.ok("Service module created succesfully!");
+    }
+
+    createServiceLayerApi(projectConf, modelName, isNewProject) {
+        let serviceTemplatePath = this.getWaterTemplatePath(this.waterVersion) + "/scaffolding/common/service-module";
+        let technologyTemplatePath = this.getWaterTemplatePath(this.waterVersion) + "/scaffolding/" + projectConf.projectTechnology + "/service-module";
         if (projectConf.applicationTypeEntity) {
             this.log.info("Creating Persistence Layer...")
             this.log.info("Creating repositories implementation...");
@@ -276,37 +359,17 @@ module.exports = class extends AcsBaseGenerator {
 
         //Overriding tests with specific technology
         if (fs.existsSync(technologyTemplatePath + "/src/test/java/.package/TestApi.java"))
-            this.fs.copyTpl(technologyTemplatePath + "/src/test/java/.package/TestApi.java", this.destinationPath(projectConf.projectServicePath) + projectConf.projectTestPath + "/" + projectConf.projectSuffixUpperCase + "ApiTest.java", projectConf);
+            this.fs.copyTpl(technologyTemplatePath + "/src/test/java/.package/TestApi.java", this.destinationPath(projectConf.projectServicePath) + projectConf.projectTestPath + "/" + modelName + "ApiTest.java", projectConf);
 
-        if (projectConf.projectTechnology === "spring") {
-            //using the same destination path for tests, in order to cover also spring requirements
-            this.log.info("Generating Spring application...")
-            this.fs.copyTpl(technologyTemplatePath + "/src/main/java/.service_package/Application.java", this.destinationPath(projectConf.projectServicePath) + projectConf.projectBasePath + "/" + projectConf.projectSuffixUpperCase + "Application.java", projectConf);
-            let testMetaInfFolder = this.destinationPath(projectConf.projectServicePath) + "/src/test/resources/META-INF";
-            let testAppPropFile = this.destinationPath(projectConf.projectServicePath) + "/src/test/resources/it.water.application.properties";
-            let certsPath = this.destinationPath(projectConf.projectServicePath) + "/src/test/resources/certs";
-            this.log.info("Removing " + testMetaInfFolder);
-            this.fs.delete(testMetaInfFolder, { recursive: true, force: true });
-            this.log.info("Removing " + testAppPropFile);
-            this.fs.delete(testAppPropFile, { force: true });
-            this.log.info("Removing " + certsPath);
-            this.fs.delete(certsPath, { recursive: true, force: true })
-        } else if (projectConf.projectTechnology === "osgi") {
-            this.fs.copyTpl(technologyTemplatePath + "/src/test/java/.package/TestConfiguration.java", this.destinationPath(projectConf.projectServicePath) + projectConf.projectTestPath + "/" + projectConf.projectSuffixUpperCase + "TestConfiguration.java", projectConf);
-            //removing persistence.xml from the common template
-            let persistenceXml = this.destinationPath(projectConf.projectServicePath) + "/src/test/resources/META-INF/persistence.xml";
-            //removing app properties which is not used
-            let appProperties = this.destinationPath(projectConf.projectServicePath) + "/src/test/resources/it.water.application.properties";
-            //removing certificates path
-            let certsPath = this.destinationPath(projectConf.projectServicePath) + "/src/test/resources/certs";
-            this.log.info("Removing " + persistenceXml);
-            this.fs.delete(persistenceXml, { recursive: true, force: true });
-            this.log.info("Removing " + appProperties);
-            this.fs.delete(appProperties, { recursive: true, force: true })
-            this.log.info("Removing " + certsPath);
-            this.fs.delete(certsPath, { recursive: true, force: true })
+        if(!isNewProject){
+            let buildGradlePath = this.destinationPath(projectConf.projectServicePath)+"/build.gradle";
+            this.addGradleDependency(buildGradlePath, "it.water.repository.jpa", "JpaRepository-api", "project.waterVersion", true);
+            this.addGradleDependency(buildGradlePath, "jakarta.transaction", "jakarta.transaction-api", "project.jakartaTransactionApiVersion", true);
+            this.addGradleDependency(buildGradlePath, "jakarta.persistence", "jakarta.persistence-api", "project.jakartaPersistenceVersion", true);
+            this.addGradleDependency(buildGradlePath, "it.water.repository", "Repository-entity", "project.waterVersion", true);
+            this.addGradleDependency(buildGradlePath, "it.water.repository", "Repository-persistence", "project.waterVersion", true);
+            this.addGradleDependency(buildGradlePath, "it.water.repository", "Repository-service", "project.waterVersion", true);
         }
-        this.log.ok("Service module created succesfully!");
     }
 
     generateRestClasses(projectConf, newProject) {
@@ -354,13 +417,13 @@ module.exports = class extends AcsBaseGenerator {
             this.fs.copyTpl(serviceTemplatePath + "/src/test/java/.package/TestRestApi.java", this.destinationPath(projectConf.projectServicePath) + projectConf.projectTestPath + "/" + projectConf.projectSuffixUpperCase + "RestApiTest.java", projectConf);
             if (fs.existsSync(technologyTemplatePath + "/src/test/java/.package/TestRestApi.java") && projectConf.hasRestServices)
                 this.fs.copyTpl(technologyTemplatePath + "/src/test/java/.package/TestRestApi.java", this.destinationPath(projectConf.projectServicePath) + projectConf.projectTestPath + "/" + projectConf.projectSuffixUpperCase + "RestApiTest.java", projectConf);
-
+            //Copying model feature test
+            this.fs.copyTpl(serviceTemplatePath + "/src/test/resources/karate/entity.feature", karatePath+"/"+modelName+"-crud.feature", projectConf);
             if (!newProject) {
-                this.fs.copyTpl(serviceTemplatePath + "/src/test/resources/karate", karatePath, projectConf);
                 this.fs.copyTpl(serviceTemplatePath + "/src/test/resources/karate-config.js", karateConfigPath, projectConf);
-                let buildGradlePath = this.destinationPath(finalPath) +"/build.gradle";
-                this.addGradleDependency(buildGradlePath,"it.water.service.rest","Rest-api","project.waterVersion",true);
-                this.addGradleDependency(buildGradlePath,"io.swagger","swagger-jaxrs","project.swaggerJaxRsVersion",true);
+                let buildGradlePath = this.destinationPath(finalPath) + "/build.gradle";
+                this.addGradleDependency(buildGradlePath, "it.water.service.rest", "Rest-api", "project.waterVersion", true);
+                this.addGradleDependency(buildGradlePath, "io.swagger", "swagger-jaxrs", "project.swaggerJaxRsVersion", true);
             }
             this.log.ok("Rest classes created succesfully!");
         } else {
@@ -371,8 +434,6 @@ module.exports = class extends AcsBaseGenerator {
             this.log.ok("No Rest configuration found, skipping...");
         }
     }
-
-
 
     launchProjectsBuild(projectsName) {
         let results = []
@@ -571,18 +632,18 @@ module.exports = class extends AcsBaseGenerator {
         return status;
     }
 
-    addGradleDependency(gradlePath,group, artifact, version,versionIsVariable) {
-        this.log.info("Searching build.gradle in "+gradlePath)
+    addGradleDependency(gradlePath, group, artifact, version, versionIsVariable) {
+        this.log.info("Searching build.gradle in " + gradlePath)
         if (!fs.existsSync(gradlePath)) {
             this.log('build.gradle not found.');
             return;
         }
 
         let content = this.fs.read(gradlePath);
-        
-        let dependencyToAdd = "implementation group:\""+group+"\", name:\""+artifact+"\",version:\""+version+"\"";
-        if(versionIsVariable)
-            dependencyToAdd = "implementation group:\""+group+"\", name:\""+artifact+"\",version: "+version;
+
+        let dependencyToAdd = "\timplementation group:\"" + group + "\", name:\"" + artifact + "\",version:\"" + version + "\"";
+        if (versionIsVariable)
+            dependencyToAdd = "\timplementation group:\"" + group + "\", name:\"" + artifact + "\",version: " + version;
 
         // Find dependecies section
         const dependenciesRegex = /dependencies\s*\{([\s\S]*?)\}/m;
@@ -592,13 +653,45 @@ module.exports = class extends AcsBaseGenerator {
             const dependenciesContent = match[1];
             // Check dependency already exists
             if (dependenciesContent.includes(dependencyToAdd)) {
-                this.log.error('Dep '+group+":"+artifact+":"+version+" alredy present!");
+                this.log.error('Dep ' + group + ":" + artifact + ":" + version + " alredy present!");
             } else {
                 //Adding dependency
                 const updatedDependencies = dependenciesContent.trimEnd() + `\n${dependencyToAdd}\n`;
-                content = content.replace(dependenciesRegex, `dependencies {\n${updatedDependencies}}`);
+                content = content.replace(dependenciesRegex, `dependencies {${updatedDependencies}}`);
                 this.fs.write(gradlePath, content);
-                this.log.ok('Dep '+group+":"+artifact+":"+version+" alredy present!");
+                this.log.ok('Dep ' + group + ":" + artifact + ":" + version + " added!");
+            }
+        } else {
+            this.log('No deps found!');
+        }
+    }
+
+    addGradleInternalDependency(gradlePath, projectGradlePath) {
+        this.log.info("Searching build.gradle in " + gradlePath)
+        if (!fs.existsSync(gradlePath)) {
+            this.log('build.gradle not found.');
+            return;
+        }
+
+        let content = this.fs.read(gradlePath);
+
+        let dependencyToAdd = "implementation " + projectGradlePath;
+
+        // Find dependecies section
+        const dependenciesRegex = /dependencies\s*\{([\s\S]*?)\}/m;
+        const match = content.match(dependenciesRegex);
+
+        if (match) {
+            const dependenciesContent = match[1];
+            // Check dependency already exists
+            if (dependenciesContent.includes(dependencyToAdd)) {
+                this.log.error('Dep ' + projectGradlePath + ' alredy present!');
+            } else {
+                //Adding dependency
+                const updatedDependencies = dependenciesContent.trimEnd() + `\n\t${dependencyToAdd}\n`;
+                content = content.replace(dependenciesRegex, `dependencies {${updatedDependencies}}`);
+                this.fs.write(gradlePath, content);
+                this.log.error('Dep ' + projectGradlePath + ' Added !');
             }
         } else {
             this.log('No deps found!');

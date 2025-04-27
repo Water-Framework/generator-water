@@ -13,7 +13,7 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok:' + project.lombokVersion
 <%if(applicationTypeEntity) {-%>
 	//Water Jakarta persistence
-	implementation 'it.water.repository.jpa:JpaRepository-api:'+project.waterVersion
+	implementation group:'it.water.repository.jpa', name:'JpaRepository-api', version: project.waterVersion
 	implementation group: 'jakarta.transaction', name: 'jakarta.transaction-api', version: project.jakartaTransactionApiVersion
 	implementation group: 'jakarta.persistence', name: 'jakarta.persistence-api', version: project.jakartaPersistenceVersion
 	//Water Persistence

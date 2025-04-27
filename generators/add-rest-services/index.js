@@ -53,6 +53,9 @@ module.exports = class extends Generator {
         currentConf.modelName = modelName
         currentConf.modelNameLowerCase = modelNameLowerCase
         this.generateRestClasses(currentConf,false);
+        this.log.info("Upgrading project ",this.projectSelected,currentConf)
+        this.setProjectConfiguration(this.projectSelected,currentConf);
+        this.saveProjectsConfiguration();
     }   
 
 

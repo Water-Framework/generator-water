@@ -8,6 +8,7 @@ module.exports = class extends Generator {
     }
 
     initializing() {
+        this.mustBeInWorkspace();
         super.printSplash();
         if(!this.options.skipUpdate)
             this.checkUpdates();
