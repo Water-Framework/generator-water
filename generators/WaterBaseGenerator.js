@@ -61,7 +61,7 @@ module.exports = class extends AcsBaseGenerator {
             const yoRcPath = path.join(parentDir, '.yo-rc.json');
             parentDir = path.dirname(parentDir);
             if (fs.existsSync(yoRcPath)) {
-                console.error(`You must be in your workspace! please move to this directory or remove wrong .yo-rc file ${parentDir}.`);
+                this.log.error(`You must be in your workspace! please move to this directory or remove wrong .yo-rc file ${parentDir}.`);
                 process.exit(1);
             } else {
                 return;
