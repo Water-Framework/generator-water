@@ -147,14 +147,6 @@ export default class extends AcsBaseGenerator {
         ];
     }
 
-    updateProjectConfOnGeneration(projectConf) {
-        this.log.info("updating: " + this.destinationPath("modules/" + projectConf.projectName + "/.yo-rc.json"));
-        let confUpdate = {
-            "generator-Water": projectConf
-        }
-        this.writeToFile(JSON.stringify(confUpdate, null, '\t'), this.destinationPath("modules/" + projectConf.projectName + "/.yo-rc.json"));
-    }
-
     createBasicProjectFiles(destFolder, conf) {
         this.log.info("Creating basic project files...")
         let templatePath = this.getWaterTemplatePath(this.waterVersion) + "/scaffolding/common/empty-module";
@@ -192,6 +184,7 @@ export default class extends AcsBaseGenerator {
     }
 
     addEntityModel(projectConf, modelName) {
+        this.upgradeConfEntitiesList(projectConf.projectName, projectConf.modelName, projectConf.isProtectedEntity, projectConf.isOwnedEntity);
         let finalPath = projectConf.projectModelPath;
         projectConf.modelName = modelName;
         let technologyTemplatePath = this.getWaterTemplatePath(this.waterVersion) + "/scaffolding/" + projectConf.projectTechnology + "/model-module";
@@ -361,8 +354,8 @@ export default class extends AcsBaseGenerator {
         if (fs.existsSync(technologyTemplatePath + "/src/test/java/.package/TestApi.java"))
             this.fs.copyTpl(technologyTemplatePath + "/src/test/java/.package/TestApi.java", this.destinationPath(projectConf.projectServicePath) + projectConf.projectTestPath + "/" + modelName + "ApiTest.java", projectConf);
 
-        if(!isNewProject){
-            let buildGradlePath = this.destinationPath(projectConf.projectServicePath)+"/build.gradle";
+        if (!isNewProject) {
+            let buildGradlePath = this.destinationPath(projectConf.projectServicePath) + "/build.gradle";
             this.addGradleDependency(buildGradlePath, "it.water.repository.jpa", "JpaRepository-api", "project.waterVersion", true);
             this.addGradleDependency(buildGradlePath, "jakarta.transaction", "jakarta.transaction-api", "project.jakartaTransactionApiVersion", true);
             this.addGradleDependency(buildGradlePath, "jakarta.persistence", "jakarta.persistence-api", "project.jakartaPersistenceVersion", true);
@@ -384,41 +377,46 @@ export default class extends AcsBaseGenerator {
         if (projectConf.projectTechnology !== "water") {
             finalPath = projectConf.projectServicePath;
         }
-        let modelName = projectConf.modelName;
+
         if (projectConf.hasRestServices) {
             this.log.info("Creating Rest Layer...")
             this.log.info("Creating Rest Api Interface...")
+            for (let idx in projectConf.entities) {
+                projectConf.modelName = projectConf.entities[idx].modelName;
+                projectConf.modelNameLowerCase = this.lowerizeFirstLetter(projectConf.entities[idx].modelName);
+                let modelName = projectConf.modelName;
+                this.fs.copyTpl(apiTemplatePath + "/src/main/java/.package/RestApi.java", this.destinationPath(finalPath) + projectConf.apiPackagePath + "/rest/" + modelName + "RestApi.java", projectConf);
+                if (technologyTemplateRestPathExists) {
+                    this.fs.copyTpl(technologyTemplatePath + "/src/main/java/.package/RestApi.java", this.destinationPath(finalPath) + projectConf.apiPackagePath + "/rest/" + modelName + "RestApi.java", projectConf);
+                }
 
-            this.fs.copyTpl(apiTemplatePath + "/src/main/java/.package/RestApi.java", this.destinationPath(finalPath) + projectConf.apiPackagePath + "/rest/" + modelName + "RestApi.java", projectConf);
-            if (technologyTemplateRestPathExists) {
-                this.fs.copyTpl(technologyTemplatePath + "/src/main/java/.package/RestApi.java", this.destinationPath(finalPath) + projectConf.apiPackagePath + "/rest/" + modelName + "RestApi.java", projectConf);
+                this.log.info("Creating Rest Api Implementations...")
+                this.fs.copyTpl(serviceTemplatePath + "/src/main/java/.service_rest_package/RestControllerImpl.java", this.destinationPath(projectConf.projectServicePath) + projectConf.serviceRestPackagePath + "/" + modelName + "RestControllerImpl.java", projectConf);
+
+                if (fs.existsSync(technologyTemplatePath + "/src/main/java/.service_rest_package/RestControllerImpl.java"))
+                    this.fs.copyTpl(technologyTemplatePath + "/src/main/java/.service_rest_package/RestControllerImpl.java", this.destinationPath(projectConf.projectServicePath) + projectConf.serviceRestPackagePath + "/" + modelName + "RestControllerImpl.java", projectConf);
+
+                if (projectConf.projectTechnology === "water") {
+                    //Creating spring module also
+                    let serviceSpringTemplatePath = this.getWaterTemplatePath(this.waterVersion) + "/scaffolding/water/service-module-spring";
+                    let serviceSpringDestinationPath = this.destinationPath(projectConf.projectServicePath) + "-spring";
+                    this.log.info("Starting from spring tempalte in " + serviceSpringTemplatePath + " and copying to ");
+                    this.fs.copyTpl(serviceSpringTemplatePath, serviceSpringDestinationPath, projectConf);
+                    //Copying java classes
+                    this.fs.copyTpl(serviceSpringTemplatePath + "/src/main/java/.spring_api_rest_package/SpringRestApi.java", serviceSpringDestinationPath + projectConf.serviceRestPackagePath + "/spring/" + modelName + "SpringRestApi.java", projectConf);
+                    this.fs.copyTpl(serviceSpringTemplatePath + "/src/main/java/.spring_service_rest_package/SpringRestControllerImpl.java", serviceSpringDestinationPath + projectConf.serviceRestPackagePath + "/spring/" + modelName + "SpringRestControllerImpl.java", projectConf);
+                    this.fs.copyTpl(serviceSpringTemplatePath + "/src/main/java/.Application.java", serviceSpringDestinationPath + projectConf.servicePackagePath + "/" + projectConf.projectSuffixUpperCase + "Application.java", projectConf);
+                    this.fs.copyTpl(serviceSpringTemplatePath + "/src/test/java/.package/RestApiTest.java", serviceSpringDestinationPath + projectConf.projectTestPath + "/" + projectConf.projectSuffixUpperCase + "RestSpringApiTest.java", projectConf);
+                }
+
+                this.log.info("Creating Rest tests...")
+                this.fs.copyTpl(serviceTemplatePath + "/src/test/java/.package/TestRestApi.java", this.destinationPath(projectConf.projectServicePath) + projectConf.projectTestPath + "/" + projectConf.projectSuffixUpperCase + "RestApiTest.java", projectConf);
+                if (fs.existsSync(technologyTemplatePath + "/src/test/java/.package/TestRestApi.java") && projectConf.hasRestServices)
+                    this.fs.copyTpl(technologyTemplatePath + "/src/test/java/.package/TestRestApi.java", this.destinationPath(projectConf.projectServicePath) + projectConf.projectTestPath + "/" + projectConf.projectSuffixUpperCase + "RestApiTest.java", projectConf);
+                //Copying model feature test
+                this.fs.copyTpl(serviceTemplatePath + "/src/test/resources/karate/entity.feature", karatePath + "/" + modelName + "-crud.feature", projectConf);
             }
-
-            this.log.info("Creating Rest Api Implementations...")
-            this.fs.copyTpl(serviceTemplatePath + "/src/main/java/.service_rest_package/RestControllerImpl.java", this.destinationPath(projectConf.projectServicePath) + projectConf.serviceRestPackagePath + "/" + modelName + "RestControllerImpl.java", projectConf);
-
-            if (fs.existsSync(technologyTemplatePath + "/src/main/java/.service_rest_package/RestControllerImpl.java"))
-                this.fs.copyTpl(technologyTemplatePath + "/src/main/java/.service_rest_package/RestControllerImpl.java", this.destinationPath(projectConf.projectServicePath) + projectConf.serviceRestPackagePath + "/" + modelName + "RestControllerImpl.java", projectConf);
-
-            if (projectConf.projectTechnology === "water") {
-                //Creating spring module also
-                let serviceSpringTemplatePath = this.getWaterTemplatePath(this.waterVersion) + "/scaffolding/water/service-module-spring";
-                let serviceSpringDestinationPath = this.destinationPath(projectConf.projectServicePath) + "-spring";
-                this.log.info("Starting from spring tempalte in " + serviceSpringTemplatePath + " and copying to ");
-                this.fs.copyTpl(serviceSpringTemplatePath, serviceSpringDestinationPath, projectConf);
-                //Copying java classes
-                this.fs.copyTpl(serviceSpringTemplatePath + "/src/main/java/.spring_api_rest_package/SpringRestApi.java", serviceSpringDestinationPath + projectConf.serviceRestPackagePath + "/spring/" + modelName + "SpringRestApi.java", projectConf);
-                this.fs.copyTpl(serviceSpringTemplatePath + "/src/main/java/.spring_service_rest_package/SpringRestControllerImpl.java", serviceSpringDestinationPath + projectConf.serviceRestPackagePath + "/spring/" + modelName + "SpringRestControllerImpl.java", projectConf);
-                this.fs.copyTpl(serviceSpringTemplatePath + "/src/main/java/.Application.java", serviceSpringDestinationPath + projectConf.servicePackagePath + "/" + projectConf.projectSuffixUpperCase + "Application.java", projectConf);
-                this.fs.copyTpl(serviceSpringTemplatePath + "/src/test/java/.package/RestApiTest.java", serviceSpringDestinationPath + projectConf.projectTestPath + "/" + projectConf.projectSuffixUpperCase + "RestSpringApiTest.java", projectConf);
-            }
-
-            this.log.info("Creating Rest tests...")
-            this.fs.copyTpl(serviceTemplatePath + "/src/test/java/.package/TestRestApi.java", this.destinationPath(projectConf.projectServicePath) + projectConf.projectTestPath + "/" + projectConf.projectSuffixUpperCase + "RestApiTest.java", projectConf);
-            if (fs.existsSync(technologyTemplatePath + "/src/test/java/.package/TestRestApi.java") && projectConf.hasRestServices)
-                this.fs.copyTpl(technologyTemplatePath + "/src/test/java/.package/TestRestApi.java", this.destinationPath(projectConf.projectServicePath) + projectConf.projectTestPath + "/" + projectConf.projectSuffixUpperCase + "RestApiTest.java", projectConf);
-            //Copying model feature test
-            this.fs.copyTpl(serviceTemplatePath + "/src/test/resources/karate/entity.feature", karatePath+"/"+modelName+"-crud.feature", projectConf);
+            //adding final files
             if (!newProject) {
                 this.fs.copyTpl(serviceTemplatePath + "/src/test/resources/karate-config.js", karateConfigPath, projectConf);
                 let buildGradlePath = this.destinationPath(finalPath) + "/build.gradle";
@@ -426,6 +424,7 @@ export default class extends AcsBaseGenerator {
                 this.addGradleDependency(buildGradlePath, "io.swagger", "swagger-jaxrs", "project.swaggerJaxRsVersion", true);
             }
             this.log.ok("Rest classes created succesfully!");
+
         } else {
             this.log.info("Removing " + karatePath);
             this.fs.delete(karatePath, { recursive: true, force: true })
@@ -435,7 +434,33 @@ export default class extends AcsBaseGenerator {
         }
     }
 
-    calculateTaskDuration(startDate){
+    addEntityStack(projectSelected, modelName, isProtectedEntity, isOwnedEntity) {
+        let currentConf = this.getProjectConfiguration(projectSelected);
+        currentConf.applicationTypeEntity = true;
+        currentConf.hasModel = true;
+        currentConf.modelName = modelName;
+        currentConf.isProtectedEntity = isProtectedEntity;
+        currentConf.isOwnedEntity = isOwnedEntity;
+        this.addEntityModel(currentConf, modelName);
+        this.addEntityServices(currentConf, modelName, false);
+        this.createServiceLayerApi(currentConf, modelName, false)
+    }
+
+    upgradeConfEntitiesList(projectSelected, modelName, isProtectedEntity, isOwnedEntity) {
+        let currentConf = this.getProjectConfiguration(projectSelected);
+        if (!currentConf["entities"])
+            currentConf["entities"] = [];
+        let currentEntity = {
+            "modelName": modelName,
+            "isProtectedEntity": isProtectedEntity,
+            "isOwnedEntity": isOwnedEntity
+        }
+        currentConf["entities"].push(currentEntity);
+        this.setProjectConfiguration(projectSelected, currentConf);
+        this.saveProjectsConfiguration();
+    }
+
+    calculateTaskDuration(startDate) {
         let endDate = Date.now();
         this.log.info("Task duration: " + (endDate - startDate) + " ms");
     }
@@ -494,7 +519,7 @@ export default class extends AcsBaseGenerator {
         //TODO remove or change this check since it can generat ambigous behaviorus
         if (!workspaceDir.endsWith(projectName)) {
             restorePreviousFolder = true;
-            this.destinationRoot(workspaceDir+"/"+projectName);
+            this.destinationRoot(workspaceDir + "/" + projectName);
         }
 
         let depCycleChecker = new DepCycleChecker();

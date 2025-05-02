@@ -10,6 +10,7 @@ export default class extends Generator {
     async initializing() {
         await this.composeWith(this.resolveInsideGeneratorPath('generators/app'), this.options);
         this.projectSelected = null;
+        this.entityName = "";
         this.newProject = false;
         this.groupId = "";
         this.artifactId = "";
@@ -34,7 +35,13 @@ export default class extends Generator {
             when: function (answers) {
                 return !answers.existingProject;
             }
-        }, {
+        },{
+            type: 'input',
+            name: 'entityName',
+            message: 'Please insert entity name:',
+            default: "MyEntity"
+        },
+         {
             type: 'input',
             name: 'entityToExtend',
             message: 'Please insert complete package and name of the entity you want to expand:',
@@ -52,6 +59,7 @@ export default class extends Generator {
         } 
         ]).then((answers) => {
             self.projectSelected = answers.project;
+            self.entityName = answers.entityName;
             self.newProject = !answers.existingProject;
             self.groupId = answers.entityGradleModelGroupId;
             self.artifactId = answers.entityGradleModelArtifactId;
@@ -59,9 +67,11 @@ export default class extends Generator {
         });
     }
 
-    configuring() {
+    async configuring() {
         this.log.ok("Starting creating extension....\n");
-        this.log.error("This task is still working progress\n");
+        //creating 
+        await this.addEntityStack(this.projectSelected,this.entityName,false,false);
+        //add extension class
     }
 
 

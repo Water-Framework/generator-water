@@ -53,18 +53,8 @@ export default class extends Generator {
         });
     }
 
-    configuring() {
-        let currentConf = this.getProjectConfiguration(this.projectSelected);
-        currentConf.applicationTypeEntity = true
-        currentConf.hasModel = true
-        currentConf.isProtectedEntity = this.isProtectedEntity
-        currentConf.isOwnedEntity = this.isOwnedEntity
-        this.addEntityModel(currentConf,this.entityName);
-        this.addEntityServices(currentConf,this.entityName,false);
-        this.createServiceLayerApi(currentConf,this.entityName,false)
-        this.log.info("Upgrading project ",this.projectSelected,currentConf)
-        this.setProjectConfiguration(this.projectSelected,currentConf);
-        this.saveProjectsConfiguration();
+    async configuring() {
+        await this.addEntityStack(this.projectSelected,this.entityName,this.isProtectedEntity,this.isOwnedEntity);
     }   
 
 

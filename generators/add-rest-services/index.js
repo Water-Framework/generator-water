@@ -56,6 +56,6 @@ export default class extends Generator {
 
 
     end() {
-        this.log.ok("Extension for " + this.projectName + " created succesfully!");
+        this.log.ok("Rest services for " + this.projectName + " created succesfully!");
     }
 };
