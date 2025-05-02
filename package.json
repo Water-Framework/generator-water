@@ -1,6 +1,6 @@
 {
   "name": "generator-water",
-  "version": "4.0.0",
+  "version": "4.1.0",
   "description": "Yeoman Generator for project Water Framework",
   "type": "module",
   "files": [
@@ -33,42 +33,10 @@
     "licenseManagementEnabled": false,
     "serverPem": "-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAt7S2yw6PLoPpgrlvbJC9\n2jWiFU6jvnZyL6+6XaXoeWpDww3wy4LiCd1Fz0PZ1ntqN6oHQOdaEDEMson98BVF\nu4JxvamFag7pp/JoQeUsiWiaC0QnPC7OEDi2TJ6wI9wcXfNhZaS9+qcWZBLu/uaL\nCtColVxsTsS3ri3NdeEmJKtbgSWHyee5slrJYSNtLxDgfCy27w7KBpfMDlPsfVpS\nIrCntYvLa5VodhIhT/kUZe4ljruRv8Xl77OFMyYhoIQl5lbxaFoC8WnUrNMx46x8\nlLHpAPzvOeKzmJgkzn6BHHBJI8gVcp4kPmJn3jg+cawXWGEi6K7PaoT+IiJQXkh0\nAQIDAQAB\n-----END PUBLIC KEY-----\n",
     "licenseUrl": "",
-    "codeObfuscationEnabled": true,
-    "codeObfuscationOptions": {
-      "compact": true,
-      "controlFlowFlattening": true,
-      "controlFlowFlatteningThreshold": 1,
-      "deadCodeInjection": true,
-      "deadCodeInjectionThreshold": 1,
-      "debugProtection": false,
-      "debugProtectionInterval": false,
-      "disableConsoleOutput": false,
-      "identifierNamesGenerator": "hexadecimal",
-      "log": false,
-      "numbersToExpressions": true,
-      "renameGlobals": false,
-      "rotateStringArray": true,
-      "selfDefending": true,
-      "shuffleStringArray": true,
-      "simplify": true,
-      "splitStrings": true,
-      "splitStringsChunkLength": 5,
-      "stringArray": true,
-      "stringArrayEncoding": [
-        "rc4"
-      ],
-      "stringArrayIndexShift": true,
-      "stringArrayWrappersCount": 5,
-      "stringArrayWrappersChainedCalls": true,
-      "stringArrayWrappersParametersMaxCount": 5,
-      "stringArrayWrappersType": "function",
-      "stringArrayThreshold": 1,
-      "transformObjectKeys": true,
-      "unicodeEscapeSequence": false
-    }
+    "codeObfuscationEnabled": false
   },
   "dependencies": {
-    "acs-abstract-generator": "6.1.0",
+    "acs-abstract-generator": "6.1.5",
     "acs-java-visitor": "2.0.1",
     "axios": "^1.9.0",
     "chalk": "^5.4.1",
@@ -77,6 +45,7 @@
     "date-format": "^4.0.14",
     "ejs": "3.1.10",
     "eslint-plugin-import": "^2.31.0",
+
     "fs-extra": "^11.3.0",
     "glob": "^11.0.2",
     "gradle-to-js": "^2.0.1",

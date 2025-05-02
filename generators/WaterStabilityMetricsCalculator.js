@@ -4,7 +4,7 @@ import {
     indegree,
     outdegree
   } from 'graph-data-structure';
-import { glob, globSync} from 'glob'
+import { glob } from 'glob'
 import DepCycleChecker from './WaterDepCycleChecker.js';
 import { parse } from 'java-parser';
 import chalk from 'chalk';
