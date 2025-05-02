@@ -1,44 +1,43 @@
-let Generator = require('../WaterBaseGenerator.js');
+import Generator from '../WaterBaseGenerator.js';
 
-let projectsName = [];
-let results = {};
 
-module.exports = class extends Generator {
+export default class extends Generator {
 
     constructor(args, opts) {
         super(args, opts);
+        this.projectsName = [];
+        this.results = {};
+        this.startDate = Date.now();
     }
 
-
-    initializing() {
-        this.composeWith(require.resolve('../app'), this.options);
+    async initializing() {
+        await this.composeWith(this.resolveInsideGeneratorPath('generators/app'), this.options);
     }
 
-    prompting() {
-        let done = this.async();
-        this.showSelectProject().then((answers) => {
-            projectsName = answers.projectsToInstall;
-            this.orderProjects(projectsName);
-            done();
+    async prompting() {
+        await this.showSelectProject().then((answers) => {
+            this.projectsName = answers.projectsToInstall;
+            this.orderProjects(this.projectsName);
         });
     }
 
-    install() {
-        results = this.launchProjectsBuild(projectsName);
+    async install() {
+        this.results = await this.launchProjectsBuild(this.projectsName);
     }
 
-    end() {
+    async end() {
+        this.calculateTaskDuration(this.startDate)
         let exitWithError = false;
-        let resultsKeys = Object.keys(results);
+        let resultsKeys = Object.keys(this.results);
         resultsKeys.map(currProject => {
-            if (results[currProject] === true)
+            if (this.results[currProject] === true)
                 this.log.ok(currProject + " OK! ");
             else {
                 exitWithError = true;
                 this.log.error(currProject + " NOK! ");
             }
         })
-
+        
         if(exitWithError)
             process.exit(-1)
     }

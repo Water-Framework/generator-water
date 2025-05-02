@@ -1,15 +1,14 @@
-let Generator = require('../WaterBaseGenerator.js');
-let chalk = require('chalk');
+import Generator from '../WaterBaseGenerator.js';
 
-module.exports = class extends Generator {
+export default class extends Generator {
 
     constructor(args, opts) {
         super(args, opts);
         this.projectName = "";
     }
 
-    initializing() {
-        this.composeWith(require.resolve('../app'), this.options);
+    async initializing() {
+        await this.composeWith(this.resolveInsideGeneratorPath('generators/app'), this.options);
         this.projectSelected = null;
         this.newProject = false;
         this.groupId = "";
@@ -17,12 +16,12 @@ module.exports = class extends Generator {
         this.entityClassToExtend = "";
     }
 
-    prompting() {
-        let done = this.async();
+    async prompting() {
+    
         let self = this;
-        let projects = this.getAllProjectsName();
+        let projects = await this.getAllProjectsName();
 
-        this.prompt([{
+        await this.prompt([{
             type: 'confirm',
             name: 'existingProject',
             message: 'Create new Project or insert into existing one?',
@@ -57,7 +56,6 @@ module.exports = class extends Generator {
             self.groupId = answers.entityGradleModelGroupId;
             self.artifactId = answers.entityGradleModelArtifactId;
             self.entityClassToExtend = answers.entityToExtend;
-            done();
         });
     }
 

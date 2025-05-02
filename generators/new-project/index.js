@@ -1,7 +1,7 @@
-let Generator = require('../WaterBaseGenerator.js');
-let chalk = require('chalk');
+import Generator from '../WaterBaseGenerator.js';
+import chalk from 'chalk';
 
-module.exports = class extends Generator {
+export default class extends Generator {
 
     constructor(args, opts) {
         super(args, opts);
@@ -28,20 +28,15 @@ module.exports = class extends Generator {
         this.serviceRestPackagePath = "";
         this.basePackage = "";
         this.testPackagePath = "";
-        //references to api project and concrete default project
-        let parentProjectPath = "";
-        let projectApiPath = "";
-        let projectPath = "";
     }
 
-    initializing() {
-        this.composeWith(require.resolve('../app'), this.options);
+    async initializing() {
+        await this.composeWith(this.resolveInsideGeneratorPath('generators/app'), this.options);
     }
 
-    prompting() {
-        let done = this.async();
+    async prompting() {
         let self = this;
-        this.prompt([
+        await this.prompt([
             {
                 type: 'list',
                 name: 'projectTechnology',
@@ -165,7 +160,7 @@ module.exports = class extends Generator {
             when: function (answer) {
                 return answer.hasRestServices === true;
             },
-            default: function(answers){
+            default: function(){
                 return true;
             }
         },
@@ -173,7 +168,7 @@ module.exports = class extends Generator {
             type: 'confirm',
             name: 'moreModules',
             message: 'do you want to add other modules to have out of the box features?',
-            default: function(answers){
+            default: function(){
                 return false;
             },
         },
@@ -364,7 +359,6 @@ module.exports = class extends Generator {
             }
 
             super.setProjectConfiguration(this.projectName, this.projectConf);
-            done();
         });
     }
 

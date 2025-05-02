@@ -1,8 +1,6 @@
-let Generator = require('../WaterBaseGenerator.js');
-let chalk = require('chalk');
-let fs = require('fs');
+import Generator from '../WaterBaseGenerator.js';
 
-module.exports = class extends Generator {
+export default class extends Generator {
 
     constructor(args, opts) {
         super(args, opts);
@@ -15,16 +13,15 @@ module.exports = class extends Generator {
         this.projectSelectedPublishModule = false;
     }
 
-    initializing() {
-        this.composeWith(require.resolve('../app'), this.options);
+    async initializing() {
+        await this.composeWith(this.resolveInsideGeneratorPath('generators/app'), this.options);
     }
 
-    prompting() {
-        let done = this.async();
+    async prompting() {
         let self = this;
         let projects = this.getAllProjectsName();
 
-        this.prompt([ {
+        await this.prompt([ {
             type: 'checkbox',
             name: 'project',
             message: 'Please select a project',
@@ -32,7 +29,6 @@ module.exports = class extends Generator {
         }
         ]).then((answers) => {
             self.projectSelected = answers.project;
-            done();
         });
     }
 

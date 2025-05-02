@@ -1,32 +1,30 @@
-let Generator = require('../WaterBaseGenerator.js');
-const DepCycleChecker = require('../WaterDepCycleChecker.js');
+import Generator from '../WaterBaseGenerator.js';
 
-let projectsName = [];
-let results = {};
-
-module.exports = class extends Generator {
+export default class extends Generator {
 
     constructor(args, opts) {
         super(args, opts);
+        this.projectsName = [];
+        this.results = {};
     }
 
-    initializing() {
-        this.composeWith(require.resolve('../app'), this.options);
+    async initializing() {
+        await this.composeWith(this.resolveInsideGeneratorPath('generators/app'), this.options);
     }
 
-    prompting() {
-        projectsName = super.getAllProjectsInWorkspace();
+    async prompting() {
+        this.projectsName = await super.getAllProjectsInWorkspace();
     }
 
-    install() {
-        results = this.launchProjectsBuild(projectsName);
+    async install() {
+        this.results = await this.launchProjectsBuild(this.projectsName);
     }
 
-    end() {
+    async end() {
         let exitWithError = false;
-        let resultsKeys = Object.keys(results);
+        let resultsKeys = Object.keys(this.results);
         resultsKeys.map(currProject => {
-            if (results[currProject] === true)
+            if (this.results[currProject] === true)
                 this.log.ok(currProject + " OK! ");
             else {
                 exitWithError = true;

@@ -1,18 +1,16 @@
-let Generator = require('../WaterBaseGenerator.js');
+import Generator from '../WaterBaseGenerator.js';
 
-module.exports = class extends Generator {
+export default class extends Generator {
 
     constructor(args, opts) {
         super(args, opts);
     }
 
-
-    initializing() {
-        this.composeWith(require.resolve('../app'), this.options);
+    async initializing() {
+        await this.composeWith(this.resolveInsideGeneratorPath('generators/app'), this.options);
     }
 
-    prompting() {
-        let done = this.async();
+    async prompting() {
         let projects = this.getAllProjectsName();
         let prompts = [];
         let self = this;
@@ -38,13 +36,12 @@ module.exports = class extends Generator {
             })
         })
 
-        return this.prompt(prompts).then((answers) => {
+        return await this.prompt(prompts).then((answers) => {
             let orders = Object.keys(answers);
             orders.map(projectName => {
                 this.addProjectConfigurationField(projectName, "order", answers[projectName]);
             });
             this.saveProjectsConfiguration();
-            done();
         });
     }
 }

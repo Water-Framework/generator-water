@@ -2,10 +2,10 @@
  *    Author: Aristide Cittadino ACSoftware
  *
  */
-let Generator = require('../WaterBaseGenerator.js');
-let fs = require('fs');
+import Generator from '../WaterBaseGenerator.js';
+import fs from 'fs';
 
-module.exports = class extends Generator {
+export default class extends Generator {
 
     constructor(args, opts) {
         super(args, opts);

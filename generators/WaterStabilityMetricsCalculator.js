@@ -1,35 +1,37 @@
-const { JavaClassVisitor } = require('acs-java-visitor');
-const DepCycleChecker = require('./WaterDepCycleChecker.js')
-const { parse } = require("java-parser");
-let chalk = require('chalk');
-let glob = require("glob")
+import { JavaClassVisitor } from 'acs-java-visitor';
+import {
+    deserializeGraph,
+    indegree,
+    outdegree
+  } from 'graph-data-structure';
+import { glob, globSync} from 'glob'
+import DepCycleChecker from './WaterDepCycleChecker.js';
+import { parse } from 'java-parser';
+import chalk from 'chalk';
 
-
-
-module.exports = class WaterStabilityMetricsCalculator {
+export default class WaterStabilityMetricsCalculator {
 
     constructor() {
 
     }
 
-    stabilityMetrics(projects, generator) {
+    async stabilityMetrics(projects, generator) {
         let depCycleChecker = new DepCycleChecker();
         let stabilityJson = {};
         for (let projectIdx in projects) {
             let currentDir = process.cwd();
-            process.chdir(currentDir+"/"+projects[projectIdx]);
-            let projectsJson = depCycleChecker.checkDepCycles(true, generator);
-            let graph = projectsJson.dependenciesGraph;
+            generator.destinationRoot(currentDir+"/"+projects[projectIdx]);
+            let projectsJson = await depCycleChecker.checkDepCycles(true, generator);
+            let graph = deserializeGraph(projectsJson.dependenciesGraph);
             let project = projects[projectIdx];
-            for (let nodeIdx in graph.nodes()) {
-                let node = graph.nodes()[nodeIdx];
+            for (const node of graph.nodes) {
                 //package:project:version, taking the middle part
                 let projectName = node.substring(node.indexOf(":") + 1, node.lastIndexOf(":"));
                 let skip = projectName.endsWith("-test") || projectName.endsWith("-features") || projectName === project;
                 if (node.indexOf(":" + project) > 0 && !skip) {
                     let projectPath = projectsJson[node].path;
-                    this.stabilityMetricsI(generator,node, graph.indegree(node), graph.outdegree(node), stabilityJson);
-                    this.stabilityMetricsA(generator,node, projectPath, stabilityJson);
+                    await this.stabilityMetricsI(generator,node, indegree(graph,node), outdegree(graph,node), stabilityJson);
+                    await this.stabilityMetricsA(generator,node, projectPath, stabilityJson);
                     let metricI = stabilityJson[node].I;
                     let metricA = stabilityJson[node].A;
                     if (metricI <= 0.5) {
@@ -47,7 +49,7 @@ module.exports = class WaterStabilityMetricsCalculator {
                     }
                 }
             }  
-            process.chdir("../");
+            generator.destinationRoot("../");
         }
         //avoid linter problems
         let consoleTmp = console;
@@ -55,16 +57,16 @@ module.exports = class WaterStabilityMetricsCalculator {
         return stabilityJson;
     }
 
-    stabilityMetricsInfo(generator) {
+    async stabilityMetricsInfo(generator) {
         generator.log("***************************** STABILITY METRICS INFO *****************************\n");
         generator.log(chalk.italic(" It gives some insights about how component has been designed: model, util projects should not be considered in this metrics: \n"));
         generator.log("- "+chalk.bold.green("GOOD")+": The component is well designed and may not have problems\n");
         generator.log("- "+chalk.bold.yellow("Zone of pain")+": The component is higly stable (I) it means it is imported from many projects but it do not depends on other compoents BUT has few degree of abstraciton (A) it means that has few abstract classes respect of total number of classes\n");
-        generator.log("- "+chalk.bold.red("Zone of uselessnes")+": The component is not stable (I) it means it is not used from other modules BUT has an high degree of abstraction, so it is useless. This value menas that the component is useless inside this current workspace, but it may be imported outside. So this value should not be considered always in a negative way.\n");
+        generator.log("- "+chalk.bold.red("Zone of uselessnes")+": The component is not stable (I) it means it is not used from other modules BUT has an high degree of abstraction, so it is useless. This value means that the component is useless inside this current workspace, but it may be imported outside. So this value should not be considered always in a negative way.\n");
         generator.log("***********************************************************************************");
     }
 
-    stabilityMetricsA(generator,project, projectPath, stabilityJson) {
+    async stabilityMetricsA(generator,project, projectPath, stabilityJson) {
         let abstractCounter = 0;
         let interfaceCounter = 0;
         let childrenClassesCounter = 0;
@@ -103,7 +105,7 @@ module.exports = class WaterStabilityMetricsCalculator {
 
     }
 
-    stabilityMetricsI(generator,project, fanIn, fanOut, stabilityJson) {
+    async stabilityMetricsI(generator,project, fanIn, fanOut, stabilityJson) {
         if (!stabilityJson[project])
             stabilityJson[project] = {};
         stabilityJson[project].fanIn = fanIn;

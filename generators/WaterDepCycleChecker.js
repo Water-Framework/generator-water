@@ -1,5 +1,8 @@
-let Graph = require("graph-data-structure");
-let chalk = require('chalk');
+import {
+    Graph,
+    serializeGraph
+  } from 'graph-data-structure';
+import chalk from 'chalk';
 
 class CycleError extends Error {
     constructor(message) {
@@ -41,21 +44,21 @@ class DependencyPathNode {
     }
 }
 
-module.exports = class DepCycleChecker {
+export default class DepCycleChecker {
 
     constructor() {
      
     }
 
-    checkDepCycles(exitOnCycle,generator) {
-        let depGraph = Graph();
-        let projectsGraph = Graph();
+    async checkDepCycles(exitOnCycle,generator) {
+        let depGraph = new Graph();
+        let projectsGraph = new Graph();
         let projectsJson = {};
         if (!generator.options.skipCycleCheck) {
             generator.log.info(chalk.bold.yellow("Check gradle depList for dependencies cycle, it may take a while, to skip please add --skipCycleCheck"));
-            let result = generator.spawnCommandSync("gradle", ["depList"], { stdio: ['pipe', 'pipe', 'pipe'] });
+            let result = await generator.spawn("gradle", ["depList"], { stdio: ['pipe', 'pipe', 'pipe'] });
             //retrocompatible for old workspaces
-            if (result.status === 0) {
+            if (result.exitCode === 0) {
                 generator.log.info("Analyzing dependencies cycles....");
                 //parsing json between DEP LIST OUTPUT and END DEP LIST OUTPUT
                 let projectsJsonStr = result.stdout.toString('utf8').split("-- DEP LIST OUTPUT --")[1].split("-- END DEP LIST OUTPUT --")[0];
@@ -86,8 +89,8 @@ module.exports = class DepCycleChecker {
                     }
                 }
                 try {
-                    this.findCycles(depGraph);
-                    this.findCycles(projectsGraph);
+                    await this.findCycles(depGraph);
+                    await this.findCycles(projectsGraph);
                 } catch (cycleError) {
                     generator.log.error("ERROR:Some Dependecy cycles has been detected in your workspace, please remove them: ");
                     generator.log.error(cycleError.message);
@@ -101,12 +104,12 @@ module.exports = class DepCycleChecker {
                 generator.log.info(chalk.bold.yellow("WARNING: Gradle \"depList\" task gradle not found. Dependency list metrics not available, please upgrade your workspace settings!"));
             }
         }
-        projectsJson.dependenciesGraph = depGraph;
+        projectsJson.dependenciesGraph = serializeGraph(depGraph);
         return projectsJson;
     }
 
-    findCycles(graph) {
-        let sourceNodes = graph.nodes();
+    async findCycles(graph) {
+        let sourceNodes = graph.nodes;
         const visited = {};
         const visiting = {};
         const nodeList = [];
@@ -134,7 +137,7 @@ module.exports = class DepCycleChecker {
     }
 
     addNodeToGraph(graph, depName) {
-        if (graph.nodes()[depName] === null || graph.nodes()[depName] === undefined) {
+        if (graph.nodes[depName] === null || graph.nodes[depName] === undefined) {
             graph.addNode(depName);
         }
     }

@@ -1,10 +1,10 @@
-let { AcsBaseGenerator } = require('acs-abstract-generator');
-const DepCycleChecker = require('./WaterDepCycleChecker.js');
-const axios = require("axios");
-const path = require("path");
-let fs = require('fs');
-let chalk = require('chalk');
-const tty = require("tty");
+import { AcsBaseGenerator } from 'acs-abstract-generator';
+import DepCycleChecker from './WaterDepCycleChecker.js';
+import axios from 'axios';
+import path from 'path';
+import fs from 'fs';
+import chalk from 'chalk';
+
 /* global Promise */
 let splash = '' +
     '@@@  @@@  @@@   @@@@@@   @@@@@@@  @@@@@@@@  @@@@@@@   \n' +
@@ -21,7 +21,7 @@ let splash = '' +
     '\n';
 
 
-module.exports = class extends AcsBaseGenerator {
+export default class extends AcsBaseGenerator {
 
     constructor(args, opts) {
         super(args, opts);
@@ -435,10 +435,15 @@ module.exports = class extends AcsBaseGenerator {
         }
     }
 
-    launchProjectsBuild(projectsName) {
+    calculateTaskDuration(startDate){
+        let endDate = Date.now();
+        this.log.info("Task duration: " + (endDate - startDate) + " ms");
+    }
+
+    async launchProjectsBuild(projectsName) {
         let results = []
         for (let i = 0; i < projectsName.length; i++) {
-            results[projectsName[i]] = this.launchSingleProjectBuild(projectsName[i]);
+            results[projectsName[i]] = await this.launchSingleProjectBuild(projectsName[i]);
         }
         return results;
     }
@@ -476,11 +481,11 @@ module.exports = class extends AcsBaseGenerator {
                 results[projectsName[i]] = false;
             }
         }
-        process.chdir(workspaceDir);
+        this.destinationRoot(workspaceDir);
         return results;
     }
 
-    launchSingleProjectBuild(projectName) {
+    async launchSingleProjectBuild(projectName) {
         this.log.ok("building: " + projectName);
         let buildResult = null;
         let workspaceDir = process.cwd();
@@ -489,40 +494,40 @@ module.exports = class extends AcsBaseGenerator {
         //TODO remove or change this check since it can generat ambigous behaviorus
         if (!workspaceDir.endsWith(projectName)) {
             restorePreviousFolder = true;
-            process.chdir(projectName);
+            this.destinationRoot(workspaceDir+"/"+projectName);
         }
 
         let depCycleChecker = new DepCycleChecker();
         depCycleChecker.checkDepCycles(true, this);
 
         let buildCommand = ["clean", "build"]
-        buildResult = this.spawnCommandSync("gradle", [...buildCommand, "-x", "test"]);
-        let projectKarafFeaturesPath = this.config.get("projectsConfiguration")[projectName]["projectFeaturesPath"];
+        buildResult = await this.spawn("gradle", [...buildCommand, "-x", "test"]);
+        let projectKarafFeaturesPath = this.config.get("projectFeaturesPath");
         if (projectKarafFeaturesPath !== null && projectKarafFeaturesPath !== undefined && projectKarafFeaturesPath.length > 0) {
             let featureDir = workspaceDir + "/" + projectKarafFeaturesPath + "/src/main/resources/features-src.xml";
             if (fs.existsSync(featureDir)) {
-                if (buildResult.status === 0) {
+                if (buildResult.exitCode === 0) {
                     this.log.info("---------------> GENERATING FEATURES--------------------")
                     this.log.info("Features path: " + featureDir)
-                    buildResult = this.spawnCommandSync("gradle", ["clean", "generateFeatures"]);
+                    buildResult = await this.spawn("gradle", ["clean", "generateFeatures"]);
                 }
             }
         }
 
-        if (buildResult.status === 0) {
-            this.spawnCommandSync("gradle", ["publishToMavenLocal"]);
+        if (buildResult.exitCode === 0) {
+            await this.spawn("gradle", ["publishToMavenLocal"]);
             this.log.ok("Build of " + projectName + " completed succesfully");
         } else {
             this.log.error("Build of " + projectName + " completed with errors");
         }
 
         if (restorePreviousFolder)
-            process.chdir("../");
+            this.destinationRoot(workspaceDir);
 
-        return buildResult.status === 0;
+        return buildResult.exitCode === 0;
     }
 
-    launchSingleProjectPublish(projectName, repoUsername, repoPassword) {
+    async launchSingleProjectPublish(projectName, repoUsername, repoPassword) {
         let publishOk = false;
         let modules = super.getModuleNamesCommaSeparated(projectName);
         let publishCommand = "publish"
@@ -535,11 +540,11 @@ module.exports = class extends AcsBaseGenerator {
             publishFeatureArgs.push("-DpublishRepoUsername=" + repoUsername)
             publishFeatureArgs.push("-DpublishRepoPassword=" + repoPassword)
         }
-        process.chdir(projectName);
-        let publishResult = this.spawnCommandSync("gradle", publishHITArgs);
-        process.chdir("../");
-        publishOk = publishResult.status === 0;
-        if (publishResult.status === 0) {
+        this.destinationRoot(projectName);
+        let publishResult = await this.spawn("gradle", publishHITArgs);
+        this.destinationRoot("../");
+        publishOk = publishResult.exitCode === 0;
+        if (publishResult.exitCode === 0) {
             this.log.ok("Publishing of " + projectName + " completed succesfully");
         } else {
             this.log.error("Publishing of " + projectName + " completed with errors");
@@ -553,11 +558,11 @@ module.exports = class extends AcsBaseGenerator {
         let testArg = ["clean", "test"];
         if (hasSonar)
             testArg.push("jacocoRootReport", "sonar", "-Dsonar.host.url=" + sonarHost, "-Dsonar.login=" + sonarToken);
-        process.chdir(projectName);
+        this.destinationRoot(projectName);
         let projectPath = process.cwd();
-        let testResult = this.spawnCommandSync("gradle", testArg);
-        process.chdir("../");
-        testOk = testResult.status === 0;
+        let testResult = await this.spawn("gradle", testArg);
+        this.destinationRoot("../");
+        testOk = testResult.exitCode === 0;
         //checks sonarqube quality gate results
         try {
             let sonarQGOk = true;
