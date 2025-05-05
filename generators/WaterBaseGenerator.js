@@ -174,9 +174,7 @@ export default class extends AcsBaseGenerator {
             //Overriding eventually with specific technologies files
             this.fs.copyTpl(technologyTemplatePath, this.destinationPath(finalPath), projectConf);
         }
-
         this.addEntityModel(projectConf, modelName);
-
         if (fs.existsSync(technologyTemplatePath + "/.yo-rc.json"))
             this.fs.copyTpl(technologyTemplatePath + "/.yo-rc.json", this.destinationPath(finalPath) + "/.yo-rc.json", projectConf);
 
@@ -261,7 +259,7 @@ export default class extends AcsBaseGenerator {
         }
 
         if (!isNewProject) {
-            this.addGradleInternalDependency(buildGradlePath, "project (\":" + projectConf.projectName + "-model\")")
+            this.addGradleInternalDependency(buildGradlePath, projectConf.projectName + "-model")
             this.addGradleDependency(buildGradlePath, "jakarta.persistence", "jakarta.persistence-api", "project.jakartaPersistenceVersion", true);
             this.addGradleDependency(buildGradlePath, "it.water.repository.jpa", "JpaRepository-api", "project.waterVersion", true);
             this.addGradleDependency(buildGradlePath, "it.water.repository", "Repository-entity", "project.waterVersion", true);
@@ -374,6 +372,7 @@ export default class extends AcsBaseGenerator {
         let karateConfigPath = this.destinationPath(projectConf.projectServicePath) + "/src/test/resources/karate-config.js";
         let apiTemplatePath = this.getWaterTemplatePath(this.waterVersion) + "/scaffolding/common/api-module";
         let finalPath = projectConf.projectApiPath;
+        let servicePath = projectConf.projectServicePath;
         if (projectConf.projectTechnology !== "water") {
             finalPath = projectConf.projectServicePath;
         }
@@ -400,7 +399,7 @@ export default class extends AcsBaseGenerator {
                     //Creating spring module also
                     let serviceSpringTemplatePath = this.getWaterTemplatePath(this.waterVersion) + "/scaffolding/water/service-module-spring";
                     let serviceSpringDestinationPath = this.destinationPath(projectConf.projectServicePath) + "-spring";
-                    this.log.info("Starting from spring tempalte in " + serviceSpringTemplatePath + " and copying to ");
+                    this.log.info("Starting from spring template in " + serviceSpringTemplatePath + " and copying to ");
                     this.fs.copyTpl(serviceSpringTemplatePath, serviceSpringDestinationPath, projectConf);
                     //Copying java classes
                     this.fs.copyTpl(serviceSpringTemplatePath + "/src/main/java/.spring_api_rest_package/SpringRestApi.java", serviceSpringDestinationPath + projectConf.serviceRestPackagePath + "/spring/" + modelName + "SpringRestApi.java", projectConf);
@@ -420,8 +419,11 @@ export default class extends AcsBaseGenerator {
             if (!newProject) {
                 this.fs.copyTpl(serviceTemplatePath + "/src/test/resources/karate-config.js", karateConfigPath, projectConf);
                 let buildGradlePath = this.destinationPath(finalPath) + "/build.gradle";
+                let serviceBuildGradlePath = this.destinationPath(servicePath) + "/build.gradle";
                 this.addGradleDependency(buildGradlePath, "it.water.service.rest", "Rest-api", "project.waterVersion", true);
                 this.addGradleDependency(buildGradlePath, "io.swagger", "swagger-jaxrs", "project.swaggerJaxRsVersion", true);
+                if(projectConf.applicationTypeEntity)
+                    this.addGradleDependency(serviceBuildGradlePath, "it.water.service.rest", "Rest-persistence", "project.waterVersion", true);
             }
             this.log.ok("Rest classes created succesfully!");
 
@@ -523,7 +525,7 @@ export default class extends AcsBaseGenerator {
         }
 
         let depCycleChecker = new DepCycleChecker();
-        depCycleChecker.checkDepCycles(true, this);
+        await depCycleChecker.checkDepCycles(true, this);
 
         let buildCommand = ["clean", "build"]
         buildResult = await this.spawn("gradle", [...buildCommand, "-x", "test"]);
@@ -671,18 +673,23 @@ export default class extends AcsBaseGenerator {
 
         let content = this.fs.read(gradlePath);
 
-        let dependencyToAdd = "\timplementation group:\"" + group + "\", name:\"" + artifact + "\",version:\"" + version + "\"";
+        let dependencyToAdd = "\timplementation group:\"" + group + "\", name:\"" + artifact + "\", version:\"" + version + "\"";
         if (versionIsVariable)
-            dependencyToAdd = "\timplementation group:\"" + group + "\", name:\"" + artifact + "\",version: " + version;
+            dependencyToAdd = "\timplementation group:\"" + group + "\", name:\"" + artifact + "\", version: " + version;
 
         // Find dependecies section
         const dependenciesRegex = /dependencies\s*\{([\s\S]*?)\}/m;
+        
         const match = content.match(dependenciesRegex);
+        const groupEscaped = this.escapeRegex(group);
+        const artifactEscaped = this.escapeRegex(artifact);
+        const versionEscaped = this.escapeRegex(version);
 
         if (match) {
             const dependenciesContent = match[1];
+            const regexStr = new RegExp(`implementation\\s+group\\s*:\\s*['"]${groupEscaped}['"]\\s*,\\s*name\\s*:\\s*['"]${artifactEscaped}['"]\\s*,\\s*version\\s*:\\s*(?:['"]${versionEscaped}['"]|${versionEscaped})`);
             // Check dependency already exists
-            if (dependenciesContent.includes(dependencyToAdd)) {
+            if (regexStr.test(dependenciesContent)) {
                 this.log.error('Dep ' + group + ":" + artifact + ":" + version + " alredy present!");
             } else {
                 //Adding dependency
@@ -705,16 +712,17 @@ export default class extends AcsBaseGenerator {
 
         let content = this.fs.read(gradlePath);
 
-        let dependencyToAdd = "implementation " + projectGradlePath;
+        let dependencyToAdd = "implementation project(" + projectGradlePath+")";
 
         // Find dependecies section
         const dependenciesRegex = /dependencies\s*\{([\s\S]*?)\}/m;
         const match = content.match(dependenciesRegex);
-
+        const escapedPath = this.escapeRegex(projectGradlePath);
         if (match) {
             const dependenciesContent = match[1];
+            const regexStr = new RegExp(`implementation\\s+project\\s*\\(\\s*["']${escapedPath}["']\\s*\\)`);
             // Check dependency already exists
-            if (dependenciesContent.includes(dependencyToAdd)) {
+            if (regexStr.test(dependenciesContent)) {
                 this.log.error('Dep ' + projectGradlePath + ' alredy present!');
             } else {
                 //Adding dependency
@@ -726,5 +734,9 @@ export default class extends AcsBaseGenerator {
         } else {
             this.log('No deps found!');
         }
+    }
+
+    escapeRegex(str) {
+        return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     }
 };

@@ -22,6 +22,6 @@ export default class extends Generator {
     }
 
     writing() {
-        super.compileAndPublish(["slackWebhookUrl","slackNotificationChannel","slackIntegrationEnabled","slackInternalWebhookUrl","slackInternalNotificationChannel"]);
+        super.compileAndPublish([]);
     }
 };

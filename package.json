@@ -1,6 +1,6 @@
 {
   "name": "generator-water",
-  "version": "4.1.0",
+  "version": "4.1.2",
   "description": "Yeoman Generator for project Water Framework",
   "type": "module",
   "files": [
@@ -31,12 +31,11 @@
     "releaseNotesFile": "ReleaseNotes",
     "modulesPath": "",
     "licenseManagementEnabled": false,
-    "serverPem": "-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAt7S2yw6PLoPpgrlvbJC9\n2jWiFU6jvnZyL6+6XaXoeWpDww3wy4LiCd1Fz0PZ1ntqN6oHQOdaEDEMson98BVF\nu4JxvamFag7pp/JoQeUsiWiaC0QnPC7OEDi2TJ6wI9wcXfNhZaS9+qcWZBLu/uaL\nCtColVxsTsS3ri3NdeEmJKtbgSWHyee5slrJYSNtLxDgfCy27w7KBpfMDlPsfVpS\nIrCntYvLa5VodhIhT/kUZe4ljruRv8Xl77OFMyYhoIQl5lbxaFoC8WnUrNMx46x8\nlLHpAPzvOeKzmJgkzn6BHHBJI8gVcp4kPmJn3jg+cawXWGEi6K7PaoT+IiJQXkh0\nAQIDAQAB\n-----END PUBLIC KEY-----\n",
     "licenseUrl": "",
     "codeObfuscationEnabled": false
   },
   "dependencies": {
-    "acs-abstract-generator": "6.1.5",
+    "acs-abstract-generator": "6.1.7",
     "acs-java-visitor": "2.0.1",
     "axios": "^1.9.0",
     "chalk": "^5.4.1",
