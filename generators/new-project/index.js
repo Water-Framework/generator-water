@@ -271,7 +271,6 @@ export default class extends Generator {
                 this.projectVersion = answers.projectVersion;
             this.applicationTypeEntity = answers.applicationType === 'entity';
             let basePackageArr = this.projectGroupId.split(".");
-
             if(this.hasModel && this.applicationTypeEntity){
                 this.modelName = this.capitalizeFirstLetter(this.camelize(answers.modelName));
             } else {
@@ -375,11 +374,6 @@ export default class extends Generator {
         this.fs.copyTpl(templatePath + "/License.md", this.destinationPath(this.parentProjectPath + "/License.md"), this.projectConf);
         this.fs.copyTpl(templatePath + "/settings.gradle", this.destinationPath(this.parentProjectPath + "/settings.gradle"), this.projectConf);
         this.fs.copyTpl(templatePath + "/README.md", this.destinationPath(this.parentProjectPath + "/README.md"), this.projectConf);
-        let parentProjectConf = this.projectConf;
-        parentProjectConf["parent-project"] = true;
-        this.fs.copyTpl(templatePath + "/.yo-rc.json", this.destinationPath(this.parentProjectPath + "/.yo-rc.json"), {
-            projectConf: JSON.stringify(parentProjectConf, null, "\t\t\t")
-        });
         this.log.ok("Parent Project created succesfully!");
     }
 
@@ -400,6 +394,12 @@ export default class extends Generator {
     }
 
     end() {
+        let templatePath = this.getWaterTemplatePath() + "/scaffolding/common/new-project";
+        let parentProjectConf = this.projectConf;
+        parentProjectConf["parent-project"] = true;
+        this.fs.copyTpl(templatePath + "/.yo-rc.json", this.destinationPath(this.parentProjectPath + "/.yo-rc.json"), {
+            projectConf: JSON.stringify(parentProjectConf, null, "\t\t\t")
+        });
         this.log.ok("Project " + this.projectName + " created succesfully!");
     }
 };

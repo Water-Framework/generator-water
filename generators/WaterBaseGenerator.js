@@ -182,7 +182,7 @@ export default class extends AcsBaseGenerator {
     }
 
     addEntityModel(projectConf, modelName) {
-        this.upgradeConfEntitiesList(projectConf.projectName, projectConf.modelName, projectConf.isProtectedEntity, projectConf.isOwnedEntity);
+        this.upgradeConfEntitiesList(projectConf);
         let finalPath = projectConf.projectModelPath;
         projectConf.modelName = modelName;
         let technologyTemplatePath = this.getWaterTemplatePath(this.waterVersion) + "/scaffolding/" + projectConf.projectTechnology + "/model-module";
@@ -259,7 +259,7 @@ export default class extends AcsBaseGenerator {
         }
 
         if (!isNewProject) {
-            this.addGradleInternalDependency(buildGradlePath, projectConf.projectName + "-model")
+            this.addGradleInternalDependency(buildGradlePath, ":"+projectConf.projectName + "-model")
             this.addGradleDependency(buildGradlePath, "jakarta.persistence", "jakarta.persistence-api", "project.jakartaPersistenceVersion", true);
             this.addGradleDependency(buildGradlePath, "it.water.repository.jpa", "JpaRepository-api", "project.waterVersion", true);
             this.addGradleDependency(buildGradlePath, "it.water.repository", "Repository-entity", "project.waterVersion", true);
@@ -445,19 +445,29 @@ export default class extends AcsBaseGenerator {
         currentConf.isOwnedEntity = isOwnedEntity;
         this.addEntityModel(currentConf, modelName);
         this.addEntityServices(currentConf, modelName, false);
-        this.createServiceLayerApi(currentConf, modelName, false)
+        this.createServiceLayerApi(currentConf, modelName, false);
+        this.updateProjectConfOnGeneration(currentConf);
     }
 
-    upgradeConfEntitiesList(projectSelected, modelName, isProtectedEntity, isOwnedEntity) {
+    upgradeConfEntitiesList(projectConf) {
+        let projectSelected = projectConf.projectName;
+        let modelName = projectConf.modelName;
+        let isProtectedEntity = projectConf.isProtectedEntity;
+        let isOwnedEntity = projectConf.isOwnedEntity;
         let currentConf = this.getProjectConfiguration(projectSelected);
         if (!currentConf["entities"])
             currentConf["entities"] = [];
+        if (!projectConf["entities"])
+            projectConf["entities"] = [];
+
         let currentEntity = {
             "modelName": modelName,
             "isProtectedEntity": isProtectedEntity,
             "isOwnedEntity": isOwnedEntity
         }
+        //pushing in workspace config
         currentConf["entities"].push(currentEntity);
+        projectConf["entities"].push(currentEntity);
         this.setProjectConfiguration(projectSelected, currentConf);
         this.saveProjectsConfiguration();
     }
@@ -712,12 +722,13 @@ export default class extends AcsBaseGenerator {
 
         let content = this.fs.read(gradlePath);
 
-        let dependencyToAdd = "implementation project(" + projectGradlePath+")";
+        let dependencyToAdd = "implementation project(\"" + projectGradlePath+"\")";
 
         // Find dependecies section
         const dependenciesRegex = /dependencies\s*\{([\s\S]*?)\}/m;
         const match = content.match(dependenciesRegex);
         const escapedPath = this.escapeRegex(projectGradlePath);
+        this.log("ESCAPED PATH: "+escapedPath)
         if (match) {
             const dependenciesContent = match[1];
             const regexStr = new RegExp(`implementation\\s+project\\s*\\(\\s*["']${escapedPath}["']\\s*\\)`);
