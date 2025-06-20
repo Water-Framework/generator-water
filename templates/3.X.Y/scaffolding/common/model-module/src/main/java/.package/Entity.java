@@ -60,7 +60,7 @@ import com.fasterxml.jackson.annotation.JsonView;
 @Getter
 @Setter(AccessLevel.PROTECTED)
 @ToString
-@EqualsAndHashCode(of = {"id","exampleField"/*todo add more fields for equals and hashcode, remember hashcode and equals are key methods for ORMs*/})
+@EqualsAndHashCode(of = {"exampleField"/*todo add more fields for equals and hashcode, remember hashcode and equals are key methods for ORMs*/},callSuper = true)
 <%- defineActionsAndRolesAnnotation -%>
 public class <%- modelName %> extends AbstractJpaEntity<%-implementedInterfaces%> {
     

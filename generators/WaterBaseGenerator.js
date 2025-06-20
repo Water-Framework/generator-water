@@ -538,7 +538,11 @@ export default class extends AcsBaseGenerator {
         await depCycleChecker.checkDepCycles(true, this);
 
         let buildCommand = ["clean", "build"]
-        buildResult = await this.spawn("gradle", [...buildCommand, "-x", "test"]);
+        if(!this.options.withTests){
+            buildCommand.push("-x")
+            buildCommand.push("test")
+        }
+        buildResult = await this.spawn("gradle", buildCommand);
         let projectKarafFeaturesPath = this.config.get("projectFeaturesPath");
         if (projectKarafFeaturesPath !== null && projectKarafFeaturesPath !== undefined && projectKarafFeaturesPath.length > 0) {
             let featureDir = workspaceDir + "/" + projectKarafFeaturesPath + "/src/main/resources/features-src.xml";
