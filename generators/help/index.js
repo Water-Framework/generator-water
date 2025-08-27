@@ -12,6 +12,8 @@ export default class extends Generator {
 
     end() {
         this.log("------------------------------------------------------------------------------------------------------------------------------------------------");
+        this.log("Available Water Generator Tasks:");
+        this.log("------------------------------------------------------------------------------------------------------------------------------------------------");
         this.log("yo water:add-entity                                                               \tAdds new entity on existing project");
         this.log("yo water:add-rest-services                                                        \tAdds rest service modules on an exisiting project");
         this.log("yo water:app                                                                      \tPrint info about the water generator");
@@ -27,6 +29,11 @@ export default class extends Generator {
         this.log("yo water:publish-all                                                              \tPublish ALL workspace projects to Maven repository");
         this.log("yo water:stabilityMetrics                                                         \tPrints stability metrics about the software quality of the modules inside this workspace");
         this.log("------------------------------------------------------------------------------------------------------------------------------------------------");
+        this.log();
+        this.log("💡 TIP: For detailed help on any specific task, add --taskHelp to the command:");
+        this.log("   Example: yo water:new-project --taskHelp");
+        this.log("   This will display comprehensive documentation including usage examples,");
+        this.log("   available options, and detailed explanations for that specific task.");
         this.log();
     }
 

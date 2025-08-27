@@ -1,5 +1,5 @@
 import Generator from '../WaterBaseGenerator.js';
-import DepCycleChecker from './WaterDepCycleChecker.js';
+import DepCycleChecker from '../WaterDepCycleChecker.js';
 import chalk from 'chalk';
 
 export default class extends Generator {
