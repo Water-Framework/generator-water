@@ -600,7 +600,7 @@ export default class extends AcsBaseGenerator {
         if (hasSonar)
             testArg.push("jacocoRootReport", "sonar", "-Dsonar.host.url=" + sonarHost, "-Dsonar.login=" + sonarToken);
         this.destinationRoot(projectName);
-        let projectPath = process.cwd();
+        let projectPath = process.cwd()+"/"+projectName;
         let testResult = await this.spawn("gradle", testArg);
         this.destinationRoot("../");
         testOk = testResult.exitCode === 0;
