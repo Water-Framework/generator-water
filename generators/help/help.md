@@ -17,6 +17,9 @@ This generator provides a complete overview of the Water generator system by:
 yo water:help
 ```
 
+### Command Line Options
+- `--fulltext` - Display complete documentation for all generator tasks
+
 ## What It Shows
 
 ### Available Tasks
@@ -49,7 +52,24 @@ Explains how to access comprehensive documentation for any specific task:
    Example: yo water:new-project --taskHelp
    This will display comprehensive documentation including usage examples,
    available options, and detailed explanations for that specific task.
+
+💡 TIP: Use --fulltext to display complete documentation for all tasks:
+   Example: yo water:help --fulltext
 ```
+
+### Full Documentation Mode
+When run with `--fulltext`, displays complete documentation for all available generator tasks:
+
+```bash
+yo water:help --fulltext
+```
+
+This comprehensive mode shows:
+- Complete documentation for every generator task
+- All usage examples and options for each task
+- Prerequisites, interactive prompts, and generated files
+- Integration information and troubleshooting guides
+- A summary of documented vs undocumented tasks
 
 ## Task Categories
 

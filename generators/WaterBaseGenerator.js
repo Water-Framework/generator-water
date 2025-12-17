@@ -485,7 +485,7 @@ export default class extends AcsBaseGenerator {
         return results;
     }
 
-    async launchProjectsPublish(projectsName, repoUsername, repoPassword) {
+    async launchProjectsPublish(projectsName, repoUsername, repoPassword,config) {
         let results = [];
         let workspaceDir = process.cwd();
         for (let i = 0; i < projectsName.length; i++) {
@@ -494,7 +494,7 @@ export default class extends AcsBaseGenerator {
             let testOk = true;
             if (buildOk) {
                 if (!this.options.skipTest) {
-                    if (this.getProjectConfiguration(projectsName[i]).hasSonarqubeIntegration) {
+                    if (config["projectsConfiguration"][projectsName[i]].hasSonarqubeIntegration) {
                         if (!this.options.sonarHost || !this.options.sonarToken) {
                             testOk = false;
                             this.log.error("Please insert --sonarHost and --sonarToken in order!");

@@ -22,16 +22,12 @@ export default class extends Generator {
         });
     }
 
-    async checkDepCycles(){
-       await this.depCycleChecker.checkDepCycles(true,this);
-    }
-
     async install() {
         let repoUsername = this.options.username;
         let repoPassword  = this.options.password;
         if(!repoUsername || !repoPassword)
             this.log.info(chalk.bold.yellow("WARN: NO CREDENTIALS SPECIFIED, PUBLISH COULD FAIL, please add --username <user> --passowrd <password>"));
-        this.results = this.launchProjectsPublish(this.projectsName,repoUsername,repoPassword);
+        this.results = this.launchProjectsPublish(this.projectsName,repoUsername,repoPassword,this.config.getAll());
     }
 
     end() {
