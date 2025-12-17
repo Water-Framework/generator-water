@@ -490,7 +490,7 @@ export default class extends AcsBaseGenerator {
         let workspaceDir = process.cwd();
         for (let i = 0; i < projectsName.length; i++) {
             this.log.ok("processing: " + projectsName[i]);
-            let buildOk = this.launchSingleProjectBuild(projectsName[i]);
+            let buildOk = await this.launchSingleProjectBuild(projectsName[i]);
             let testOk = true;
             if (buildOk) {
                 if (!this.options.skipTest) {
