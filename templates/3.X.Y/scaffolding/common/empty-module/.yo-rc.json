@@ -1,5 +1,5 @@
 {
-    "generator-hyperiot": {
+    "generator-water": {
         "inner-project": true,
         "project-type": "custom",
         "projectName": "<%- projectName %>",
