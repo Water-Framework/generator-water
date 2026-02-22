@@ -20,3 +20,6 @@ Reasoning Steps
 
 Agentic Operation
 - Attempt a first pass autonomously unless a critical piece of information is missing; stop and request clarification if key success criteria are not met or if significant ambiguities arise.
+
+Skills
+- `/water-generate` - Guides users through generating Water Framework projects, entities, REST services, modules, and extensions using the `yo water:*` commands. Supports all technologies (Water, Spring, OSGi, Quarkus) and both interactive and non-interactive modes.
