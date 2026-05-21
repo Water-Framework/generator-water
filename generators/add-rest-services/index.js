@@ -11,6 +11,16 @@ export default class extends Generator {
         this.projectSelectedRootPath = "";
         this.projectSelectedBasePackage = "";
         this.projectSelectedPublishModule = false;
+
+        this.option('inlineArgs', {
+            type: Boolean,
+            desc: 'Skip interactive prompts and use only command line arguments',
+            default: false
+        });
+        this.option('project', {
+            type: String,
+            desc: 'Target project name'
+        });
     }
 
     async initializing() {
@@ -18,16 +28,19 @@ export default class extends Generator {
     }
 
     async prompting() {
+        if (this.options.inlineArgs) {
+            this.projectSelected = this.options.project;
+            return;
+        }
+
         let self = this;
         let projects = this.getAllProjectsName();
-
-        await this.prompt([ {
+        await this.prompt([{
             type: 'checkbox',
             name: 'project',
             message: 'Please select a project',
             choices: projects
-        }
-        ]).then((answers) => {
+        }]).then((answers) => {
             self.projectSelected = answers.project;
         });
     }
@@ -52,8 +65,7 @@ export default class extends Generator {
         this.log.info("Upgrading project ",this.projectSelected,currentConf)
         this.setProjectConfiguration(this.projectSelected,currentConf);
         this.saveProjectsConfiguration();
-    }   
-
+    }
 
     end() {
         this.log.ok("Rest services for " + this.projectName + " created succesfully!");

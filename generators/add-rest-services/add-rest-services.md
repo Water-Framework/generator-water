@@ -13,23 +13,35 @@ This generator retrofits an existing project with REST capabilities by:
 
 ## Usage
 
-### Interactive Mode
 ```bash
-yo water:add-rest-services
+yo water:add-rest-services --inlineArgs [options...]
 ```
 
-### Prerequisites
+Use `--inlineArgs` to skip all interactive prompts. REST configuration (context root, authentication, model name) is derived automatically from the existing project configuration.
+
+## Available Arguments
+
+| Flag | Type | Default | Description |
+|------|------|---------|-------------|
+| `--project` | string | — | Target project name (must match an existing workspace project) |
+
+## Example
+
+```bash
+yo water:add-rest-services --inlineArgs \
+  --project=my-ecommerce-app
+```
+
+## Prerequisites
 - Must be run within a Water workspace
 - Target project must exist and have entities defined
 - Project should not already have REST services enabled
 
-## Interactive Prompts
+## Prompts (interactive mode)
 
-The generator will prompt you for:
+When running without `--inlineArgs`, the generator will prompt for:
 
 1. **Project Selection**: Choose which existing project to add REST services to
-2. **REST Context Root**: Base path for all REST endpoints (e.g., "/api/users")
-3. **Authentication**: Whether to enable automatic login management (@Login annotation)
 
 ## Generated Components
 

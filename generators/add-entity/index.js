@@ -14,6 +14,31 @@ export default class extends Generator {
         this.projectSelectedPublishModule = false;
         this.isProtectedEntity = false;
         this.isOwnedEntity = false;
+
+        this.option('inlineArgs', {
+            type: Boolean,
+            desc: 'Skip interactive prompts and use only command line arguments',
+            default: false
+        });
+        this.option('project', {
+            type: String,
+            desc: 'Target project name'
+        });
+        this.option('entityName', {
+            type: String,
+            desc: 'Entity class name in PascalCase',
+            default: 'MyEntity'
+        });
+        this.option('isProtectedEntity', {
+            type: Boolean,
+            desc: 'Enable Water Permission System access control on this entity',
+            default: false
+        });
+        this.option('isOwnedEntity', {
+            type: Boolean,
+            desc: 'Enable ownership semantics (entities belong to specific users/owners)',
+            default: false
+        });
     }
 
     async initializing() {
@@ -21,9 +46,17 @@ export default class extends Generator {
     }
 
     async prompting() {
+        if (this.options.inlineArgs) {
+            this.projectSelected = this.options.project;
+            this.entityName = this.options.entityName || 'MyEntity';
+            this.isProtectedEntity = this.options.isProtectedEntity !== undefined ? this.options.isProtectedEntity : false;
+            this.isOwnedEntity = this.options.isOwnedEntity !== undefined ? this.options.isOwnedEntity : false;
+            return;
+        }
+
         let self = this;
         let projects = this.getAllProjectsName();
-        await this.prompt([ {
+        await this.prompt([{
             type: 'checkbox',
             name: 'project',
             message: 'Please select a project',
@@ -33,7 +66,7 @@ export default class extends Generator {
             type: 'input',
             name: 'entityName',
             message: 'Please insert entity name',
-        },{
+        }, {
             type: 'confirm',
             name: 'isProtectedEntity',
             message: 'Is your aggregate model a "protected entity" so its access should be controlled by the Permission System?',
@@ -54,9 +87,8 @@ export default class extends Generator {
     }
 
     async configuring() {
-        await this.addEntityStack(this.projectSelected,this.entityName,this.isProtectedEntity,this.isOwnedEntity);
-    }   
-
+        await this.addEntityStack(this.projectSelected, this.entityName, this.isProtectedEntity, this.isOwnedEntity);
+    }
 
     end() {
         this.log.ok("Extension for " + this.projectName + " created succesfully!");

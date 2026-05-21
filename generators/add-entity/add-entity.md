@@ -13,19 +13,39 @@ This generator creates a new entity within an existing project, including:
 
 ## Usage
 
-### Interactive Mode
 ```bash
-yo water:add-entity
+yo water:add-entity --inlineArgs [options...]
 ```
 
-### Prerequisites
+Use `--inlineArgs` to skip all interactive prompts.
+
+## Available Arguments
+
+| Flag | Type | Default | Description |
+|------|------|---------|-------------|
+| `--project` | string | — | Target project name (must match an existing workspace project) |
+| `--entityName` | string | `MyEntity` | Entity class name in PascalCase (e.g. `Product`, `Order`) |
+| `--isProtectedEntity` | boolean | `false` | Enable Water Permission System access control on this entity |
+| `--isOwnedEntity` | boolean | `false` | Enable ownership semantics (entities belong to specific users/owners) |
+
+## Example
+
+```bash
+yo water:add-entity --inlineArgs \
+  --project=my-ecommerce-app \
+  --entityName=Product \
+  --isProtectedEntity=true \
+  --isOwnedEntity=false
+```
+
+## Prerequisites
 - Must be run within a Water workspace
 - At least one project must exist in the workspace
 - The target project should be configured for entities
 
-## Interactive Prompts
+## Prompts (interactive mode)
 
-The generator will prompt you for:
+When running without `--inlineArgs`, the generator will prompt for:
 
 1. **Project Selection**: Choose which existing project to add the entity to
 2. **Entity Name**: Name of the new entity (e.g., "User", "Product", "Order")

@@ -12,6 +12,20 @@ export default class extends Generator {
         this.projectSelectedRootPath = "";
         this.projectSelectedBasePackage = "";
         this.projectSelectedPublishModule = false;
+
+        this.option('inlineArgs', {
+            type: Boolean,
+            desc: 'Skip interactive prompts and use only command line arguments',
+            default: false
+        });
+        this.option('project', {
+            type: String,
+            desc: 'Target project name'
+        });
+        this.option('moduleName', {
+            type: String,
+            desc: 'Module name suffix (will be prefixed with {project}-)'
+        });
     }
 
     async initializing() {
@@ -19,10 +33,20 @@ export default class extends Generator {
     }
 
     async prompting() {
+        if (this.options.inlineArgs) {
+            this.projectSelected = this.options.project;
+            this.projectName = this.projectSelected + "-" + this.options.moduleName;
+            this.projectSelectedGroupId = this.getProjectConfiguration(this.projectSelected)["projectGroupId"];
+            this.projectSelectedVersion = this.getProjectConfiguration(this.projectSelected)["projectVersion"];
+            this.projectSelectedRootPath = this.getProjectConfiguration(this.projectSelected)["projectPath"];
+            this.projectSelectedPublishModule = this.getProjectConfiguration(this.projectSelected)["publishModule"];
+            this.projectSelectedBasePackage = this.projectSelectedGroupId.split(".").join("/");
+            return;
+        }
+
         let self = this;
         let projects = this.getAllProjectsName();
-
-        await this.prompt([ {
+        await this.prompt([{
             type: 'checkbox',
             name: 'project',
             message: 'Please select a project',
@@ -54,7 +78,7 @@ export default class extends Generator {
             "projectName": this.projectName,
             "projectGroupId": this.projectSelectedGroupId,
             "projectVersion": this.projectSelectedVersion,
-            "publishModule" : this.projectSelectedPublish 
+            "publishModule" : this.projectSelectedPublish
 
         }
         this.createBasicProjectFiles(projectPath,conf)
@@ -65,8 +89,7 @@ export default class extends Generator {
         //create package folder
         fs.mkdirSync(projectPath+"/src/main/java/"+this.projectSelectedBasePackage,{recursive:true});
         fs.mkdirSync(projectPath+"/src/test/java/"+this.projectSelectedBasePackage,{recursive:true});
-    }   
-
+    }
 
     end() {
         this.log.ok("Extension for " + this.projectName + " created succesfully!");

@@ -36,6 +36,7 @@ export default class extends Generator {
         this.log("yo water:app                                                                      \tPrint info about the water generator");
         this.log("yo water:build                                                                    \tLaunch build on workspace projects");
         this.log("yo water:build-all                                                                \tLaunch build on all workspace projects");
+        this.log("yo water:claude-init                                                              \tInitializes Claude Code with Water Framework knowledge base in current directory");
         this.log("yo water:help                                                                     \tShow help");
         this.log("yo water:new-empty-module                                                         \tCreates a new empty module into an existing project");
         this.log("yo water:new-entity-extension                                                     \tScaffolds classes to create an entity extension inside a new or existing project");

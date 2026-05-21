@@ -12,9 +12,44 @@ This generator creates entity extension functionality by:
 
 ## Usage
 
-### Interactive Mode
 ```bash
-yo water:new-entity-extension
+yo water:new-entity-extension --inlineArgs [options...]
+```
+
+Use `--inlineArgs` to skip all interactive prompts.
+
+## Available Arguments
+
+| Flag | Type | Default | Description |
+|------|------|---------|-------------|
+| `--existingProject` | boolean | `true` | `true` = add extension into an existing project; `false` = create a new project for the extension |
+| `--project` | string | — | Target project name. Required only when `--existingProject=false` |
+| `--entityName` | string | `MyEntity` | Extension entity class name in PascalCase (e.g. `PremiumUser`) |
+| `--entityToExtend` | string | — | Fully qualified class name of the entity to extend (e.g. `it.water.user.model.WaterUser`) |
+| `--entityGradleModelGroupId` | string | — | Maven Group ID of the model artifact containing the entity to extend (e.g. `it.water.user`) |
+| `--entityGradleModelArtifactId` | string | — | Maven Artifact ID of the model artifact containing the entity to extend (e.g. `User-model`) |
+
+## Examples
+
+### Add extension to an existing project
+```bash
+yo water:new-entity-extension --inlineArgs \
+  --existingProject=true \
+  --project=my-ecommerce-app \
+  --entityName=PremiumUser \
+  --entityToExtend=it.water.user.model.WaterUser \
+  --entityGradleModelGroupId=it.water.user \
+  --entityGradleModelArtifactId=User-model
+```
+
+### Create a new project for the extension
+```bash
+yo water:new-entity-extension --inlineArgs \
+  --existingProject=false \
+  --entityName=ExtendedUser \
+  --entityToExtend=it.water.user.model.WaterUser \
+  --entityGradleModelGroupId=it.water.user \
+  --entityGradleModelArtifactId=User-model
 ```
 
 ## Prerequisites
@@ -22,15 +57,15 @@ yo water:new-entity-extension
 - Base entity must exist (either in workspace or external dependency)
 - Understanding of entity extension patterns
 
-## Interactive Prompts
+## Prompts (interactive mode)
 
-The generator will prompt you for:
+When running without `--inlineArgs`, the generator will prompt for:
 
 1. **Target Project**: Choose project to create extension in (or create new project)
-2. **Base Entity**: Specify the entity to extend
-3. **Extension Name**: Name of the extension entity
-4. **Extension Properties**: Additional fields for the extension
-5. **Extension Type**: Type of extension (inheritance, composition, etc.)
+2. **Base Entity**: Fully qualified class name of the entity to extend
+3. **Extension Name**: Name of the extension entity in PascalCase
+4. **Model Group ID**: Maven Group ID of the artifact containing the base entity
+5. **Model Artifact ID**: Maven Artifact ID of the model artifact
 
 ## Extension Types
 

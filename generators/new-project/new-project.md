@@ -1,88 +1,103 @@
-# Water New Project Generator - Command Line Arguments
+# Water New Project Generator
 
-The `water:new-project` generator now supports command-line arguments to skip the interactive prompting phase and run in batch mode.
+The `water:new-project` generator scaffolds a complete Water Framework microservice project with model, API, service, and optional REST layers.
 
 ## Usage
 
-### Interactive Mode (Default)
-```bash
-yo water:new-project
-```
-This runs the generator with interactive prompts as before.
-
-### Non-Interactive Mode with Arguments
 ```bash
 yo water:new-project --inlineArgs [options...]
 ```
-When `--inlineArgs` is specified, the generator skips all interactive prompts and uses the provided command-line arguments.
+
+Use `--inlineArgs` to skip all interactive prompts. Collect all required parameters before running the command.
 
 ## Available Arguments
 
-### Required/Common Arguments
-- `--projectName` - Project name (default: "my-awesome-project")
-- `--projectTechnology` - Technology to use: water, spring, osgi, quarkus (default: "water")
-- `--applicationType` - Application type: entity, service (default: "entity")
-
-### Optional Arguments
-- `--projectGroupId` - Group ID (default: auto-generated from project name)
-- `--projectVersion` - Project version (default: "1.0.0", ignored for water projects)
-- `--hasModel` - Whether service project has model (default: false)
-- `--modelName` - Model name (default: "MyEntityName")
-- `--isProtectedEntity` - Whether entity is protected by permission system (default: false)
-- `--isOwnedEntity` - Whether entity is an owned entity (default: false)
-- `--springRepository` - Use Spring repository instead of Water repositories (default: true)
-- `--hasRestServices` - Whether project has REST services (default: true)
-- `--restContextRoot` - REST context root path (default: auto-generated)
-- `--hasAuthentication` - Add automatic login management (default: true)
-- `--moreModules` - Add additional modules (default: false)
-- `--modules` - Comma-separated list of modules: user-integration, role-integration, permission, shared-entity-integration
-- `--publishModule` - Deploy to remote maven repository (default: false)
-- `--publishRepoName` - Repository symbolic name (default: "My Repository")
-- `--publishRepoUrl` - Repository URL (default: "https://myrepo/m2")
-- `--publishRepoHasCredentials` - Repository requires authentication (default: false)
-- `--hasSonarqubeIntegration` - Add Sonarqube integration (default: false)
+| Flag | Type | Default | Description |
+|------|------|---------|-------------|
+| `--projectName` | string | `my-awesome-project` | Project name in kebab-case (e.g. `product-catalog`) |
+| `--projectTechnology` | string | `water` | Target technology: `water`, `spring`, `osgi`, `quarkus` |
+| `--projectGroupId` | string | auto-derived | Maven Group ID. Auto-derived from project name as `com.{projectName}` if omitted |
+| `--projectVersion` | string | `1.0.0` | Project version. Ignored for `water` projects (version managed by framework) |
+| `--applicationType` | string | `entity` | `entity` = CRUD with persistence; `service` = integration without own entities |
+| `--hasModel` | boolean | `false` | Whether a `service` project defines its own JPA model |
+| `--modelName` | string | `MyEntityName` | Entity class name in PascalCase. Required for `entity` type or `service` with `hasModel=true` |
+| `--isProtectedEntity` | boolean | `false` | Enable Water Permission System access control on the entity |
+| `--isOwnedEntity` | boolean | `false` | Enable ownership semantics (entities belong to specific users/owners) |
+| `--springRepository` | boolean | `true` | Use Spring Data repositories instead of Water repositories. Spring tech + entity type only |
+| `--hasRestServices` | boolean | `true` | Generate REST controllers, REST API interfaces, and Karate test files |
+| `--restContextRoot` | string | `/{projectName}s` | REST base path (e.g. `/products`). Slash prefix added automatically if missing |
+| `--hasAuthentication` | boolean | `true` | Add `@Login` annotation on REST endpoints for automatic authentication |
+| `--moreModules` | boolean | `false` | Enable selection of additional integration modules |
+| `--modules` | string (csv) | — | Comma-separated modules: `user-integration`, `role-integration`, `permission`, `shared-entity-integration` |
+| `--publishModule` | boolean | `false` | Configure deployment to a remote Maven repository |
+| `--publishRepoName` | string | `My Repository` | Symbolic name for the Maven repository |
+| `--publishRepoUrl` | string | `https://myrepo/m2` | URL of the Maven repository |
+| `--publishRepoHasCredentials` | boolean | `false` | Whether the repository requires username/password authentication |
+| `--hasSonarqubeIntegration` | boolean | `false` | Add SonarQube properties to the project for CI/CD integration |
 
 ## Examples
 
-### Create a basic Water project
+### Water CRUD project with REST
 ```bash
-yo water:new-project --inlineArgs --projectName=my-service --applicationType=entity
+yo water:new-project --inlineArgs \
+  --projectName=home-library \
+  --projectTechnology=water \
+  --projectGroupId=it.acsoftware.library \
+  --applicationType=entity \
+  --modelName=Book \
+  --isProtectedEntity=true \
+  --isOwnedEntity=true \
+  --hasRestServices=true \
+  --restContextRoot=/books \
+  --hasAuthentication=true \
+  --publishModule=true \
+  --publishRepoName="ACSoftware Nexus" \
+  --publishRepoUrl=https://nexus.acsoftware.it/nexus/repository/maven-releases \
+  --publishRepoHasCredentials=true \
+  --hasSonarqubeIntegration=true
 ```
 
-### Create a Spring project with custom settings
+### Spring project with permission and modules
 ```bash
 yo water:new-project --inlineArgs \
   --projectName=user-management \
   --projectTechnology=spring \
+  --projectGroupId=com.mycompany.users \
+  --projectVersion=1.0.0 \
   --applicationType=entity \
   --modelName=User \
   --isProtectedEntity=true \
   --hasRestServices=true \
-  --hasAuthentication=true
-```
-
-### Create a service project with modules
-```bash
-yo water:new-project --inlineArgs \
-  --projectName=notification-service \
-  --applicationType=service \
-  --hasModel=true \
-  --modelName=Notification \
+  --hasAuthentication=true \
   --moreModules=true \
   --modules=user-integration,permission
 ```
 
-### Using arguments in interactive mode
-You can also provide arguments in interactive mode to pre-fill the prompts:
+### Integration service without persistence
 ```bash
-yo water:new-project --projectName=my-project --projectTechnology=spring
+yo water:new-project --inlineArgs \
+  --projectName=notification-service \
+  --projectTechnology=water \
+  --applicationType=service \
+  --hasModel=false \
+  --hasRestServices=true \
+  --restContextRoot=/notifications
 ```
-The prompts will show your provided values as defaults.
+
+### OSGi modular project
+```bash
+yo water:new-project --inlineArgs \
+  --projectName=iot-gateway \
+  --projectTechnology=osgi \
+  --applicationType=entity \
+  --modelName=Device \
+  --hasRestServices=true
+```
 
 ## Notes
 
 - Boolean arguments accept `true`/`false` values
-- When using `--inlineArgs`, all conditional logic from the interactive prompts is preserved
-- The `--projectGroupId` is auto-generated from the project name if not provided
-- For Water projects, the version is always managed by the framework
-- Module names for `--modules` should be comma-separated without spaces
+- All conditional logic from the interactive prompts is preserved (e.g. `--springRepository` is ignored for non-Spring projects)
+- `--projectGroupId` is auto-derived from the project name if not provided
+- For `water` projects, `--projectVersion` is ignored — version is always managed by the framework
+- `--modules` values must be comma-separated without spaces

@@ -1,7 +1,6 @@
 ---
 name: water-generate
 description: Use when the user wants to generate Water Framework code - new projects, entities, REST services, modules, or extensions using the yo water generator. Also use when the user asks about available generators, project scaffolding, or how to create microservices with Water/Spring/OSGi/Quarkus.
-allowed-tools: Bash, Read, Glob, Grep
 ---
 
 You are an expert assistant for the **Water Framework code generator** (`generator-water`), a Yeoman-based scaffolding tool for Java microservices. Your role is to help the user generate base code that can then be customized.
@@ -88,13 +87,13 @@ Once all prerequisites are satisfied, proceed to Step 1.
 
 Ask the user (if not already clear) what they need to generate. The available operations are:
 
-| Operation | Command | When to use |
-|-----------|---------|-------------|
-| **New Project** | `yo water:new-project` | Create a brand new microservice project with model, API, and service layers |
-| **Add Entity** | `yo water:add-entity` | Add a new JPA entity (with full CRUD stack) to an existing project |
-| **Add REST Services** | `yo water:add-rest-services` | Add REST API layer to an existing project that doesn't have one |
-| **New Empty Module** | `yo water:new-empty-module` | Add a custom Gradle sub-module to an existing project |
-| **New Entity Extension** | `yo water:new-entity-extension` | Extend an entity from another module (e.g., extend WaterUser) |
+| Operation | Command | Docs | When to use |
+|-----------|---------|------|-------------|
+| **New Project** | `yo water:new-project` | `generators/new-project/new-project.md` | Create a brand new microservice project with model, API, and service layers |
+| **Add Entity** | `yo water:add-entity` | `generators/add-entity/add-entity.md` | Add a new JPA entity (with full CRUD stack) to an existing project |
+| **Add REST Services** | `yo water:add-rest-services` | `generators/add-rest-services/add-rest-services.md` | Add REST API layer to an existing project that doesn't have one |
+| **New Empty Module** | `yo water:new-empty-module` | `generators/new-empty-module/new-empty-module.md` | Add a custom Gradle sub-module to an existing project |
+| **New Entity Extension** | `yo water:new-entity-extension` | `generators/new-entity-extension/new-entity-extension.md` | Extend an entity from another module (e.g., extend WaterUser) |
 | **Build** | `yo water:build` | Build selected workspace projects (respects dependency order) |
 | **Build All** | `yo water:build-all` | Build all projects in the workspace |
 | **Publish** | `yo water:publish` | Publish selected projects to a Maven repository |
@@ -109,13 +108,31 @@ Ask the user (if not already clear) what they need to generate. The available op
 
 ## Step 2: Gather configuration details
 
-### ⚠️ For `new-project`: Ask for technology FIRST
+### ⚠️ For `new-project`: Mandatory questions — ask ALL of these before generating
 
-**If the user has not explicitly specified the technology, ask this question before anything else:**
+Collect every answer below before building the command. Do NOT assume defaults for mandatory fields; use the listed default only when the user explicitly confirms it.
 
-> "Which technology do you want to use for this project? Options: `water` (native Water Framework), `spring` (Spring Boot 3.X), `osgi` (OSGi/Karaf), `quarkus` (Quarkus cloud-native)."
+**Ask in this order:**
 
-Do NOT proceed until the user answers this question. Do NOT assume a default.
+1. **Technology** *(mandatory, no default)* — `water`, `spring`, `osgi`, `quarkus`
+2. **Project name** *(mandatory)* — kebab-case (e.g. `product-catalog`). Default: `my-awesome-project`
+3. **Group ID** *(mandatory)* — Maven Group ID (e.g. `com.mycompany`). Default: auto-derived from project name as `com.{projectName}` — confirm with the user before using the default
+4. **Version** *(mandatory for non-`water` tech)* — e.g. `1.0.0`. Skip entirely for `water` projects (version is managed by the framework)
+5. **Application type** — `entity` (CRUD with persistence) or `service` (integration/business logic). Default: `entity`
+6. **Entity / model name** *(mandatory if `entity` type, or `service` with `hasModel=true`)* — PascalCase (e.g. `Product`)
+7. **isProtectedEntity** — enable Water Permission System access control. Default: `false`
+8. **isOwnedEntity** — enable ownership semantics. Default: `false`
+9. **Spring repository** *(only for `spring` tech + `entity` type)* — use Spring Data repos instead of Water repos. Default: `true`
+10. **REST services** — generate REST controllers and Karate tests. Default: `true`
+11. **REST context root** *(if REST enabled)* — base path (e.g. `/products`). Default: `/{projectName}s`
+12. **Authentication** *(if REST enabled)* — add `@Login` on endpoints. Default: `true`
+13. **Publish to Nexus / Maven repo** *(mandatory question)* — ask the user if they want to publish to a remote Maven repository (`publishModule`). If yes, also ask:
+    - Repository name (`publishRepoName`)
+    - Repository URL (`publishRepoUrl`)
+    - Whether it requires credentials (`publishRepoHasCredentials`)
+14. **SonarQube integration** *(mandatory question)* — ask the user if they want SonarQube properties added to the project (`hasSonarqubeIntegration`). Default: `false`
+
+> Items 13 and 14 must **always be asked explicitly** — never skip them or assume `false`.
 
 ---
 
@@ -168,24 +185,37 @@ All options below can be passed via `--inlineArgs` for non-interactive generatio
 
 ### Complete reference: `yo water:add-entity` options
 
-> **Interactive only** — does not support `--inlineArgs`.
+Supports `--inlineArgs` for non-interactive execution.
 
-| Option | Type | Default | Description |
-|--------|------|---------|-------------|
-| **project** | checkbox (from workspace) | — | Select the target project from existing workspace projects |
-| **entityName** | string | — | Entity class name in PascalCase (e.g. `Product`) |
-| **isProtectedEntity** | boolean | `false` | Enable Water Permission System access control on this entity |
-| **isOwnedEntity** | boolean | `false` | Enable ownership semantics |
+| Option | CLI Flag | Type | Default | Description |
+|--------|----------|------|---------|-------------|
+| **project** | `--project` | string | — | Target project name (must match an existing workspace project) |
+| **entityName** | `--entityName` | string | `MyEntity` | Entity class name in PascalCase (e.g. `Product`) |
+| **isProtectedEntity** | `--isProtectedEntity` | boolean | `false` | Enable Water Permission System access control on this entity |
+| **isOwnedEntity** | `--isOwnedEntity` | boolean | `false` | Enable ownership semantics |
+
+```bash
+yo water:add-entity --inlineArgs \
+  --project=<project-name> \
+  --entityName=<EntityName> \
+  --isProtectedEntity=<true|false> \
+  --isOwnedEntity=<true|false>
+```
 
 ---
 
 ### Complete reference: `yo water:add-rest-services` options
 
-> **Interactive only** — does not support `--inlineArgs`.
+Supports `--inlineArgs` for non-interactive execution.
 
-| Option | Type | Default | Description |
-|--------|------|---------|-------------|
-| **project** | checkbox (from workspace) | — | Select the target project. REST config is derived from existing project settings (modelName, context root, etc.) |
+| Option | CLI Flag | Type | Default | Description |
+|--------|----------|------|---------|-------------|
+| **project** | `--project` | string | — | Target project name. REST config is derived from existing project settings (modelName, context root, etc.) |
+
+```bash
+yo water:add-rest-services --inlineArgs \
+  --project=<project-name>
+```
 
 > The generator automatically sets `hasRestServices=true` on the selected project and regenerates the REST layer.
 
@@ -193,12 +223,18 @@ All options below can be passed via `--inlineArgs` for non-interactive generatio
 
 ### Complete reference: `yo water:new-empty-module` options
 
-> **Interactive only** — does not support `--inlineArgs`.
+Supports `--inlineArgs` for non-interactive execution.
 
-| Option | Type | Default | Description |
-|--------|------|---------|-------------|
-| **project** | checkbox (from workspace) | — | Select the parent project where the module will be added |
-| **projectName** | string | `{project}-` | Module name. Automatically prefixed with `{project}-` (e.g. entering `events` creates `my-project-events`) |
+| Option | CLI Flag | Type | Default | Description |
+|--------|----------|------|---------|-------------|
+| **project** | `--project` | string | — | Parent project name |
+| **moduleName** | `--moduleName` | string | — | Module name suffix — the final module name will be `{project}-{moduleName}` (e.g. `--moduleName=events` on `my-project` creates `my-project-events`) |
+
+```bash
+yo water:new-empty-module --inlineArgs \
+  --project=<project-name> \
+  --moduleName=<module-suffix>
+```
 
 > The generator creates the full module folder structure: `src/main/java`, `src/main/resources`, `src/test/java`, `src/test/resources`.
 
@@ -206,29 +242,35 @@ All options below can be passed via `--inlineArgs` for non-interactive generatio
 
 ### Complete reference: `yo water:new-entity-extension` options
 
-> **Interactive only** — does not support `--inlineArgs`.
+Supports `--inlineArgs` for non-interactive execution.
 
-| Option | Type | Default | Description |
-|--------|------|---------|-------------|
-| **existingProject** | boolean | `true` | `true` = add extension into an existing project; `false` = create a new project for the extension |
-| **project** | checkbox (from workspace) | — | Select the target project. Only shown if `existingProject=false` |
-| **entityName** | string | `MyEntity` | Name for the new extension entity in PascalCase |
-| **entityToExtend** | string | e.g. `it.water.user.model.WaterUser` | Fully qualified class name of the entity to extend (package + class) |
-| **entityGradleModelGroupId** | string | e.g. `it.water.user` | Maven Group ID of the model artifact that contains the entity to extend |
-| **entityGradleModelArtifactId** | string | e.g. `User-model` | Maven Artifact ID of the model artifact that contains the entity to extend |
+| Option | CLI Flag | Type | Default | Description |
+|--------|----------|------|---------|-------------|
+| **existingProject** | `--existingProject` | boolean | `true` | `true` = add extension into an existing project; `false` = create a new project for the extension |
+| **project** | `--project` | string | — | Target project name. Required only when `existingProject=false` |
+| **entityName** | `--entityName` | string | `MyEntity` | Name for the new extension entity in PascalCase |
+| **entityToExtend** | `--entityToExtend` | string | — | Fully qualified class name of the entity to extend (e.g. `it.water.user.model.WaterUser`) |
+| **entityGradleModelGroupId** | `--entityGradleModelGroupId` | string | — | Maven Group ID of the model artifact that contains the entity to extend (e.g. `it.water.user`) |
+| **entityGradleModelArtifactId** | `--entityGradleModelArtifactId` | string | — | Maven Artifact ID of the model artifact that contains the entity to extend (e.g. `User-model`) |
+
+```bash
+yo water:new-entity-extension --inlineArgs \
+  --existingProject=<true|false> \
+  --project=<project-name> \
+  --entityName=<EntityName> \
+  --entityToExtend=<fully.qualified.ClassName> \
+  --entityGradleModelGroupId=<group.id> \
+  --entityGradleModelArtifactId=<artifact-id>
+```
 
 ---
 
 ## Step 3: Generate the command
 
-### Interactive mode (recommended for first-time users)
-Simply run the base command — the generator will prompt for every option:
-```bash
-yo water:new-project
-```
+**Always use `--inlineArgs`** — collect all required parameters from the user before running the command, then generate the full non-interactive invocation.
 
-### Non-interactive mode (recommended when all params are known)
-Use `--inlineArgs` to skip all prompts. Only supported by `new-project`:
+Before generating, ask the user for any parameter not yet provided (technology is mandatory; all others have defaults listed in the table above).
+
 ```bash
 yo water:new-project --inlineArgs \
   --projectName=<name> \
@@ -252,6 +294,8 @@ yo water:new-project --inlineArgs \
   --publishRepoHasCredentials=<true|false> \
   --hasSonarqubeIntegration=<true|false>
 ```
+
+Only include flags that are relevant to the user's choices (e.g. omit `--springRepository` for non-Spring projects, omit `--modules` if `--moreModules=false`).
 
 ---
 
@@ -311,7 +355,7 @@ After generating, guide the user on what to customize:
 - **Water version**: For `water` technology, version is always `project.waterVersion` (managed by the framework, not user-configurable).
 - **Template versioning**: Templates follow a fallback strategy: exact version → minor (3.0.X) → major (3.X.Y) → basic.
 - **Technology overrides**: Technology-specific templates override common templates (e.g. Spring adds `@Repository` annotations).
-- **`--inlineArgs` only for `new-project`**: All other generators are interactive-only and do not support CLI flags.
+- **Always use `--inlineArgs`**: All generators support `--inlineArgs`. Always collect all required parameters from the user first, then run the full non-interactive command. Never run any generator without `--inlineArgs`.
 
 ---
 
@@ -357,8 +401,11 @@ yo water:new-project --inlineArgs \
 
 **Scenario 4: Add entity to existing project**
 ```bash
-yo water:add-entity
-# Interactively: select project, enter entity name, choose protection/ownership
+yo water:add-entity --inlineArgs \
+  --project=product-catalog \
+  --entityName=Category \
+  --isProtectedEntity=false \
+  --isOwnedEntity=false
 ```
 
 **Scenario 5: OSGi modular project**
@@ -384,13 +431,12 @@ yo water:new-project --inlineArgs \
 
 **Scenario 7: Extend WaterUser entity in a new project**
 ```bash
-yo water:new-entity-extension
-# Interactively:
-#   existingProject: false (create new project)
-#   entityName: ExtendedUser
-#   entityToExtend: it.water.user.model.WaterUser
-#   entityGradleModelGroupId: it.water.user
-#   entityGradleModelArtifactId: User-model
+yo water:new-entity-extension --inlineArgs \
+  --existingProject=false \
+  --entityName=ExtendedUser \
+  --entityToExtend=it.water.user.model.WaterUser \
+  --entityGradleModelGroupId=it.water.user \
+  --entityGradleModelArtifactId=User-model
 ```
 
 ---
@@ -402,7 +448,7 @@ User needs code generation
   |
   |-- New project from scratch?
   |    \-- FIRST: Ask which technology (water / spring / osgi / quarkus) if not stated
-  |    \-- yo water:new-project
+  |    \-- Collect ALL required params, then run: yo water:new-project --inlineArgs ...
   |         |-- Has persistence? -> applicationType=entity
   |         |    |-- Needs permission control? -> isProtectedEntity=true
   |         |    |-- Needs ownership? -> isOwnedEntity=true
@@ -411,16 +457,20 @@ User needs code generation
   |              \-- Needs its own model? -> hasModel=true
   |
   |-- Existing project, add entity?
-  |    \-- yo water:add-entity (interactive only)
+  |    \-- Collect params (project, entityName, isProtectedEntity, isOwnedEntity)
+  |    \-- yo water:add-entity --inlineArgs ...
   |
   |-- Existing project, add REST?
-  |    \-- yo water:add-rest-services (interactive only)
+  |    \-- Collect params (project)
+  |    \-- yo water:add-rest-services --inlineArgs ...
   |
   |-- Existing project, add custom module?
-  |    \-- yo water:new-empty-module (interactive only)
+  |    \-- Collect params (project, moduleName)
+  |    \-- yo water:new-empty-module --inlineArgs ...
   |
   |-- Extend entity from another project?
-  |    \-- yo water:new-entity-extension (interactive only)
+  |    \-- Collect params (existingProject, project, entityName, entityToExtend, groupId, artifactId)
+  |    \-- yo water:new-entity-extension --inlineArgs ...
   |
   |-- Build project(s)?
   |    |-- Selected -> yo water:build

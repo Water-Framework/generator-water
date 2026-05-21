@@ -12,22 +12,40 @@ This generator creates a minimal module structure for:
 
 ## Usage
 
-### Interactive Mode
 ```bash
-yo water:new-empty-module
+yo water:new-empty-module --inlineArgs [options...]
 ```
+
+Use `--inlineArgs` to skip all interactive prompts.
+
+## Available Arguments
+
+| Flag | Type | Default | Description |
+|------|------|---------|-------------|
+| `--project` | string | — | Parent project name (must match an existing workspace project) |
+| `--moduleName` | string | — | Module name suffix. The final module name will be `{project}-{moduleName}` (e.g. `--moduleName=events` on `my-project` creates `my-project-events`) |
+
+## Example
+
+```bash
+yo water:new-empty-module --inlineArgs \
+  --project=my-ecommerce-app \
+  --moduleName=payment-gateway
+```
+
+Creates `my-ecommerce-app-payment-gateway/` with the full module folder structure.
 
 ## Prerequisites
 - Must be run within a Water workspace
 - At least one project must exist in the workspace
 - Target project should be properly configured
 
-## Interactive Prompts
+## Prompts (interactive mode)
 
-The generator will prompt you for:
+When running without `--inlineArgs`, the generator will prompt for:
 
 1. **Project Selection**: Choose which existing project to add the module to
-2. **Module Name**: Name of the new module (e.g., "utils", "integration", "custom")
+2. **Module Name**: Name suffix for the new module (e.g., "utils", "integration", "custom")
 
 ## Generated Structure
 
