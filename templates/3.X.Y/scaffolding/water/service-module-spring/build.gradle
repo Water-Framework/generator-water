@@ -19,9 +19,9 @@ dependencies {
 	//Rest Modules
 	implementation group: 'it.water.service.rest', name: 'Rest-spring-api', version: project.waterVersion
 
-	implementation project (":<%- projectSuffixUpperCase %>-api")
-	implementation project (":<%- projectSuffixUpperCase %>-model")
-	implementation project (":<%- projectSuffixUpperCase %>-service")
+	implementationInclude project (":<%- projectSuffixUpperCase %>-api")
+	implementationInclude project (":<%- projectSuffixUpperCase %>-model")
+	implementationInclude project (":<%- projectSuffixUpperCase %>-service")
 
 	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:'+project.springOpenApiWebMvcVersion
 	
